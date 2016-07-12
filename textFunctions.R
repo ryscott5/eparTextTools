@@ -1,10 +1,18 @@
 library(tm)
 library(stringr)
+<<<<<<< HEAD
 library(qdapTools)
 library(tm)
 library(SnowballC)
 library(rvest)
 library(downloader)
+=======
+library(qdaptools)
+library(tm)
+library(SnowballC)
+library(rvest)
+
+>>>>>>> 77efdc70df4a618a8d9b6c76c7fa4c78b5e2fcfb
 #package depends on xpdf... on mac, install via brew install xpdf and follow instructions.
 
 #the check for tika command will install tika to the current working directory (on a mac)
@@ -15,8 +23,13 @@ getTextR<-function(fname,tika=FALSE,tikapath="tika-app-1.13.jar"){
   if(tika==TRUE){
     pdoc<-system(command=paste("java -jar",tikapath,"-t",gsub(" ","\\ ",fname,fixed=TRUE)),intern=TRUE,wait=TRUE)
   } else {
+<<<<<<< HEAD
     pdoc<-if(str_detect(fname,".docx+$")==TRUE){read_docxtm(fname)} else {
       if(str_detect(fname,".doc+$")==TRUE){readDOC()(language="en",elem=list(uri=fname))} else {
+=======
+    pdoc<-if(str_detect(fname,fixed(".docx"))==TRUE){read_docxtm(fname)} else {
+      if(str_detect(fname,fixed(".doc"))==TRUE){readDOC()(language="en",elem=list(uri=fname))} else {
+>>>>>>> 77efdc70df4a618a8d9b6c76c7fa4c78b5e2fcfb
         if(str_detect(fname, fixed(".pdf"))==TRUE){readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")} else {if(str_detect(fname,fixed(".txt"))==TRUE){readPlain(elem=list(uri=fnames[57],content=iconv(enc2utf8(readLines(fnames[57])), sub = "byte")),language="en")} else {"FILETYPE NA"}}}}}
   pdoc
 }
@@ -64,8 +77,11 @@ readPDF2<-function (engine = c("xpdf", "Rpoppler", "ghostscript", "Rcampdf","cus
   }
 }
 
+<<<<<<< HEAD
 allDocs<-function(directory){lapply(file.path(directory,list.files(directory)),getTextR)}
 
+=======
+>>>>>>> 77efdc70df4a618a8d9b6c76c7fa4c78b5e2fcfb
 assocPTable<-function(assoctable,corpus){
   assoctable<-assoctable[sapply(assoctable,length)>0]
   dft<-do.call(rbind,lapply(1:length(assoctable),function(i){data.frame("Word"=names(t1)[i],"Match"=names(assoctable[[i]]),"Association"=c(assoctable[[i]]))}))
@@ -77,4 +93,7 @@ assocPrettyOneStep<-function(wordlist,termDocumentMatrix,corpus,corrVal){
   assocPTable(findAssocs(termDocumentMatrix,wordlist,corrVal),corpus)
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 77efdc70df4a618a8d9b6c76c7fa4c78b5e2fcfb
