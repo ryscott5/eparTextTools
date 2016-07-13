@@ -1,17 +1,11 @@
 library(tm)
 library(stringr)
-<<<<<<< HEAD
 library(qdapTools)
 library(tm)
 library(SnowballC)
 library(rvest)
 library(downloader)
-=======
-library(qdaptools)
-library(tm)
-library(SnowballC)
-library(rvest)
-
+library(DT)
 #package depends on xpdf... on mac, install via brew install xpdf and follow instructions.
 
 #the check for tika command will install tika to the current working directory (on a mac)
@@ -73,15 +67,28 @@ readPDF2<-function (engine = c("xpdf", "Rpoppler", "ghostscript", "Rcampdf","cus
   }
 }
 
-allDocs<-function(directory){lapply(file.path(directory,list.files(directory)),getTextR)}
+allDocs<-function(directory){do.call(c,lapply(file.path(directory,list.files(directory)),getTextR))}
 
+doc_clean_process<-function(corpusname){
+stopWords <- function(x) removeWords(x, stopwords("en"))
+funs <- list(stripWhitespace,
+             stopWords,
+             removePunctuation,
+             stemDocument,
+             content_transformer(tolower))
+corpus2<-tm_map(corpusname, FUN = tm_reduce, tmFuns = funs, mc.cores=1)
+corpus2}
 assocPTable<-function(assoctable,corpus){
-  assoctable<-assoctable[sapply(assoctable,length)>0]
-  dft<-do.call(rbind,lapply(1:length(assoctable),function(i){data.frame("Word"=names(t1)[i],"Match"=names(assoctable[[i]]),"Association"=c(assoctable[[i]]))}))
-  dft$Word<-stemCompletion(dft$Word,dictionary=corpus,type="prevalent")
-  dft$Match<-stemCompletion(dft$Match,dictionary=corpus,type="prevalent")
+  #assoctable<-assoctable[sapply(assoctable,length)>0]
+  dft<-do.call(rbind,lapply(1:length(assoctable),function(i){tryCatch({data.frame("Word"=names(assoctable)[i],"Match"=names(assoctable[[i]]),"Association"=c(assoctable[[i]]))},error=function(e){data.frame("Word"=names(assoctable)[i],"Match"="too few words","Association"=c(0))})}))
+  dft$Word<-as.character(dft$Word)
+  dft$Match<-as.character(dft$Match)
+  #dft$Word[dft$Word%in%c(names(assoctable)[sapply(assoctable,length)>0])]<-stemCompletion(dft$Word[dft$Word%in%c(names(assoctable)[sapply(assoctable,length)>0])],dictionary=corpus,type="prevalent")
+  dft$Match[dft$Word%in%c(names(assoctable)[sapply(assoctable,length)>0])]<-stemCompletion(dft$Match[dft$Word%in%c(names(assoctable)[sapply(assoctable,length)>0])],dictionary=corpus,type="prevalent")
   datatable(data=dft,rownames=FALSE,filter="top",)}
-
+assocPrettyOneStep<-function(wordlist,termDocumentMatrix,corpus,corrVal=.8){
+  assocPTable(findAssocs(termDocumentMatrix,wordlist,corrVal),corpus)
+}
 assocPrettyOneStep<-function(wordlist,termDocumentMatrix,corpus,corrVal){
   assocPTable(findAssocs(termDocumentMatrix,wordlist,corrVal),corpus)
 }

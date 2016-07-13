@@ -20,20 +20,40 @@ corpus1<-allDocs("demo.docs.folder")
 Documents are read into R as a textual corpus--the method used by the TM package. This enables preservation of document metatdata alongside document text. Metadata such as ids and timestamps is stored in the .$meta location of each corpus.
 
 ```r
-lapply(corpus1,function(X){X$meta$datetimestamp})
-lapply(corpus1,function(X){X$meta$id})
-
+lapply(corpus1,function(X){X$meta})
 ```
 
-Once documents are in R, any textual processing functions in R can be used on the documents. We focus on three general approaches--Description, Cateogrization, and Exploration.
+###Cleaning and Parsing Text
+Texts are stored in the corpus as character strings facilitating use of different analysis packages. Some basic cleaning tools from the TM package may be helpful for performing various funcitons.
+
+```r
+corpus2<-doc_clean_process(corpus1)
+```
+
+The object Corpus2 is now a cleaned version of the original corpus, which is useful for many description tasks and some analysis tasks.
+
+###Description: Word Frequencies and Associations
+
+For basic description, it is often useful to generate a term document matrix. This is done via the code below, with an additional step to remove sparse terms.
+
+```r
+tdm<-TermDocumentMatrix(corpus2) %>% removeSparseTerms(.,.2)
+```
+Once a term document matrix is available, one can easily begin to create tables and charts to explore the data.
+
+```r
+freqterms<-lapply(1:length(corpus2), function(X){findFreqTerms(tdm[,X],lowfreq=15)})
+lapply(freqterms,wordcloud)
+```
 
 
-##Text Analysis Methods
 
 
-###Description
 
-####Word Frequencies and Associations
+One command, assocPrettyOneStep(), takes a wordlist as an argument and returns a list of associated words above a correlaiton threshold. 
+
+assocPrettyOneStep(c(""),tdm, corpus2,.5)
+
 
 ###Categorization
 

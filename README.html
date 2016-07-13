@@ -57,11 +57,19 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <p>This tookit provides a set of resources for analyzing textual documents using the R programming language for the conduct of portfolio analysis and review. The tools rely on text mining, natural language processing, and machine learning programs developed by other R users and as such heavily relies on code developed by other packages. Thus, it may be thought of as a set of tools enabling portfolio analysis rather than a new package for conduct of text analysis.</p>
 <div id="extracting-text" class="section level2">
 <h2>Extracting Text</h2>
-<p>The toolkit requires some familiarity with the R programming language for use. Main functions enabling workflow include reading documents into R via the “getTextR” command. The getTextR command takes a file directory as an argument, and returns a textual corpus. It is capable of reading word documents (both doc and docx), pdf documents, and txt documents. Further document types can be added by replacing the “FILETYPE NA” line with additional document if loops.</p>
-<p>Documents are read into R as a textual corpus–the method used by the TM package. This enables preservation of document metatdata alongside document text. Once documents are in R, any textual processing functions in R can be used on the documents.</p>
-<p>To begin this process, first load the textFunctions. For demonstration purposes we also create a demonstration documents dataset using the demo.docs.R code.</p>
-<pre class="r"><code>source(textFunctions.R)
-source(demo.docs.R)</code></pre>
+<p>To begin this process, first load the textFunctions. For demonstration purposes we also create a demonstration document dataset using the demo.docs.R code.</p>
+<pre class="r"><code>source(&quot;textFunctions.R&quot;)
+source(&quot;demo.docs.R&quot;)</code></pre>
+<p>Main functions enabling workflow include reading documents into R via the “getTextR” command. The getTextR command takes a file directory as an argument, and returns a textual corpus. It is capable of reading word documents (both doc and docx), pdf documents, and txt documents. Further document types can be added by replacing the “FILETYPE NA” line with additional document if loops. The allDocs() command is a conveniance wrapper which loops through a directory parsing documents and creating a corpus with metadata.</p>
+<pre class="r"><code>corpus1&lt;-allDocs(&quot;demo.docs.folder&quot;)</code></pre>
+<p>Documents are read into R as a textual corpus–the method used by the TM package. This enables preservation of document metatdata alongside document text. Metadata such as ids and timestamps is stored in the .$meta location of each corpus.</p>
+<pre class="r"><code>lapply(corpus1,function(X){X$meta})</code></pre>
+<div id="cleaning-and-parsing-text" class="section level3">
+<h3>Cleaning and Parsing Text</h3>
+<p>Texts are stored in the corpus as character strings facilitating use of different analysis packages. Some basic cleaning tools from the TM package may be helpful for performing various funcitons.</p>
+<pre class="r"><code>corpus2&lt;-doc_clean_process(corpus1)</code></pre>
+<p>Once documents are in R, any textual processing functions in R can be used on the documents. We focus on three general approaches–Description, Cateogrization, and Exploration.</p>
+</div>
 </div>
 <div id="text-analysis-methods" class="section level2">
 <h2>Text Analysis Methods</h2>

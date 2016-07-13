@@ -14,6 +14,13 @@ library(DT)
 tdm<-TermDocumentMatrix(corpus2)
 tdm<-removeSparseTerms(tdm,.2)
 wordlist<-c("cheese","gender")
+freqterms<-lapply(1:length(corpus2), function(X){findFreqTerms(tdm[,X],lowfreq=15)})
+lapply(freqterms,wordcloud)
+
+library("wordcloud")
+wordcloud
+freqCount<-sort(colSums(matrix(tdm)),decreasing=TRUE)
+
 t1<-findAssocs(tdm,wordlist,.5)
 termDocumentMatrix=tdm
 corrVal=.5
