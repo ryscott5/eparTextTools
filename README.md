@@ -9,7 +9,8 @@ To run this document, clone the repository to a local directory and set the dire
 
 ##Useful Links
 [Guide to R and Github](http://r-pkgs.had.co.nz/git.html)
-[tm package]
+[tm packages](https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf)
+[ggplot2 guide](http://ggplot2.org/)
 
 ##Extracting Text
 
