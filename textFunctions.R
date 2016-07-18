@@ -76,14 +76,14 @@ readPDF2<-function (engine = c("xpdf", "Rpoppler", "ghostscript", "Rcampdf","cus
 
 allDocs<-function(directory){do.call(c,lapply(file.path(directory,list.files(directory)),getTextR))}
 doc_clean_process<-function(corpusname){
-stopWords <- function(x) removeWords(x, stopwords("en"))
-funs <- list(stripWhitespace,
-             stopWords,
-             removePunctuation,
-             stemDocument,
-             content_transformer(tolower))
-corpus2<-tm_map(corpusname, FUN = tm_reduce, tmFuns = funs, mc.cores=1)
-corpus2}
+  stopWords <- function(x) removeWords(x, stopwords("en"))
+  funs <- list(stripWhitespace,
+               stopWords,
+               removePunctuation,
+               stemDocument,
+               content_transformer(tolower))
+  corpus2<-tm_map(corpusname, FUN = tm_reduce, tmFuns = funs, mc.cores=1)
+  corpus2}
 assocPTable<-function(assoctable,corpus,ngram=FALSE){
   #assoctable<-assoctable[sapply(assoctable,length)>0]
   dft<-do.call(rbind,lapply(1:length(assoctable),function(i){tryCatch({data.frame("Word"=names(assoctable)[i],"Match"=names(assoctable[[i]]),"Association"=c(assoctable[[i]]))},error=function(e){data.frame("Word"=names(assoctable)[i],"Match"="too few words","Association"=c(0))})}))
@@ -135,4 +135,3 @@ interest_plot_bydoc<-function(wordlist,termDocumentMatrix){
   } else {
     ggplot(tempframe, aes(variable, value)) + geom_bar(fill="#8ebfad", position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12), panel.background=element_blank())+xlab("")+ylab("Frequency")+scale_fill_pander()
   }}
-

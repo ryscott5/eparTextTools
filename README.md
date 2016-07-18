@@ -66,7 +66,7 @@ interest_plot_bydoc(c("staff"),tdm)
 interest_plot_bydoc(c("staff","meet"),tdm)
 ```
 
-By editing the term Document matrix to include weighting, each of these commands can be used while taking the length of documents into account.
+By editing the term document matrix to include weighting, each of these commands can be used while taking the length of documents into account.
 
 ```{r}
 tdm2<-TermDocumentMatrix(corpus2,control=list(weighting=function(x) weightSMART(x))) 
@@ -86,20 +86,21 @@ One command, assocPrettyOneStep(), takes a wordlist as an argument and returns a
 assocPrettyOneStep(c("develop","target"),tdm, corpus2,.5)
 ```
 
-While the functions to tokenization based on individual words, bigrams or trigrams can also be used to process text.
+Bigrams or trigrams (rather than word-based tokenization) can also be used to process text by creating a custom ngram tokenizer and inserting it into the TermDocumentMatrix() command. All of the previous commands, with the exception of the word association table, can be used to explore word frequencies and correlations.
 
 ```{r}
 BigramTokenizer <-function(x){unlist(lapply(ngrams(words(x), 2), paste, collapse = " "), use.names = FALSE)}
-freqterms<-lapply(1:length(corpus2), function(X){findFreqTerms(tdm_bi[,X],lowfreq=10)})
-freqterms
+tdm_bi <- TermDocumentMatrix(corpus2, control = list(tokenize = BigramTokenizer))
+freqterms2<-lapply(1:length(corpus2), function(X){findFreqTerms(tdm_bi[,X],lowfreq=10)})
+word_heatmap(tdm_bi,6)
+wfplots(tdm_bi,typePlot=1,2)
 ```
 
-###Categorization
+###Topic Modeling and Document Clustering 
 
-####Topic Modeling and Document Clustering 
 
-###Exploration and Model Identification
+##Natural Language Processing
+While description of word frequencies is useful as a baseline for exploring textual documents, such methods rely on a bag-of-words approach, meaning any natural meanings to words or meaning derived from ordering of text is lost. Natural Language Processing provides a methodology for incorporating structure and natural language meanings of words into analysis via detection of common patterns in text.
 
-####Natural Language Processing
 
 ####Supervised/Unsupervised Learning
