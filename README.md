@@ -5,11 +5,17 @@ output: html_document
 
 This tookit provides a set of resources for analyzing textual documents using the R programming language for the conduct of portfolio analysis and review. The tools rely on text mining, natural language processing, and machine learning programs developed by other R users and as such heavily relies on code developed by other packages. Thus, it may be thought of as a set of tools enabling portfolio analysis rather than a new package for conduct of text analysis.
 
-To run this document, clone the repository to a local directory and set the directory as your working directory. Alternatively, you download a zip file of the repository and open the .Rproject file. This document is stored as readme.md with coding in chunks. 
+To run this document, clone the repository to a local directory. To do this, first set up an ssh key with rstudio by going to tools...global options...git/svn...create ssh key and registering the key with your github account. Then, go to file...new projects...version control and enter the ssh site for the github page (the clone link).  Alternatively, you download a zip file of the repository and open the .Rproject file. This document is stored as readme.md with coding in chunks. 
+
+The program depends on a few software installations, notably "antiword" or "tika" and "Apache openNLP". To install these on a mac, one can use homebrew and run the command "brew install antiword". Installing openNLP requires updating the Java JRE file on your make. This can also be done via homebrew on a mac. 
+
+The document reading code is designed to be able to use the tika library, though this is disabled by default. 
 
 ##Useful Links
 [Guide to R and Github](http://r-pkgs.had.co.nz/git.html)
+
 [tm packages](https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf)
+
 [ggplot2 guide](http://ggplot2.org/)
 
 ##Extracting Text
@@ -60,23 +66,27 @@ word_heatmap(tdm,6)
 Using wfplots(), one can create a basic ggplot() object describing the most frequent terms across documents, or the documents in which the most frequent terms are likely to occur. The objects created by the command can be edited by adding on additional functions.
 
 ```{r}
-wfplots(tdm,typePlot=1,10)
-wfplots(tdm,typePlot=0,10)
-wfplots(tdm,typePlot=0,10)+theme_fivethirtyeight()+facet_wrap(~word)
+wfplots(tdm,typePlot=1,10,shortendoc=TRUE)
+wfplots(tdm,typePlot=0,10,shortendoc=TRUE)
+wfplots(tdm,typePlot=0,10,shortendoc=TRUE)+theme_fivethirtyeight()+facet_wrap(~word)
 ```
 
 The same is true for the interest_plot command, which allows the user to specify words they are interested in viewing across documents rather than relying on specific frequencies. 
 
 ```{r}
-interest_plot(c("staff","meet","organ"),tdm,by.var=c("Programmatic","Programmatic","Subject"),"Word Categories")
-interest_plot_bydoc(c("staff"),tdm)
-interest_plot_bydoc(c("staff","meet"),tdm)
+tdm$dimnames$Docs<-substring(tdm$dimnames$Docs,nchar(tdm$dimnames$Docs)-20)
+interest_plot(c("women","farmer","school"),tdm, by.var=c("Identity","Program","Identity"), "Classification")
+interest_plot_bydoc(c("women","farmer","school"),tdm)
+interest_plot_bydoc(c("women","farmer","school"),tdm)
 ```
+
 
 By editing the term document matrix to include weighting, each of these commands can be used while taking the length of documents into account.
 
 ```{r}
 tdm2<-TermDocumentMatrix(corpus2,control=list(weighting=function(x) weightSMART(x))) 
+tdm2$dimnames$Docs<-substring(tdm2$dimnames$Docs,nchar(tdm2$dimnames$Docs)-20)
+
 wfplots(tdm2,typePlot=1,10)
 wfplots(tdm2,typePlot=0,10)
 interest_plot_bydoc(c("school"),tdm2)
@@ -90,7 +100,7 @@ word_heatmap(tdm3,6)
 One command, assocPrettyOneStep(), takes a wordlist as an argument and returns a list of associated words above a correlation threshold. This thus informs what words are most likely to cooccur accross a corpus of documents.
 
 ```{r}
-assocPrettyOneStep(c("develop","target"),tdm, corpus2,.5)
+assocPrettyOneStep(c("women","farmer","effect"),tdm, corpus2,.5)
 ```
 
 Bigrams or trigrams (rather than word-based tokenization) can also be used to process text by creating a custom ngram tokenizer and inserting it into the TermDocumentMatrix() command. All of the previous commands, with the exception of the word association table, can be used to explore word frequencies and correlations.
@@ -99,15 +109,20 @@ Bigrams or trigrams (rather than word-based tokenization) can also be used to pr
 BigramTokenizer <-function(x){unlist(lapply(ngrams(words(x), 2), paste, collapse = " "), use.names = FALSE)}
 tdm_bi <- TermDocumentMatrix(corpus2, control = list(tokenize = BigramTokenizer))
 freqterms2<-lapply(1:length(corpus2), function(X){findFreqTerms(tdm_bi[,X],lowfreq=10)})
+tdm_bi$dimnames$Docs<-substring(tdm_bi$dimnames$Docs,nchar(tdm_bi$dimnames$Docs)-20)
 word_heatmap(tdm_bi,6)
-wfplots(tdm_bi,typePlot=1,2)
+wfplots(tdm_bi,typePlot=1,20)
 ```
 
 ###Topic Modeling and Document Clustering 
 
+kmeans(tdm,5,n=10)
+
 
 ##Natural Language Processing
 While description of word frequencies is useful as a baseline for exploring textual documents, such methods rely on a bag-of-words approach, meaning any natural meanings to words or meaning derived from ordering of text is lost. Natural Language Processing provides a methodology for incorporating structure and natural language meanings of words into analysis via detection of common patterns in text.
+
+
 
 
 ####Supervised/Unsupervised Learning

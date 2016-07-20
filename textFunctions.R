@@ -1,4 +1,5 @@
 list.of.packages <- c("ggplot2", "Rcpp","tm","ggthemes","SnowballC","rvest","downloader","DT","wordcloud","d3heatmap","plyr","reshape2","dplyr","qdapTools","stringr")
+?readDOC
 packages.Req <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(packages.Req)) install.packages(packages.Req)
 lapply(list.of.packages, function(X) library(X,character=TRUE))
@@ -83,12 +84,16 @@ assocPrettyOneStep<-function(wordlist,termDocumentMatrix,corpus,corrVal=.8){
 }
 
 
-wfplots<-function(termDocumentMatrix,typePlot=1,wordcount,minfreq=5){
+wfplots<-function(termDocumentMatrix,typePlot=1,wordcount,minfreq=5,shortendoc=FALSE){
   mfcomframe<-data.frame(inspect(termDocumentMatrix[findFreqTerms(termDocumentMatrix, lowfreq=minfreq),]))
   mfcomframe<-mfcomframe[sort(rowSums(mfcomframe),index.return=TRUE,decreasing=TRUE)$ix[1:wordcount],]
   mfcomframe$word<-row.names(mfcomframe)
   mfcomframe$word<-factor(mfcomframe$word, levels = mfcomframe$word)
   mfcomframe<-melt(mfcomframe,id=c("word"))
+  if(shortendoc==TRUE){
+    mfcomframe$variable<-as.factor(mfcomframe$variable)
+    levels(mfcomframe$variable)<-1:length(levels(mfcomframe$variable))}
+  ?substring
   if(typePlot==1){
     plotout<-ggplot(mfcomframe)+geom_bar(aes(x=word,y=value,fill=variable),position="stack",stat="identity")+coord_flip()+theme_pander()+scale_fill_tableau(name="Document")+ylab("Frequency")+xlab("Word")}
   if(typePlot!=1){
@@ -113,6 +118,18 @@ interest_plot<-function(wordlist,termDocumentMatrix,by.var=NULL,byvarname=""){
 }
 
 interest_plot_bydoc<-function(wordlist,termDocumentMatrix){
+  tempframe<-data.frame(inspect(termDocumentMatrix[wordlist,]))
+  tempframe$word<-row.names(tempframe)
+  tempframe<-melt(tempframe,id=c("word"))
+  if(length(wordlist)>1){
+    ggplot(tempframe, aes(variable, value, fill=word)) + geom_bar(position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12),panel.background=element_blank())+xlab("")+ylab("Frequency")+scale_fill_pander()
+  } else {
+    ggplot(tempframe, aes(variable, value)) + geom_bar(fill="#8ebfad", position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12), panel.background=element_blank())+xlab("")+ylab("Frequency")+scale_fill_pander()
+  }}
+
+
+interest_plot_bydoc_char<-function(wordlist,termDocumentMatrix,doccharacteristic){
+  termDocumentMatrix$dimnames$Docs<-doccharacteristic
   tempframe<-data.frame(inspect(termDocumentMatrix[wordlist,]))
   tempframe$word<-row.names(tempframe)
   tempframe<-melt(tempframe,id=c("word"))
