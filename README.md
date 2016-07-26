@@ -75,13 +75,12 @@ saveWidget(word_heatmap(tdm,6),"figures1.html")
 
 [Example 1: Download Raw File](figures/figures1.html)
 
-[Example 2: Download Raw File](figures/figures2.html)
-
 ```{r}
 word_heatmap(tdm,20)
 saveWidget(word_heatmap(tdm,20),"figures2.html")
 ```
 
+[Example 2: Download Raw File](figures/figures2.html)
 
 
 Using wfplots(), one can create a basic ggplot() object describing the most frequent terms across documents, or the documents in which the most frequent terms are likely to occur. The objects created by the command can be edited by adding on additional functions.
@@ -136,24 +135,35 @@ ggsave("figures/figures8.png")
 ```{r}
 interest_plot_bydoc(c("school"),tdm2)
 ggsave("figures/figures9.png")
+```
+![Alt text](figures/figures9.png)
+
+```{r}
 word_heatmap(tdm2,6)
 saveWidget(word_heatmap(tdm2,6),"figures10.html")
 ```
+[Example 10: Download Raw File](figures/figures10.html)
 
 ```{r}
 tdm3<-tdm
 tdm3$v<-(tdm3$v/colSums(as.matrix(tdm3))[tdm3$j])*100
 word_heatmap(tdm3,6)
-saveWidget(word_heatmap(tdm3,6),"figures10.html")
+saveWidget(word_heatmap(tdm3,6),"figures11.html")
 rm(tdm2,tdm3)
 ```
+
+[Example 11: Download Raw File](figures/figures11.html)
+
 
 One command, assocPrettyOneStep(), takes a wordlist as an argument and returns a list of associated words above a correlation threshold. This thus informs what words are most likely to cooccur accross a corpus of documents.
 
 ```{r}
 assocPrettyOneStep(c("women","farmer","effect"),tdm, corpus2,.5)
-saveWidget(assocPrettyOneStep(c("women","farmer","effect"),tdm, corpus2,.5),"figures11.html")
+saveWidget(assocPrettyOneStep(c("women","farmer","effect"),tdm, corpus2,.5),"figures12.html")
 ```
+
+[Example 12: Download Raw File](figures/figures12.html)
+
 
 Bigrams or trigrams (rather than word-based tokenization) can also be used to process text by creating a custom ngram tokenizer and inserting it into the TermDocumentMatrix() command. All of the previous commands, with the exception of the word association table, can be used to explore word frequencies and correlations.
 
@@ -164,9 +174,11 @@ tdm_bi <- TermDocumentMatrix(corpus2, control = list(tokenize = BigramTokenizer)
 freqterms2<-lapply(1:length(corpus2), function(X){findFreqTerms(tdm_bi[,X],lowfreq=10)})
 tdm_bi$dimnames$Docs<-substring(tdm_bi$dimnames$Docs,nchar(tdm_bi$dimnames$Docs)-20)
 word_heatmap(tdm_bi,10)
-saveWidget(word_heatmap(tdm_bi,10), "figures12.html")
+saveWidget(word_heatmap(tdm_bi,10), "figures13.html")
 rm(tdm_bi)
 ```
+[Example 13: Download Raw File](figures/figures13.html)
+
 
 #Natural Language Processing
 While description of word frequencies is useful as a baseline for exploring textual documents, such methods rely on a bag-of-words approach, meaning any natural meanings to words or meaning derived from ordering of text is lost. Natural Language Processing provides a methodology for incorporating structure and natural language meanings of words into analysis via detection of common patterns in text.
@@ -200,6 +212,7 @@ Once the proper nouns are (mostly) removed from the dataset, we can fit a topic 
 
 Fitting a topic model has numerous benefits over simply viewing raw word counts, including that it allows exploration of the content of a batch of documents that can potentially reveal broad patterns missed by human coders. The stm package has its own text cleaning method which repeats many of the processing steps conducted above. Fiting the model can be somewhat slow given the settings used below, which includes
 
+##CODE BELOW STILL IN PROGRESS
 ```{r}
 processed <- textProcessor(sapply(corpEnt2,content),metadata=do.call(rbind, lapply(corpEnt2,function(x){t(matrix(x$meta,dimnames=list(names(x$meta))))})))
 out <- prepDocuments(processed$documents,processed$vocab,processed$meta)
@@ -215,4 +228,10 @@ plotModels(mselect,labels=1:length(mselect$runout))
 
 ```
 
+
+##After making figures, run code below
+```{r}
+lapply(list.files() %>% .[str_detect(.,"figures\\w+.html")],function(X){file.copy(from=X,to=file.path("figures",X),overwrite=TRUE)})
+file.remove(list.files() %>% .[str_detect(.,"figures\\w+.html")])
+```
 
