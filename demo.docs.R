@@ -1,6 +1,5 @@
-demo.docs<-c("http://docs.gatesfoundation.org/documents/guide-to-actionable-measurement.pdf","http://docs.gatesfoundation.org/Documents/EvaluationsHS.pdf","http://docs.gatesfoundation.org/Documents/The%20Strategy%20Lifecycle.pdf","http://docs.gatesfoundation.org/Documents/GD%20Progress%20Report%20Guidelines.doc","http://docs.gatesfoundation.org/Documents/Guideline_GD_Proposal.doc")
-demo.docs2<-c("http://evans.uw.edu/sites/default/files/EPAR_UW_Request_205_Farmer_attitudes_Public_12913_0.pdf","http://evans.uw.edu/sites/default/files/Evans%20UW_Request%2064_Gender%20and%20Cropping%20Series%20Executive%20Summary_03_02_2010_0.pdf","http://evans.uw.edu/sites/default/files/Evans%20UW_Request%2033_Gender%20and%20Cropping%20Overview_Jan-19-2010.pdf","http://evans.uw.edu/sites/default/files/Evans%20UW_Request%2055_Cotton%20%26%20Gender_18%20January%202010.pdf","http://evans.uw.edu/sites/default/files/Evans_UW_Request%2051_Gender%20and%20Cropping_Yams_2%20July%202009.pdf","http://evans.uw.edu/sites/default/files/Evans_UW_Request%2040_Gender%20and%20Cropping_Millet_06-29-2009.pdf","http://evans.uw.edu/sites/default/files/Evans%20UW_Request%2038_Gender%20and%20Cropping_Maize%20in%20SSA_06-01-2009.pdf")
-
-dir.create("demo.docs.folder")
-library(downloader)
-lapply(demo.docs2,function(X) {download(X, destfile=file.path("demo.docs.folder",tail(unlist(strsplit(X,split="/",fixed=TRUE)),n=1)))})
+demo.docs<-read.csv("demodoc_links.csv",stringsAsFactors=FALSE)
+demo.docs<-demo.docs$links
+if(file.exists("demo.docs.folder")==FALSE){dir.create("demo.docs.folder")}
+demo.docs<-demo.docs[which(file.exists(paste("demo.docs.folder/",sapply(demo.docs, function(X){tail(unlist(strsplit(X,split="/",fixed=TRUE)),n=1)}),sep=""))==FALSE)]
+lapply(demo.docs, function(X){download(X, destfile=file.path("demo.docs.folder",tail(unlist(strsplit(X,split="/",fixed=TRUE)),n=1)))})

@@ -1,8 +1,12 @@
-list.of.packages <- c("ggplot2", "Rcpp","tm","ggthemes","SnowballC","rvest","downloader","DT","wordcloud","d3heatmap","plyr","reshape2","dplyr","qdapTools","stringr")
-?readDOC
+list.of.packages <- c("ggplot2", "Rcpp","tm","ggthemes","SnowballC","rvest","downloader","DT","wordcloud","d3heatmap","plyr","reshape2","dplyr","qdapTools","stringr","openNLP","NLP","stm","LDAvis","servr","Rtsne","geometry","downloader")
+
+if("StanfordCoreNLP"%in%c(installed.packages()[,"Package"])==FALSE){install.packages('StanfordCoreNLP',repos="http://datacube.wu.ac.at/",type="source")}
+if("openNLPmodels.en"%in%c(installed.packages()[,"Package"])==FALSE){install.packages('openNLPmodels.en',repos="http://datacube.wu.ac.at/",type="source")}
 packages.Req <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+
 if(length(packages.Req)) install.packages(packages.Req)
 lapply(list.of.packages, function(X) library(X,character=TRUE))
+
 #package depends on xpdf... on mac, install via brew install xpdf and follow instructions.
 
 #the check for tika command will install tika to the current working directory (on a mac)
@@ -138,3 +142,15 @@ interest_plot_bydoc_char<-function(wordlist,termDocumentMatrix,doccharacteristic
   } else {
     ggplot(tempframe, aes(variable, value)) + geom_bar(fill="#8ebfad", position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12), panel.background=element_blank())+xlab("")+ylab("Frequency")+scale_fill_pander()
   }}
+
+
+#nlp
+sent_token_annotator <- Maxent_Sent_Token_Annotator()
+word_token_annotator <- Maxent_Word_Token_Annotator()
+pos_tag_annotator<- Maxent_POS_Tag_Annotator()
+org.annotate<-Maxent_Entity_Annotator(language = "en", kind="organization", probs = FALSE,model = NULL)
+pers.annotate<-Maxent_Entity_Annotator(language = "en", kind="person", probs = FALSE,model = NULL)
+location.annotate<-Maxent_Entity_Annotator(language = "en", kind="location", probs = FALSE,model = NULL)
+#misc.annotate<-Maxent_Entity_Annotator(language = "en", kind="misc", probs = FALSE,model = NULL)
+money.annotate<-Maxent_Entity_Annotator(language = "en", kind="money", probs = FALSE,model = NULL)
+parse_annotator <- Parse_Annotator()

@@ -25,6 +25,9 @@ To begin this process, first load the textFunctions. For demonstration purposes 
 ```{r}
 source("textFunctions.R")
 source("demo.docs.R")
+
+
+
 ```
 
 Main functions enabling workflow include reading documents into R via the "getTextR" command. The getTextR command takes a file directory as an argument, and returns a textual corpus. It is capable of reading word documents (both doc and docx), pdf documents, and txt documents. Further document types can be added by replacing the "FILETYPE NA" line with additional document if loops. The allDocs() command is a conveniance wrapper which loops through a directory parsing documents and creating a corpus with metadata.
@@ -114,13 +117,62 @@ word_heatmap(tdm_bi,6)
 wfplots(tdm_bi,typePlot=1,20)
 ```
 
+
+
+
 ###Topic Modeling and Document Clustering 
 
 kmeans(tdm,5,n=10)
 
 
+
+
+
 ##Natural Language Processing
 While description of word frequencies is useful as a baseline for exploring textual documents, such methods rely on a bag-of-words approach, meaning any natural meanings to words or meaning derived from ordering of text is lost. Natural Language Processing provides a methodology for incorporating structure and natural language meanings of words into analysis via detection of common patterns in text.
+
+```{r}
+basic_annotates<-lapply(corpus1, function(k){
+y1<-annotate(as.String(k$content), list(sent_token_annotator,word_token_annotator))
+y1<-annotate(as.String(k$content), list(org.annotate,pers.annotate),y1)
+list(k,y1)
+})
+
+##Removing entities for corp3
+corpEnt<-lapply(basic_annotates,function(k){as.String(k[[1]]$content)[k[[2]][k[[2]]$type=="entity"]]})
+corpEnt2<-lapply(basic_annotates,function(k){
+bv<-as.String(k[[1]]$content)[subset(k[[2]], type=="entity")]
+for(e in bv){k[[1]]$content<-str_replace_all(k[[1]]$content,fixed(e),"")}
+k})
+corpEnt2<-lapply(corpEnt2, function(k){
+y1<-annotate(as.String(k[[1]]$content), list(sent_token_annotator,word_token_annotator))
+y1<-annotate(as.String(k[[1]]$content), list(org.annotate,pers.annotate),y1)
+list(k[[1]],y1)
+})
+corpEnt2[[1]]
+corpEnt2<-doc_clean_process(do.call(c, lapply(corpEnt2,function(k) k[[1]])))
+
+```
+
+###Topic Model
+
+library("stm")
+processed <- textProcessor(sapply(corpEnt2,content),metadata=do.call(rbind, lapply(corpEnt2,function(x){t(matrix(x$meta,dimnames=list(names(x$meta))))})))
+out <- prepDocuments(processed$documents,processed$vocab,processed$meta)
+
+st1<-stm(out$documents,out$vocab,K=0, init.type="Spectral")
+toLDAvis(st1,out$documents,R=20,plot.opts=list(xlab="Component 1",ylab="Component 2"),lambda.step=.05,out.dir=tempfile(),open.browser=interactive())
+summary(st1)
+
+
+
+ksearch<-searchK(out$documents, out$vocab, K = c(3,4,5),init.type="LDA")
+
+mselect<-selectModel(out$documents, out$vocab, K = 20, prevalence=~datetimestamp+author,data=out$meta,max.em.its = 75, runs = 20, seed = 8458159)
+
+
+
+plotModels(mselect,labels=1:length(mselect$runout))
 
 
 
