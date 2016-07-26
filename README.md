@@ -71,23 +71,40 @@ The word_heatmap function provides an easy wrapper for structuring term document
 ```{r}
 word_heatmap(tdm,6)
 saveWidget(word_heatmap(tdm,6),"figures1.html")
+```
+
+[Example 1: Right Click and Save Page as]("https://raw.githubusercontent.com/ryscott5/eparTextTools/master/figures/figures1.html?token=AGrqiIM10q6zdLz5VTiG4wD2tVieGtZyks5XoRzLwA%3D%3D")
+
+[Example 2: Right Click and Save Page as]("https://raw.githubusercontent.com/ryscott5/eparTextTools/master/figures/figures2.html?token=AGrqiA_FHnK_Vq5wUKB8O6Eytvx9KWH8ks5XoR0nwA%3D%3D")
+
+```{r}
 word_heatmap(tdm,20)
 saveWidget(word_heatmap(tdm,20),"figures2.html")
-
 ```
+
+
 
 Using wfplots(), one can create a basic ggplot() object describing the most frequent terms across documents, or the documents in which the most frequent terms are likely to occur. The objects created by the command can be edited by adding on additional functions.
 
 ```{r}
 wfplots(tdm[,1:10],typePlot=1,10,shortendoc=TRUE)
 ggsave("figures/figures3.png")
+```
+
+![Alt text]("https://github.com/ryscott5/eparTextTools/blob/master/figures/figures3.png")
+
+```{r}
 wfplots(tdm[,1:30],typePlot=0,10,shortendoc=TRUE)
 ggsave("figures/figures4.png")
+```
+![Alt text]("https://github.com/ryscott5/eparTextTools/blob/master/figures/figures4.png")
 
+```{r}
 wfplots(tdm[,1:30],typePlot=0,10,shortendoc=TRUE)+theme_fivethirtyeight()+facet_wrap(~word)
 ggsave("figures/figures5.png")
-
 ```
+
+![Alt text]("https://github.com/ryscott5/eparTextTools/blob/master/figures/figures5.png")
 
 The same is true for the interest_plot command, which allows the user to specify words they are interested in viewing across documents rather than relying on specific frequencies. 
 
@@ -95,24 +112,35 @@ The same is true for the interest_plot command, which allows the user to specify
 tdm$dimnames$Docs<-substring(tdm$dimnames$Docs,nchar(tdm$dimnames$Docs)-20)
 interest_plot(c("women","farmer","school"),tdm, by.var=c("Identity","Program","Identity"), "Classification")
 ggsave("figures/figures6.png")
+```
+![Alt text]("https://github.com/ryscott5/eparTextTools/blob/master/figures/figures6.png")
+
+```{r}
 interest_plot_bydoc(c("women","farmer","school"),tdm)
 ggsave("figures/figures7.png")
 ```
+
+![Alt text]("https://github.com/ryscott5/eparTextTools/blob/master/figures/figures7.png")
 
 By editing the term document matrix to include weighting, each of these commands can be used while taking the length of documents into account.
 
 ```{r}
 tdm2<-TermDocumentMatrix(corpus2,control=list(weighting=function(x) weightSMART(x))) 
 tdm2$dimnames$Docs<-substring(tdm2$dimnames$Docs,nchar(tdm2$dimnames$Docs)-20)
-
 wfplots(tdm2[,1:10],typePlot=1,10)
 wfplots(tdm2[,1:30],typePlot=0,5)
 ggsave("figures/figures8.png")
+```
+![Alt text]("https://github.com/ryscott5/eparTextTools/blob/master/figures/figures8.png")
+
+```{r}
 interest_plot_bydoc(c("school"),tdm2)
 ggsave("figures/figures9.png")
 word_heatmap(tdm2,6)
 saveWidget(word_heatmap(tdm2,6),"figures10.html")
+```
 
+```{r}
 tdm3<-tdm
 tdm3$v<-(tdm3$v/colSums(as.matrix(tdm3))[tdm3$j])*100
 word_heatmap(tdm3,6)
