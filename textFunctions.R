@@ -1,5 +1,6 @@
-list.of.packages <- c("ggplot2", "Rcpp","tm","ggthemes","SnowballC","rvest","downloader","DT","wordcloud","d3heatmap","plyr","reshape2","dplyr","qdapTools","stringr","openNLP","NLP","stm","LDAvis","servr","Rtsne","geometry","downloader")
+options(java.parameters = "-Xmx4g")
 
+list.of.packages <- c("ggplot2", "Rcpp","tm","ggthemes","SnowballC","rvest","downloader","DT","wordcloud","d3heatmap","plyr","reshape2","dplyr","qdapTools","stringr","openNLP","NLP","stm","LDAvis","servr","Rtsne","geometry","downloader","corrplot","pryr")
 if("StanfordCoreNLP"%in%c(installed.packages()[,"Package"])==FALSE){install.packages('StanfordCoreNLP',repos="http://datacube.wu.ac.at/",type="source")}
 if("openNLPmodels.en"%in%c(installed.packages()[,"Package"])==FALSE){install.packages('openNLPmodels.en',repos="http://datacube.wu.ac.at/",type="source")}
 packages.Req <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -89,7 +90,7 @@ assocPrettyOneStep<-function(wordlist,termDocumentMatrix,corpus,corrVal=.8){
 
 
 wfplots<-function(termDocumentMatrix,typePlot=1,wordcount,minfreq=5,shortendoc=FALSE){
-  mfcomframe<-data.frame(inspect(termDocumentMatrix[findFreqTerms(termDocumentMatrix, lowfreq=minfreq),]))
+  mfcomframe<-data.frame(as.matrix(termDocumentMatrix[findFreqTerms(termDocumentMatrix, lowfreq=minfreq),]))
   mfcomframe<-mfcomframe[sort(rowSums(mfcomframe),index.return=TRUE,decreasing=TRUE)$ix[1:wordcount],]
   mfcomframe$word<-row.names(mfcomframe)
   mfcomframe$word<-factor(mfcomframe$word, levels = mfcomframe$word)
@@ -106,14 +107,14 @@ wfplots<-function(termDocumentMatrix,typePlot=1,wordcount,minfreq=5,shortendoc=F
 }
 
 word_heatmap<-function(termDocumentMatrix,wordcount,minfreq=2){
-  mfcomframe<-data.frame(inspect(termDocumentMatrix[findFreqTerms(termDocumentMatrix, lowfreq=minfreq),]))
+  mfcomframe<-data.frame(as.matrix(termDocumentMatrix[findFreqTerms(termDocumentMatrix, lowfreq=minfreq),]))
   mfcomframe<-mfcomframe[sort(rowSums(mfcomframe),index.return=TRUE,decreasing=TRUE)$ix[1:wordcount],]
   mfcomframe$word<-row.names(mfcomframe)
   mtcells<-as.matrix(termDocumentMatrix[mfcomframe$word,])
   d3heatmap(termDocumentMatrix[mfcomframe$word,], scale="column",colors="Blues",Rowv=FALSE,xaxis_font_size=8)}
 
 interest_plot<-function(wordlist,termDocumentMatrix,by.var=NULL,byvarname=""){
-  tempframe<-data.frame(inspect(termDocumentMatrix[wordlist,]))
+  tempframe<-data.frame(as.matrix(termDocumentMatrix[wordlist,]))
   tempframe<-data.frame("Count"=rowSums(tempframe),"word"=row.names(tempframe))
   if(is.null(by.var)){
     ggplot(tempframe, aes(word, Count)) + geom_bar(fill="#8ebfad", position = "dodge", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12),panel.background=element_blank())+xlab("")+ylab("Frequency")}
@@ -122,7 +123,7 @@ interest_plot<-function(wordlist,termDocumentMatrix,by.var=NULL,byvarname=""){
 }
 
 interest_plot_bydoc<-function(wordlist,termDocumentMatrix){
-  tempframe<-data.frame(inspect(termDocumentMatrix[wordlist,]))
+  tempframe<-data.frame(as.matrix(termDocumentMatrix[wordlist,]))
   tempframe$word<-row.names(tempframe)
   tempframe<-melt(tempframe,id=c("word"))
   if(length(wordlist)>1){
@@ -134,7 +135,7 @@ interest_plot_bydoc<-function(wordlist,termDocumentMatrix){
 
 interest_plot_bydoc_char<-function(wordlist,termDocumentMatrix,doccharacteristic){
   termDocumentMatrix$dimnames$Docs<-doccharacteristic
-  tempframe<-data.frame(inspect(termDocumentMatrix[wordlist,]))
+  tempframe<-data.frame(as.matrix(termDocumentMatrix[wordlist,]))
   tempframe$word<-row.names(tempframe)
   tempframe<-melt(tempframe,id=c("word"))
   if(length(wordlist)>1){
