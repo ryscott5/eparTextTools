@@ -73,9 +73,9 @@ word_heatmap(tdm,6)
 saveWidget(word_heatmap(tdm,6),"figures1.html")
 ```
 
-[Example 1: Right Click and Save Page as]("https://raw.githubusercontent.com/ryscott5/eparTextTools/master/figures/figures1.html?token=AGrqiIM10q6zdLz5VTiG4wD2tVieGtZyks5XoRzLwA%3D%3D")
+[Example 1: Download Raw File](figures/figures1.html)
 
-[Example 2: Right Click and Save Page as]("https://raw.githubusercontent.com/ryscott5/eparTextTools/master/figures/figures2.html?token=AGrqiA_FHnK_Vq5wUKB8O6Eytvx9KWH8ks5XoR0nwA%3D%3D")
+[Example 2: Download Raw File](figures/figures2.html)
 
 ```{r}
 word_heatmap(tdm,20)
@@ -91,20 +91,20 @@ wfplots(tdm[,1:10],typePlot=1,10,shortendoc=TRUE)
 ggsave("figures/figures3.png")
 ```
 
-![Alt text]("figures/figures3.png")
+![Alt text](figures/figures3.png)
 
 ```{r}
 wfplots(tdm[,1:30],typePlot=0,10,shortendoc=TRUE)
 ggsave("figures/figures4.png")
 ```
-![Alt text]("figures/figures4.png")
+![Alt text](figures/figures4.png)
 
 ```{r}
 wfplots(tdm[,1:30],typePlot=0,10,shortendoc=TRUE)+theme_fivethirtyeight()+facet_wrap(~word)
 ggsave("figures/figures5.png")
 ```
 
-![Alt text]("figures/figures5.png")
+![Alt text](figures/figures5.png)
 
 The same is true for the interest_plot command, which allows the user to specify words they are interested in viewing across documents rather than relying on specific frequencies. 
 
@@ -113,14 +113,14 @@ tdm$dimnames$Docs<-substring(tdm$dimnames$Docs,nchar(tdm$dimnames$Docs)-20)
 interest_plot(c("women","farmer","school"),tdm, by.var=c("Identity","Program","Identity"), "Classification")
 ggsave("figures/figures6.png")
 ```
-![Alt text]("figures/figures6.png")
+![Alt text](figures/figures6.png)
 
 ```{r}
 interest_plot_bydoc(c("women","farmer","school"),tdm)
 ggsave("figures/figures7.png")
 ```
 
-![Alt text]("figures/figures7.png")
+![Alt text](figures/figures7.png)
 
 By editing the term document matrix to include weighting, each of these commands can be used while taking the length of documents into account.
 
@@ -131,7 +131,7 @@ wfplots(tdm2[,1:10],typePlot=1,10)
 wfplots(tdm2[,1:30],typePlot=0,5)
 ggsave("figures/figures8.png")
 ```
-![Alt text]("figures/figures8.png")
+![Alt text](figures/figures8.png)
 
 ```{r}
 interest_plot_bydoc(c("school"),tdm2)
