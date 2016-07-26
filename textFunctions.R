@@ -155,3 +155,6 @@ location.annotate<-Maxent_Entity_Annotator(language = "en", kind="location", pro
 #misc.annotate<-Maxent_Entity_Annotator(language = "en", kind="misc", probs = FALSE,model = NULL)
 money.annotate<-Maxent_Entity_Annotator(language = "en", kind="money", probs = FALSE,model = NULL)
 parse_annotator <- Parse_Annotator()
+
+lapply(list.files() %>% .[str_detect(.,"figures\\w+.html")],function(X){file.copy(from=X,to=file.path("figures",X),overwrite=TRUE)})
+file.remove(list.files() %>% .[str_detect(.,"figures\\w+.html")])
