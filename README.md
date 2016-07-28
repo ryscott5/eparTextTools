@@ -84,14 +84,14 @@ word_heatmap(tdm,6)
 saveWidget(word_heatmap(tdm,6),"figures1.html")
 ```
 
-[Example 1: Download Raw File](figures/figures1.html)
+[Example 1: CLICK HERE](http://students.washington.edu/ryscott5/epar/figures/figures1.html)
 
 ```{r}
 word_heatmap(tdm,20)
 saveWidget(word_heatmap(tdm,20),"figures2.html")
 ```
 
-[Example 2: Download Raw File](figures/figures2.html)
+[Example 2: CLICK HERE](http://students.washington.edu/ryscott5/epar/figures/figures1.html)
 
 
 Using wfplots(), one can create a basic ggplot() object describing the most frequent terms across documents, or the documents in which the most frequent terms are likely to occur. The objects created by the command can be edited by adding on additional functions.
@@ -153,7 +153,7 @@ ggsave("figures/figures9.png")
 word_heatmap(tdm2,6)
 saveWidget(word_heatmap(tdm2,6),"figures10.html")
 ```
-[Example 10: Download Raw File](figures/figures10.html)
+[Example 10: CLICK HERE](http://students.washington.edu/ryscott5/epar/figures/figures10.html)
 
 ```{r}
 tdm3<-tdm
@@ -163,7 +163,7 @@ saveWidget(word_heatmap(tdm3,6),"figures11.html")
 rm(tdm2,tdm3)
 ```
 
-[Example 11: Download Raw File](figures/figures11.html)
+[Example 11: CLICK HERE](http://students.washington.edu/ryscott5/epar/figures/figures11.html)
 
 
 One command, assocPrettyOneStep(), takes a wordlist as an argument and returns a list of associated words above a correlation threshold. This thus informs what words are most likely to cooccur accross a corpus of documents.
@@ -173,7 +173,7 @@ assocPrettyOneStep(c("women","farmer","effect"),tdm, corpus2,.5)
 saveWidget(assocPrettyOneStep(c("women","farmer","effect"),tdm, corpus2,.5),"figures12.html")
 ```
 
-[Example 12: Download Raw File](figures/figures12.html)
+[Example 12: CLICK HERE](http://students.washington.edu/ryscott5/epar/figures/figures12.html)
 
 
 Bigrams or trigrams (rather than word-based tokenization) can also be used to process text by creating a custom ngram tokenizer and inserting it into the TermDocumentMatrix() command. All of the previous commands, with the exception of the word association table, can be used to explore word frequencies and correlations.
@@ -188,7 +188,7 @@ word_heatmap(tdm_bi,10)
 saveWidget(word_heatmap(tdm_bi,10), "figures13.html")
 rm(tdm_bi)
 ```
-[Example 13: Download Raw File](figures/figures13.html)
+[Example 13: CLICK HERE](http://students.washington.edu/ryscott5/epar/figures/figures13.html)
 
 
 #Natural Language Processing
@@ -239,10 +239,13 @@ out <- prepDocuments(processed$documents,processed$vocab,processed$meta)
 
 st1<-stm(out$documents,out$vocab,K=30, init.type="LDA")
 
-
-
 toLDAvis(st1,out$documents,R=20,plot.opts=list(xlab="Component 1",ylab="Component 2"),lambda.step=.05,out.dir=tempfile(),open.browser=interactive())
+saveWidget(toLDAvis(st1,out$documents,R=20,plot.opts=list(xlab="Component 1",ylab="Component 2"),lambda.step=.05,out.dir="figures/figures14.html"))
+```
+[Example 14: CLICK HERE](http://students.washington.edu/ryscott5/epar/figures/figures14/index.html)
 
+
+```{r}
 ksearch<-searchK(out$documents, out$vocab, K = c(3,4,5),init.type="LDA")
 
 mselect<-selectModel(out$documents, out$vocab, K = 20, prevalence=~datetimestamp+author,data=out$meta,max.em.its = 75, runs = 20, seed = 8458159)
@@ -250,7 +253,6 @@ mselect<-selectModel(out$documents, out$vocab, K = 20, prevalence=~datetimestamp
 plotModels(mselect,labels=1:length(mselect$runout))
 
 ```
-
 
 ##After making figures, run code below
 ```{r}
