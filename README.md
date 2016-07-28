@@ -101,20 +101,20 @@ wfplots(tdm[,1:10],typePlot=1,10,shortendoc=TRUE)
 ggsave("figures/figures3.png")
 ```
 
-![Alt text](figures/figures3.png)
+![http://students.washington.edu/ryscott5/epar/figures/figures3.png](figures/figures3.png)
 
 ```{r}
 wfplots(tdm[,1:30],typePlot=0,10,shortendoc=TRUE)
 ggsave("figures/figures4.png")
 ```
-![Alt text](figures/figures4.png)
+![http://students.washington.edu/ryscott5/epar/figures/figures4.png](figures/figures4.png)
 
 ```{r}
 wfplots(tdm[,1:30],typePlot=0,10,shortendoc=TRUE)+theme_fivethirtyeight()+facet_wrap(~word)
 ggsave("figures/figures5.png")
 ```
 
-![Alt text](figures/figures5.png)
+![http://students.washington.edu/ryscott5/epar/figures/figures5.png](figures/figures5.png)
 
 The same is true for the interest_plot command, which allows the user to specify words they are interested in viewing across documents rather than relying on specific frequencies. 
 
@@ -123,14 +123,14 @@ tdm$dimnames$Docs<-substring(tdm$dimnames$Docs,nchar(tdm$dimnames$Docs)-20)
 interest_plot(c("women","farmer","school"),tdm, by.var=c("Identity","Program","Identity"), "Classification")
 ggsave("figures/figures6.png")
 ```
-![Alt text](figures/figures6.png)
+![http://students.washington.edu/ryscott5/epar/figures/figures6.png](figures/figures6.png)
 
 ```{r}
 interest_plot_bydoc(c("women","farmer","school"),tdm)
 ggsave("figures/figures7.png")
 ```
 
-![Alt text](figures/figures7.png)
+![http://students.washington.edu/ryscott5/epar/figures/figures7.png](figures/figures7.png)
 
 By editing the term document matrix to include weighting, each of these commands can be used while taking the length of documents into account.
 
@@ -141,13 +141,13 @@ wfplots(tdm2[,1:10],typePlot=1,10)
 wfplots(tdm2[,1:30],typePlot=0,5)
 ggsave("figures/figures8.png")
 ```
-![Alt text](figures/figures8.png)
+![http://students.washington.edu/ryscott5/epar/figures/figures8.png](figures/figures8.png)
 
 ```{r}
 interest_plot_bydoc(c("school"),tdm2)
 ggsave("figures/figures9.png")
 ```
-![Alt text](figures/figures9.png)
+![http://students.washington.edu/ryscott5/epar/figures/figures9.png](figures/figures9.png)
 
 ```{r}
 word_heatmap(tdm2,6)
