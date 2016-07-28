@@ -21,14 +21,11 @@ The document reading code is designed to be able to use the tika library, though
 #Theory of Text Tools
 The goal of the text tools is to build and develop a methodology for automated portfolio review that can leverage tools of machine learning, supervised machine learning, and text mining to support human coding and portfolio review analysis tasks. The basic framework under development is shown below. 
 
-![Model of Program](https://www.lucidchart.com/publicSegments/view/65b1ee3a-635e-4a8b-b776-d3d8303c6bdb/image.png)
+![Model of Program](https://www.lucidchart.com/publicSegments/view/ecbf4945-8913-479b-ab7d-0f44e5553d30/image.png)
 
-The tools work towards two broad goals. First of all, the tools provide a flexible framework for describing and classifying the content of textual documents. This includes analysis of word frequencies, description of common words, testing for correlations between words, and categorization of strings of text into modeled or human coded categories of topics. The text tools, as designed, support query-based description, such as "how often does EPAR research involve the words "policy analysis versus program evaluation?" However, they also allow a user to explore documents by allowing the documents to suggest word correlations, commonalities, and topics.
+The tools work towards two broad goals. First of all, the tools provide a flexible framework for describing and classifying the content of textual documents. This includes analysis of word frequencies, description of common words, testing for correlations between words, and categorization of strings of text into modeled or human coded categories of topics. The text tools, as designed, support query-based description, such as "how often does EPAR research involve the words policy analysis versus program evaluation?" However, they also allow a user to explore documents by allowing the documents to suggest word correlations, commonalities, and topics.
 
 In addition to the basic description tasks, the tools are designed to support automated extraction of program theory from a body of documents by relying on a combination of machine learning, natural language processing, and supervised classification techniques. 
-
-$$Put small lit review here$$
-
 
 This readme file first guides a user through the basic description and classification tasks, and provides a basic example of how the tools can be leveraged to extract program theory. At present, the code analyzes the public body of EPAR research stored on the Evans School of Public Policy website, but it is designed to be readily portable to any document set.
 
