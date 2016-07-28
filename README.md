@@ -18,6 +18,17 @@ The document reading code is designed to be able to use the tika library, though
 
 [ggplot2 guide](http://ggplot2.org/)
 
+#Theory of Text Tools
+The goal of the text tools is to build and develop a methodology for automated portfolio review that can leverage tools of machine learning, supervised machine learning, and text mining to support human coding and portfolio review analysis tasks. The basic framework under development is shown below. 
+
+![Model of Program](https://www.lucidchart.com/publicSegments/view/65b1ee3a-635e-4a8b-b776-d3d8303c6bdb/image.png)
+
+The tools work towards two broad goals. First of all, the tools provide a flexible framework for describing and classifying the content of textual documents. This includes analysis of word frequencies, description of common words, testing for correlations between words, and categorization of strings of text into modeled or human coded categories of topics. The text tools, as designed, support query-based description, such as "how often does EPAR research involve the words "policy analysis versus program evaluation?" However, they also allow a user to explore documents by allowing the documents to suggest word correlations, commonalities, and topics.
+
+In addition to the basic description tasks, the tools are designed to support automated extraction of program theory from a body of documents by relying on a combination of machine learning, natural language processing, and supervised classification techniques.
+
+#Description and Classification
+
 ##Extracting Text
 
 To begin this process, first load the textFunctions. For demonstration purposes we also create a demonstration document dataset using the demo.docs.R code.
@@ -187,7 +198,8 @@ While description of word frequencies is useful as a baseline for exploring text
 y1<-lapply(corpus1,function(k){list(k,annotate(as.String(k$content),sent_token_annotator))})
 y1<-y1[which(sapply(1:length(y1),function(i){length(y1[[i]][[2]]$type)})>1)]
 y1<-lapply(y1,function(k){list(k[[1]],annotate(as.String(k[[1]]$content),word_token_annotator,k[[2]]))})
-basic_annotates<-lapply(y1,function(k){list(k[[1]],annotate(as.String(k[[1]]$content), list(org.annotate,pers.annotate),k[[2]]))})
+
+basic_annotates<-lapply(y1,function(k){list(k[[1]],annotate(as.String(k[[1]]$content), list(org.annotate,pers.annotate,location.annotate),k[[2]]))})
 
 ##Removing entities for corp3
 corpEnt<-lapply(basic_annotates,function(k){as.String(k[[1]]$content)[k[[2]][k[[2]]$type=="entity"]]})
@@ -203,6 +215,12 @@ k})
 #})
 
 corpEnt2<-doc_clean_process(do.call(c, lapply(corpEnt2,function(k) k[[1]])))
+
+locations<-lapply(basic_annotates,function(k){list(k[[1]],k[[2]][which(sapply(subset(k[[2]],type=="entity")$features,function(x) {x=="location"})==TRUE)])})
+
+locuts<-lapply(basic_annotates,function(X){as.String(X[[1]]$content)[X[[2]][sapply(subset(X[[2]],type=="entity")$features,function(x){x$kind=="location"})]]})
+locuts[[1]]
+
 ```
 While we later come back to natural language processing for extraction of verbs, subjects, and direct objects, once proper nouns are removed from the dataset one method of analyzing variability across a group of text documents is to build a topic model for the data.
 
@@ -212,12 +230,17 @@ Once the proper nouns are (mostly) removed from the dataset, we can fit a topic 
 
 Fitting a topic model has numerous benefits over simply viewing raw word counts, including that it allows exploration of the content of a batch of documents that can potentially reveal broad patterns missed by human coders. The stm package has its own text cleaning method which repeats many of the processing steps conducted above. Fiting the model can be somewhat slow given the settings used below, which includes
 
-##CODE BELOW STILL IN PROGRESS
 ```{r}
-processed <- textProcessor(sapply(corpEnt2,content),metadata=do.call(rbind, lapply(corpEnt2,function(x){t(matrix(x$meta,dimnames=list(names(x$meta))))})))
+processed <- textProcessor(sapply(corpEnt2,function(x) content(x[[1]])),metadata=do.call(rbind, lapply(corpEnt2,function(x){t(matrix(x[[1]]$meta,dimnames=list(names(x[[1]]$meta))))})))
+
 out <- prepDocuments(processed$documents,processed$vocab,processed$meta)
 
-st1<-stm(out$documents,out$vocab,K=0, init.type="Spectral")
+#st1<-stm(out$documents,out$vocab,K=0, init.type="Spectral")
+
+st1<-stm(out$documents,out$vocab,K=30, init.type="LDA")
+
+
+
 toLDAvis(st1,out$documents,R=20,plot.opts=list(xlab="Component 1",ylab="Component 2"),lambda.step=.05,out.dir=tempfile(),open.browser=interactive())
 
 ksearch<-searchK(out$documents, out$vocab, K = c(3,4,5),init.type="LDA")
