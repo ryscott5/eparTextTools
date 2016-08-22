@@ -231,16 +231,47 @@ Once the proper nouns are (mostly) removed from the dataset, we can fit a topic 
 Fitting a topic model has numerous benefits over simply viewing raw word counts, including that it allows exploration of the content of a batch of documents that can potentially reveal broad patterns missed by human coders. The stm package has its own text cleaning method which repeats many of the processing steps conducted above. Fiting the model can be somewhat slow given the settings used below, which includes
 
 ```{r}
-processed <- textProcessor(sapply(corpEnt2,function(x) content(x[[1]])),metadata=do.call(rbind, lapply(corpEnt2,function(x){t(matrix(x[[1]]$meta,dimnames=list(names(x[[1]]$meta))))})))
 
-out <- prepDocuments(processed$documents,processed$vocab,processed$meta)
+
+corpEntS<-sapply(corpEnt2,function(x) as.character(as.String(content(x[[1]]))))
+
+corpEnt3<-corpEnt2
+corpEnt3<-lapply(names(corpEnt2[[1]][[1]]$meta),function(K){meta(do.call(c,lapply(corpEnt2,function(x){x[[1]]})),K)})
+
+corpEnt3[[1]]<-melt(sapply(1:length(corpEnt3[[1]]),function(x) paste(corpEnt3[[1]][[x]],collapse="")))[,1]
+corpEnt3[[2]]<-melt(sapply(1:length(corpEnt3[[2]]), function(x) ymd_hms(corpEnt3[[2]][[x]]),simplify=T))
+corpEnt3[[2]]<-join(data.frame("L1"=1:length(corpEnt3[[1]])),corpEnt3[[2]])$value
+corpEnt3[[3]]<-melt(sapply(1:length(corpEnt3[[3]]),function(x) paste(corpEnt3[[3]][[x]],collapse="")))[,1]
+corpEnt3[[4]]<-melt(sapply(1:length(corpEnt3[[4]]),function(x) paste(corpEnt3[[4]][[x]],collapse="")))[,1]
+corpEnt3[[5]]<-melt(sapply(1:length(corpEnt3[[5]]),function(x) paste(corpEnt3[[5]][[x]],collapse="")))[,1]
+corpEnt3[[6]]<-melt(sapply(1:length(corpEnt3[[6]]),function(x) paste(corpEnt3[[6]][[x]],collapse="")))[,1]
+corpEnt3[[7]]<-melt(sapply(1:length(corpEnt3[[6]]),function(x) paste(corpEnt3[[7]][[x]],collapse="")))[,1]
+getTokenizers()
+corpEnt3<-data.frame(corpEnt3)
+colnames(corpEnt3)<-names(meta(corpEnt2[[1]][[1]]))
+class(corpEntS)
+?substr
+substr(corpEntS[1],1,1000)
+?textProcessor
+processed <-textProcessor(corpEntS,metadata=corpEnt3,sparselevel=1,)
+missingINF<-unlist(unique(sapply(colnames(corpEnt3),function(x){which(is.na((corpEnt3[,x])))}),simplify=T))
+processed$vocab[2000]
+out <- prepDocuments(processed$documents[-missingINF],processed$vocab,processed$meta[-missingINF],lower.thresh=2)
 
 #st1<-stm(out$documents,out$vocab,K=0, init.type="Spectral")
-
-st1<-stm(out$documents,out$vocab,K=30, init.type="LDA")
+st1<-stm(out$documents,out$vocab,data=out$meta, K=10,prevalence=~author+as.numeric(datetimestamp)+heading, init.type="LDA",max.em.its=5)
 
 toLDAvis(st1,out$documents,R=20,plot.opts=list(xlab="Component 1",ylab="Component 2"),lambda.step=.05,out.dir=tempfile(),open.browser=interactive())
 saveWidget(toLDAvis(st1,out$documents,R=20,plot.opts=list(xlab="Component 1",ylab="Component 2"),lambda.step=.05,out.dir="figures/figures14.html"))
+
+ggplot(melt(st1$theta))+geom_bar(aes(x=Var1,y=value,fill=as.factor(Var2)),stat="identity",position="stack")+scale_fill_tableau()+theme_minimal()
+colnames(out$meta)
+
+
+st1R<-estimateEffect(1:10~author+as.numeric(datetimestamp),stmobj=st1,metadata=out$meta,nsims=1, documents=out$documents,)
+
+sapply(1:10,function(i){st1R$parameters[[i]][[1]]$est[32]})
+
 ```
 [Example 14: CLICK HERE](http://students.washington.edu/ryscott5/epar/figures/figures14/index.html)
 
@@ -259,4 +290,9 @@ plotModels(mselect,labels=1:length(mselect$runout))
 lapply(list.files() %>% .[str_detect(.,"figures\\w+.html")],function(X){file.copy(from=X,to=file.path("figures",X),overwrite=TRUE)})
 file.remove(list.files() %>% .[str_detect(.,"figures\\w+.html")])
 ```
+wd<-read.csv(textConnection(RCurl::getURL("https://docs.google.com/spreadsheets/d/1ng7I5QoYu_NzegZvO9568M42q52iVCsLz-D0WhVa--8/pub?gid=0&single=true&output=csv")),stringsAsFactors=FALSE)
+findThoughts(st1,texts=out$documents,topics=1,n=1)
+findTopic(st1, wd$Up.Words, n=10, type=c("frex"), verbose=TRUE)
+
+assocPrettyOneStep(wd$Up.words,, corpus2,.5)
 
