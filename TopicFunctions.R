@@ -68,15 +68,14 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
 }
 
 
-
 AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME){
   pos_tag_annotator<- Maxent_POS_Tag_Annotator()
-  tcs<-pblapply(1:length(unique(tps)), function(k){
-    toChar<-SENTENCEFRAME$SC[-PROCESSED$docs.removed][-OUT$docs.removed][which(tps==k)]
-    toCharANS<-ANNOTATELIST[-PROCESSED$docs.removed] %>% .[-OUT$docs.removed] %>% .[which(tps==k)]
+  tcs<-pblapply(1:length(unique(MAXTOPS)), function(k){
+    toChar<-SENTENCEFRAME$SC[-PROCESSED$docs.removed][-OUT$docs.removed][which(MAXTOPS==k)]
+    toCharANS<-ANNOTATELIST[-PROCESSED$docs.removed] %>% .[-OUT$docs.removed] %>% .[which(MAXTOPS==k)]
     KeepA<-unique(unlist(sapply(WT, function(W) which(str_detect(toChar,tolower(W))))))
     anns<-lapply(KeepA,function(i){
-      ANT<-annotate(as.String(toChar[KeepA]),pos_tag_annotator,toCharANS[i][[1]])
+      ANT<-annotate(as.String(toChar[i]),pos_tag_annotator,toCharANS[i][[1]])
       wans<-subset(ANT, type=="word")
       vans<-wans[which(unlist(wans$features)%in%c("VB","VBN","VBZ","VBG","VBN","VBP"))]
       vanstf<-sapply(1:length(vans), function(i2) TRUE%in%str_detect(as.character(as.String(toChar[i])[vans[i2]]),WT))
@@ -86,11 +85,12 @@ AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRA
         #vsent<-subset(anns[[1]], start>=vsent$start) %>% subset(.,end<=vsent$end)
         #psent<-parse_annotator(as.String(toChar),vsent)
         #list(vsent,psent)
-        data.frame("Sent"=ifelse(length(vsent)>0,as.character(as.String(toChar[i])[vsent]),NA),"rowid"=i)
+        data.frame("Sent"=ifelse(length(vsent)>0,as.character(as.String(toChar[i])[vsent]),NA),"rowid"=which(SENTENCEFRAME[-PROCESSED$docs.removed,][-OUT$docs.removed,][which(MAXTOPS==k),][i,]$SC==SENTENCEFRAME[-PROCESSED$docs.removed,][-OUT$docs.removed,]$SC))
       }))
       vanstf})})
   allcs<-na.omit(melt(tcs))
   allcs}
+
 
 FillFolder<-function(PREPFRAME,FOLDERNAME){
   library(httr)
@@ -104,8 +104,8 @@ FillFolder<-function(PREPFRAME,FOLDERNAME){
     Sys.sleep(.5)
   }}
 
-ParseFolderToFrame<-function(FOLDERNAME,PREPFRAME){
-  rels<-lapply(1:length(list.files("getAlchemy")),function(i) fromJSON(readLines(file.path("getAlchemy",FOLDERNAME,list.files("getAlchemy/FOLDERNAME")[i])))$relations)
+ParseFolderToFrame<-function(FOLDERNAME,PREPFRAME,WT){
+  rels<-lapply(1:length(list.files(file.path("getAlchemy",FOLDERNAME))),function(i) fromJSON(readLines(file.path("getAlchemy",FOLDERNAME,list.files(file.path("getAlchemy",FOLDERNAME))[i])))$relations)
   rels2<-rels[which(sapply(rels,function(x) length(x)>0))]
   joinkey<-lapply(1:length(rels),function(i)  {
     mrow<-max(c(nrow(rels[[i]]$subject$keywords[[1]]),nrow(rels[[i]]$object$keywords[[1]]),length(rels[[i]]$action$verb$text)))
@@ -136,20 +136,66 @@ ParseFolderToFrame<-function(FOLDERNAME,PREPFRAME){
   joinkey$verbkey<-tolower(joinkey$verbkey)
   joinkey_sub<-subset(joinkey, verbkey%in%WT)
   library(dplyr)
-  subcs<-cbind(joinkey_sub,PREPFRAME[as.numeric(list.files("getAlchemy")[as.numeric(joinkey_sub$whichi)] %>% gsub("al","",.) %>% gsub('.json',"",.,fixed=T)),])
-  subcs}
+  subcs<-cbind(joinkey_sub,PREPFRAME[as.numeric(list.files(file.path("getAlchemy",FOLDERNAME))[as.numeric(joinkey_sub$whichi)] %>% gsub("al","",.) %>% gsub('.json',"",.,fixed=T)),])
+  subcs_full<-cbind(joinkey,PREPFRAME[as.numeric(list.files(file.path("getAlchemy",FOLDERNAME))[as.numeric(joinkey$whichi)] %>% gsub("al","",.) %>% gsub('.json',"",.,fixed=T)),])
+  list("SmallVerb"=subcs,"FullVerb"=subcs_full)}
+frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME){
+  OV<-PREPFRAME[as.numeric(list.files(file.path("getAlchemy",FOLDERNAME)) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
+  OVF<-BASEINPUT$SentFrame[-BASEINPUT$processed$docs.removed,][-BASEINPUT$out$docs.removed,][OV$value,] 
+  PARSEFRAME<-cbind(PARSEFRAME,OVF[,c("author","datetimestamp","id","ents")])
+  PARSEFRAME<-PARSEFRAME[,c(1,2,3,5,7,8,9,10,11)]
+  colnames(PARSEFRAME)<-c('Subject','Object',"Verb","Sentence","Topic","Author","Date","Document","Entities")
+  PARSEFRAME$Topic<-sapply(1:10,function(i) paste(labelTopics(st1,n=5)[[1]][i,],collapse=","))[PARSEFRAME$Topic]
+  PARSEFRAME$Topic<-as.factor(PARSEFRAME$Topic)
+  PARSEFRAME$Verb<-as.factor(PARSEFRAME$Verb)
+  PARSEFRAME}
+
+library(DT)
+
+frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME,TOPICMOD){
+  # PARSEFRAME<-Frame1[[1]]
+  # rm(PARSEFRAME)
+  # BASEINPUT<-BASE_INPUT
+  # rm(BASEINPUT)
+  # FOLDERNAME<-"test2"
+  # rm(FOLDERNAME)
+  # PREPFRAME<-Pf1
+  # rm(PREPFRAME)
+  # TOPICMOD<-st1
+  # rm(TOPICMOD)
+  OV<-PREPFRAME[as.numeric(list.files(file.path("getAlchemy",FOLDERNAME)) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
+  OVF<-BASEINPUT$SentFrame[-BASEINPUT$processed$docs.removed,][-BASEINPUT$out$docs.removed,][OV$value,] 
+  PARSEFRAME<-cbind(PARSEFRAME,OVF[,c("author","datetimestamp","id","ents")])
+  colnames(PARSEFRAME)
+  PARSEFRAME<-PARSEFRAME[,c("subkey","obkey","verbkey","Sent","L1","author","datetimestamp",'id',"ents")]
+  colnames(PARSEFRAME)<-c('Subject','Object',"Verb","Sentence","Topic","Author","Date","Document","Entities")
+  PARSEFRAME$Topic<-sapply(1:TOPICMOD$settings$dim$K,function(i) paste(labelTopics(TOPICMOD,n=5)[[1]][i,],collapse=","))[PARSEFRAME$Topic]
+  PARSEFRAME$Topic<-as.factor(PARSEFRAME$Topic)
+  PARSEFRAME$Verb<-as.factor(PARSEFRAME$Verb)
+  PARSEFRAME}
+
+frametable.html<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME,TOPICMOD){
+  OV<-PREPFRAME[as.numeric(list.files(file.path("getAlchemy",FOLDERNAME)) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
+  OVF<-BASEINPUT$SentFrame[-BASEINPUT$processed$docs.removed,][-BASEINPUT$out$docs.removed,][OV$value,] 
+  PARSEFRAME<-cbind(PARSEFRAME,OVF[,c("author","datetimestamp","id","ents")])
+  PARSEFRAME<-PARSEFRAME[,c(1,2,3,5,7,8,9,10,11)]
+  colnames(PARSEFRAME)<-c('Subject Keyword','Object Keyword',"Verb","Sentence","Topic","Author","Date and Time","Document","Entities")
+  PARSEFRAME$Topic<-sapply(1:TOPICMOD$settings$dim$K,function(i) paste(labelTopics(TOPICMOD,n=5)[[1]][i,],collapse=","))[PARSEFRAME$Topic]
+  PARSEFRAME$Topic<-as.factor(PARSEFRAME$Topic)
+  PARSEFRAME$Verb<-as.factor(PARSEFRAME$Verb)
+  datatable(data=PARSEFRAME,rownames=FALSE,filter="top")}
 
 TopicCoreFrame<-function(MAXTOPS,PARSEFRAME){
+  library(stringdist)
   cormatsbysub<-lapply(unique(MAXTOPS),function(X) {
-    topiccs<-filter(subcs,L1==X)
+    topiccs<-filter(PARSEFRAME,L1==X)
+    if(nrow(topiccs)>0){
     dmh<-hclust(stringdistmatrix(unique(na.omit(topiccs$subkey)),method="lcs"))
     dmh$labels<-unique(na.omit(topiccs$subkey))
-    plot(dmh)
     ids1<-rect.hclust(dmh,h=mean(dmh$height))
     dmo<-hclust(stringdistmatrix(unique(na.omit(topiccs$obkey)),method="lcs"))
     dmo$labels<-unique(na.omit(topiccs$obkey))
-    plot(dmo)
-    ids2<-rect.hclust(dmo,h=mean(dmo$height))
+    ids2<-rect.hclust(dmo,h=min(dmo$height))
     dmv<-hclust(stringdistmatrix(unique(na.omit(topiccs$verbkey)),method="lcs"))
     dmv$labels<-unique(na.omit(topiccs$verbkey))
     
@@ -159,7 +205,7 @@ TopicCoreFrame<-function(MAXTOPS,PARSEFRAME){
     byobject<-lapply(ids2,function(Y) topiccs[which(topiccs$obkey%in%names(Y)),])
     names(byobject)<-sapply(ids2,function(Y) names(Y[1]))
     
-    byverb<-lapply(unique(na.omit(topiccs$verbkey)),function(Y) joinkey[which(topiccs$verbkey==Y),])
+    byverb<-lapply(unique(na.omit(topiccs$verbkey)),function(Y) PARSEFRAME[which(topiccs$verbkey==Y),])
     names(byverb)<-unique(na.omit(topiccs$verbkey))
     
     combine.ds<-function(bysubject,byobject,byverb){
@@ -181,7 +227,48 @@ TopicCoreFrame<-function(MAXTOPS,PARSEFRAME){
     for(i in 1:nrow(ts.e)){
       ts.e[i,]<-sapply(names(ts.e[i,]),function(K){length(which(subset(tst,tst$SubCat==rownames(ts.e)[i])$ObjCat==K))})
     }
-    ts.e
+    ts.e} else {matrix(NA)}
   })
   cormatsbysub
+}
+
+
+
+SimpFrameList<-function(TCOREFRAME){
+  lapply(TCOREFRAME,function(X){t1<-melt(as.matrix(X)) %>% filter(value>0)
+  colnames(t1)<-c("Subject","Object","Count")
+  t1
+  })}
+
+
+
+clusterWords<-function(COLUMN,NUM,TOPICMODEL){
+  subprobs<-do.call(rbind.fill,lapply(unique(COLUMN), function(X){
+    k<-data.frame(t(exp(TOPICMODEL$beta$logbeta[[1]][,which(TOPICMODEL$vocab==tm::stemDocument(tolower(X)))])))
+    if(nrow(k)>0){
+      k$word<-X
+    }
+    k
+  }))
+  row.names(subprobs)<-subprobs$word
+  subprobs<-subprobs[,1:10]
+  d1<-kmeans(subprobs,NUM)
+  optName<-sapply(1:NUM, function(k) {names(d1$cluster[d1$cluster==k][which.min(sapply(1:length(which(d1$cluster==k)),function(i) sum(abs(subprobs[which(d1$cluster==k),]-fitted(d1)[which(d1$cluster==k),])[i,])))])})
+  data.frame("Word"=row.names(subprobs),"optName"=optName[d1$cluster])
+}
+
+
+idSimilar<-function(SEARCH,COLUMN,NUM,TOPICMODEL){
+  subprobs<-do.call(rbind.fill,lapply(unique(COLUMN), function(X){
+    k<-data.frame(t(exp(TOPICMODEL$beta$logbeta[[1]][,which(TOPICMODEL$vocab==tm::stemDocument(tolower(X)))])))
+    if(nrow(k)>0){
+      k$word<-X
+    }
+    k
+  }))
+  sid<-which(subprobs$word==SEARCH)
+  row.names(subprobs)<-subprobs$word
+  subprobs<-subprobs[,1:10]
+  d1<-kmeans(subprobs,NUM)
+  names(d1$cluster[d1$cluster==d1$cluster[sid]])
 }
