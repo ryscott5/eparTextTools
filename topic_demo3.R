@@ -10,10 +10,7 @@ source("TopicFunctions.R")
 
 BASE_INPUT<-PreTopicFrame(corpus1,25)
 
-
-
 form1<-paste("~as.factor(Orig)",paste(colnames(BASE_INPUT$out$meta)[12:ncol(BASE_INPUT$out$meta)],sep="",collapse="+"),sep="+")
-
 
 #ideally, we would use the spectral modle but it crashes R unfortunately, instead, we fit the model below. notice that k is the number of topics. each document is assumed to have multiple categories (Blei et al 2003). We extract the most likely topic for each document. The topic model is also used on the back end for evaluating causal patterns as it forms the basis of word clustering etc.
 
@@ -46,22 +43,12 @@ head(Frame1[[1]])
 frametable.html(Frame1[[1]], BASE_INPUT,"test2",Pf1)
 head(Frame1[[1]])
 basic_table<-frametable(Frame1[[1]], BASE_INPUT,"test2",Pf1,st1)
-save(basic_table,st1,file="basic_top1.RData")
-head(basic_table)
+save(basic_table,st1,file="basic_topic3.RData")
+
+
 clusterWords(basic_table$Object,100,st1)
 clusterWords(basic_table$Subject,80,st1)
 clusterWords(basic_table$Verb,10,st1)
 
 idSimilar("women",basic_table$Object,100,st1) 
 
-basic_table[basic_table$Object%in%idSimilar("maize",basic_table$Object,100,st1),] %>% datatable(rownames=FALSE,filter = 'bottom',options = list(columnDefs = list(list(
-  targets =  c(which(names(.) %in% c("Sentence","Document","Topic","Entities"))-1),
-  render = JS(
-    "function(data, type, row, meta) {",
-    "return type === 'display' && data.length > 10 ?",
-    "'<span title=\"' + data + '\">' + data.substr(0, 10) + '...</span>' : data;",
-    "}")
-))), callback = JS('table.page(3).draw(false);'))
-
-?datatable
-datatable(basic_table)
