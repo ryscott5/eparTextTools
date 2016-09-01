@@ -1,0 +1,74 @@
+---
+title: "DTITLENAME"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r code1, echo=FALSE}
+
+suppressWarnings(library(DT,warn.conflicts=FALSE,quietly=TRUE))
+suppressWarnings(library(tm,warn.conflicts=FALSE,quietly=TRUE))
+suppressWarnings(library(plyr,warn.conflicts=FALSE,quietly=TRUE))
+#suppressWarnings(library(BayesFactorExtras,warn.conflicts=FALSE,quietly=TRUE))
+```
+
+```{r results='asis',echo=FALSE,message=FALSE}
+load("DFILENAME")
+#createDownloadURI(c("basic_table","st1"),filename="basic_top1")
+idSimilar<-function(SEARCH,COLUMN,NUM,TOPICMODEL){
+  subprobs<-do.call(rbind.fill,lapply(unique(COLUMN), function(X){
+    k<-data.frame(t(exp(TOPICMODEL$beta$logbeta[[1]][,which(TOPICMODEL$vocab==tm::stemDocument(tolower(X)))])))
+    if(nrow(k)>0){
+      k$word<-X
+    }
+    k
+  }))
+  sid<-which(subprobs$word==SEARCH)
+  row.names(subprobs)<-subprobs$word
+  subprobs<-subprobs[,1:10]
+  d1<-kmeans(subprobs,NUM)
+  names(d1$cluster[d1$cluster==d1$cluster[sid]])
+}
+```
+
+```{r echo=FALSE}
+inputPanel(
+  selectInput("NOV", label = "Select Word Type",
+              choices = c("Subject","Object","Verb"), selected = "Subject"),
+  textInput("word",label= "Word", value=""),
+  sliderInput("Kclusters", label = "Estimated number of unique subjects/objects/verbs:",min = 2, max = 150, value = 15, step = 1),
+  checkboxInput('Shorten',label='Shorten Strings?', value=TRUE)
+)
+
+renderDataTable({
+  if(nchar(input$word)>1){
+    t1<-basic_table[basic_table[,input$NOV]%in%idSimilar(input$word,basic_table[,input$NOV],input$Kclusters,st1),]}
+  else {t1<-basic_table} 
+  if(input$Shorten==TRUE){
+ datatable(t1,rownames=FALSE,filter ='bottom',extensions = 'Buttons', options = list(
+   dom = 'Bfrtip',
+   scrollX=TRUE,
+  buttons = c('copy', 'csv', 'excel', 'pdf', 'print','colvis'),
+   columnDefs = list(list(
+  targets =  c(which(names(t1) %in% c("Sentence","Document","Topic","Entities"))-1),
+  render = JS(
+    "function(data, type, row, meta) {",
+    "return type === 'display' && data.length > 10 ?",
+    "'<span title=\"' + data + '\">' + data.substr(0, 10) + '...</span>' : data;",
+    "}")
+))
+), callback = JS('table.page(3).draw(false);'))
+  } else{
+     datatable(t1,rownames=FALSE,filter ='bottom',extensions = 'Buttons', options = list(
+   dom = 'Bfrtip',
+   scrollX=TRUE,
+  buttons = c('copy', 'csv', 'excel', 'pdf', 'print','colvis')
+), callback = JS('table.page(3).draw(false);'))
+  }
+})
+```
+
