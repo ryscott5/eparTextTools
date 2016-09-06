@@ -15,7 +15,6 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
   corpEntN[[7]]<-melt(sapply(1:length(corpEntN[[6]]),function(x) paste(corpEntN[[7]][[x]],collapse="")))[,1]
   corpEntN<-data.frame(corpEntN)
   colnames(corpEntN)<-names(meta(corpus1[[1]]))
-  corpEntN
   para_token_annotator <-Annotator(function(s, a = Annotation()) {
     spans <- blankline_tokenizer(s)
     n <- length(spans)
@@ -26,7 +25,6 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
                rep.int("paragraph", n),
                spans$start,
                spans$end)}, list(description ="A paragraph token annotator based on blankline_tokenizer()."))
-  library(pbapply)
   par1<-lapply(corpus1b,function(x) annotate(as.String(content(x)),para_token_annotator))
   corpEntN$Orig<-1:nrow(corpEntN)
   par2<-lapply(1:length(par1),function(i) {
@@ -35,9 +33,9 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
     dfout})
   par2<-do.call(rbind,par2)
   par2$SC<-as.character(par2$S)
-  par2<-subset(par2,nchar(par2$SC)>=100)
+  par2<-par2[nchar(par2$SC)>=100,]
   allans<-pblapply(par2$S,function(X) annotate(X,sent_token_annotator))
-  par2<-par2[-which(sapply(allans,function(X) length(X)>0)==FALSE),]
+  par2<-par2[which(sapply(allans,function(X) length(X)>0)==TRUE),]
   allans<-allans[sapply(allans,function(X) length(X)>0)]
   allans<-pblapply(1:nrow(par2),function(i){annotate(par2$S[i],word_token_annotator,allans[[i]])})
   allans<-pblapply(1:nrow(par2),function(i){annotate(par2$S[i],list(org.annotate,pers.annotate,location.annotate),allans[[i]])})
@@ -53,8 +51,6 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
         sn<-gsub(entit1[k],"",sn,fixed=TRUE)
       }
       par2$SnE[i]<-sn}}
-  par2$ents
-  
   allents<-sapply(par2$ents,function(x) c(unlist(strsplit(x,","))),USE.NAMES=FALSE)
   allents<-unlist(allents)
   top.ents<-names(sort(table(allents),decreasing=TRUE)[1:howmanyentities])
@@ -68,6 +64,7 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
 }
 
 
+
 AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME){
   pos_tag_annotator<- Maxent_POS_Tag_Annotator()
   tcs<-pblapply(1:length(unique(MAXTOPS)), function(k){
@@ -79,6 +76,7 @@ AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRA
       wans<-subset(ANT, type=="word")
       vans<-wans[which(unlist(wans$features)%in%c("VB","VBN","VBZ","VBG","VBN","VBP"))]
       vanstf<-sapply(1:length(vans), function(i2) TRUE%in%str_detect(as.character(as.String(toChar[i])[vans[i2]]),WT))
+      droppedLs<-which(vanstf==FALSE)
       vans2<-vans[vanstf==TRUE]
       vanstf<-do.call(rbind,lapply(1:length(vans2), function(i3){
         vsent<-subset(ANT,start<=vans2[i3]$start) %>% subset(.,end>=vans2[i3]$end) %>% subset(type=="sentence")
@@ -88,21 +86,59 @@ AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRA
         data.frame("Sent"=ifelse(length(vsent)>0,as.character(as.String(toChar[i])[vsent]),NA),"rowid"=which(SENTENCEFRAME[-PROCESSED$docs.removed,][-OUT$docs.removed,][which(MAXTOPS==k),][i,]$SC==SENTENCEFRAME[-PROCESSED$docs.removed,][-OUT$docs.removed,]$SC))
       }))
       vanstf})})
-  allcs<-na.omit(melt(tcs))
+  tcs[[1]]
+  names(tcs)<-[1:30][-droppedLs]
+  droppedLs2<-which(sapply(tcs,length)<1)
+  tcs2<-tcs[sapply(tcs, length)>0]
+  allcs<-na.omit(melt(tcs2))
   allcs}
 
-
-FillFolder<-function(PREPFRAME,FOLDERNAME){
+FillFolderMan<-function(PREPFRAME,FOLDERNAME){
   library(httr)
-  if(dir.exists("getAlchemy")==FALSE) {dir.create("getAlchemy")}
-  if(dir.exists(file.path("getAlchemy",FOLDERNAME))==FALSE) {dir.create(file.path("getAlchemy",FOLDERNAME))}
-  
+  #if(dir.exists("getAlchemy")==FALSE) {dir.create("getAlchemy")}
+  #if(dir.exists(file.path("getAlchemy",FOLDERNAME))==FALSE) {dir.create(file.path("getAlchemy",FOLDERNAME))}
   for(i in 1:nrow(PREPFRAME)){
     X<-PREPFRAME$Sent[i]
     req <- POST("http://access.alchemyapi.com/calls/text/TextGetRelations", 
                 body = list(apikey="6837e8ae18678cadd3c42fc55ed938b3818ce470",text=X,keywords=1,outputMode="json",disambiguate=0), encode = "form",write_disk(file.path("getAlchemy",FOLDERNAME,paste("al",i,".json",sep=""))))
     Sys.sleep(.5)
   }}
+
+findBroken<-function(FOLDERNAME){
+flist<-list.files(file.path("getAlchemy",FOLDERNAME))
+bad<-sapply(flist,function(X){
+tfile<-readLines(file.path("getAlchemy",FOLDERNAME,X))
+p1<-str_detect(paste(tfile,collapse=" ",sep=" "),"If you are seeing this message, you are likely making an excessive number of concurrent HTTP connections to this service.  Please check the concurrency limits for your assigned service tier.")
+a<-tryCatch(jsonlite::fromJSON(tfile), error=function(e){"error"})
+p2<-a=="error"
+TRUE%in%c(p1,p2)
+})        
+flist[bad]
+}
+
+
+FillFolder<-function(PREPFRAME,FOLDERNAME){
+  library(httr)
+  if(dir.exists("getAlchemy")==FALSE) {dir.create("getAlchemy")}
+  if(dir.exists(file.path("getAlchemy",FOLDERNAME))==FALSE) {dir.create(file.path("getAlchemy",FOLDERNAME))}
+  for(i in 1:nrow(PREPFRAME)){
+    X<-PREPFRAME$Sent[i]
+    req <- POST("http://access.alchemyapi.com/calls/text/TextGetRelations", 
+                body = list(apikey="6837e8ae18678cadd3c42fc55ed938b3818ce470",text=X,keywords=1,outputMode="json",disambiguate=0), encode = "form",write_disk(file.path("getAlchemy",FOLDERNAME,paste("al",i,".json",sep=""))))
+    Sys.sleep(.5)
+  }}
+
+FillRetry<-function(PREPFRAME,FOLDERNAME,FILENAMES){
+  library(httr)
+  for(X in FILENAMES){
+    Num1<-gsub(".json","",X) %>% gsub("al","",.) %>% as.numeric()
+    Sent<-PREPFRAME$Sent[Num1]
+    file.remove(file.path("getAlchemy",FOLDERNAME,X))
+    req <- POST("http://access.alchemyapi.com/calls/text/TextGetRelations", 
+                body = list(apikey="6837e8ae18678cadd3c42fc55ed938b3818ce470",text=Sent,keywords=1,outputMode="json",disambiguate=0), encode = "form",write_disk(file.path("getAlchemy",FOLDERNAME,X)))
+    Sys.sleep(.5)
+  }}
+
 
 ParseFolderToFrame<-function(FOLDERNAME,PREPFRAME,WT){
   rels<-lapply(1:length(list.files(file.path("getAlchemy",FOLDERNAME))),function(i) fromJSON(readLines(file.path("getAlchemy",FOLDERNAME,list.files(file.path("getAlchemy",FOLDERNAME))[i])))$relations)
