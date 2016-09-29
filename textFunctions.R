@@ -1,6 +1,7 @@
-options(java.parameters = "-Xmx4g")
+options(java.parameters = "-Xmx2048m")
 
-list.of.packages <- c("ggplot2", "Rcpp","tm","ggthemes","SnowballC","rvest","downloader","DT","wordcloud","d3heatmap","plyr","reshape2","dplyr","qdapTools","stringr","openNLP","NLP","stm","LDAvis","servr","Rtsne","geometry","downloader","corrplot","pryr","openNLPmodels.en","lubridate","pbapply")
+list.of.packages <- c("ggplot2", "Rcpp","tm","ggthemes","SnowballC","rvest","downloader","DT","wordcloud","d3heatmap","plyr","reshape2","dplyr","qdapTools","stringr","openNLP","NLP","stm","LDAvis","servr","Rtsne","geometry","downloader","corrplot","pryr","openNLPmodels.en","lubridate","pbapply","devtools","tm.plugin.mail","plotly")
+
 if("StanfordCoreNLP"%in%c(installed.packages()[,"Package"])==FALSE){install.packages('StanfordCoreNLP',repos="http://datacube.wu.ac.at/",type="source")}
 if("openNLPmodels.en"%in%c(installed.packages()[,"Package"])==FALSE){install.packages('openNLPmodels.en',repos="http://datacube.wu.ac.at/",type="source")}
 packages.Req <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -22,6 +23,23 @@ getTextR<-function(fname,tika=FALSE,tikapath="tika-app-1.13.jar"){
       if(str_detect(fname,".doc+$")==TRUE){readDOC()(language="en",elem=list(uri=fname))} else {pdoc<-if(str_detect(fname, fixed(".pdf"))==TRUE){readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")} else {if(str_detect(fname,fixed(".txt"))==TRUE){readPlain(elem=list(uri=fname,content=iconv(enc2utf8(readLines(fname)), sub = "byte")),language="en")} else {"FILETYPE NA"}}}}}
   pdoc
 }
+readMails<-function(FOLDERCONTAININGDOCS,newmailsdirectory){
+  FOLDERCONTAININGDOCS<-"../docs"
+  newmailsdirectory<-"../testnewdocs"
+  dir.create(newmailsdirectory)
+  messages<-list.files(FOLDERCONTAININGDOCS,full.names=TRUE)[str_detect(tools::file_ext(list.files(FOLDERCONTAININGDOCS)),"msg")]
+  plyr::l_ply(messages,function(X) system(paste(paste("msgconvert --mbox",file.path(FOLDERCONTAININGDOCS,"msgs.mbox",sep=""),X))))
+  file.remove(messages)
+  mbases<-list.files(FOLDERCONTAININGDOCS)[tools::file_ext(list.files("../docs"))%in%"mbox"==FALSE]
+  file.copy(file.path(FOLDERCONTAININGDOCS,"msgs.mbox"),file.path(newmailsdirectory,"msgs.mbox"))
+  mails<-MBoxSource(file.path(newmailsdirectory,"msgs.mbox"))
+  file.remove("../docs/msgs.mbox")
+  mailsc<-Corpus(mails)
+  mailsc}
+
+copyDir<-function(from,to){
+  dir.create(to)
+  system(paste("cp -r", from, to))}
 
 read_docxtm<-function (file, skip = 0) {
   tmp <- tempfile()
@@ -67,6 +85,8 @@ readPDF2<-function (engine = c("xpdf", "Rpoppler", "ghostscript", "Rcampdf","cus
 }
 
 allDocs<-function(directory){do.call(c,lapply(file.path(directory,list.files(directory)),getTextR))}
+
+
 doc_clean_process<-function(corpusname){
   stopWords <- function(x) removeWords(x, stopwords("en"))
   funs <- list(stripWhitespace,

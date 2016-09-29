@@ -1,0 +1,15 @@
+numwords<-426572
+word.vector.file<-"../LargeFiles/conceptnet-numberbatch-201609_en_main.txt"
+library(data.table)
+word.vector.df<-fread(word.vector.file,nrows=10,header=FALSE,select=1)
+?readLines
+readLines(word.vector.file,n=1)
+word.vector.df
+row.names(word.vector.df)
+normalize.vector(colSums(word.vector.df[grep("^man$",word.list),-1]))
+word.vector.df[1,]
+XML::parseURI(word.vector.df[2])
+install.packages("ppls")
+devtools::install_github("bmschmidt/wordVectors")
+library(ppls)
+rm(anf)

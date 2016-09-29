@@ -1,8 +1,11 @@
 .Rproj.user
 .Rhistory
 .RData
-<<<<<<< HEAD
 demo.docs.folder
+savedObjects
+figures
 getAlchemy
-=======
->>>>>>> 77efdc70df4a618a8d9b6c76c7fa4c78b5e2fcfb
+basefile.rds
+basecorpus.rds
+baseWORK.RData
+keepthese921.Rdata

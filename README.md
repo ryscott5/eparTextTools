@@ -5,6 +5,14 @@ output: html_document
 
 This tookit provides a set of resources for analyzing textual documents using the R programming language for the conduct of portfolio analysis and review. The tools rely on text mining, natural language processing, and machine learning programs developed by other R users and as such heavily relies on code developed by other packages. Thus, it may be thought of as a set of tools enabling portfolio analysis rather than a new package for conduct of text analysis.
 
+The tools are set up to be run on a Google Cloud compute instance. this has the benefit of allowing you to run processes in the cloud rather than on your own local computer. While setting up and running a Google Instance can be a new trial for those who have never used a Linux shell, 99% of the coding can be done in RStudio simply by visiting the rstudio-server webpage that the Google Cloud Instance Startup code creates. 
+
+In terms of sizing, a 2GPU 7.5GB RAM n1-standard machine should work fine so long as you increase the size of the JAVA heap space. If you need a job to complete more quickly or less quickly, you could by a larger instance. Cloud pricing is [here](https://cloud.google.com/compute/pricing). You can set up the job to be pre-emptable as well. This will save you lots of money and is highly recommended. When using a preemptible instance you must make sure to save your robjects to file regularly as Google can shut down your work at any time. However, this will reduce the computing costs by about 1/5th.
+
+The tools can be used with Amazon AWS if that is a more familiar format, however, the installation instructions will be somewhat different and you will have to be flexible in porting the cloud_startup code to AWS.
+
+
+
 To run this document, clone the repository to a local directory. To do this, first set up an ssh key with rstudio by going to tools...global options...git/svn...create ssh key and registering the key with your github account. Then, go to file...new projects...version control and enter the ssh site for the github page (the clone link).  Alternatively, you download a zip file of the repository and open the .Rproject file. This document is stored as readme.md with coding in chunks. 
 
 The program depends on a few software installations, notably "antiword" or "tika" and "Apache openNLP". To install these on a mac, one can use homebrew and run the command "brew install antiword". Installing openNLP requires updating the Java JRE file on your make. This can also be done via homebrew on a mac. 
@@ -296,3 +304,5 @@ findTopic(st1, wd$Up.Words, n=10, type=c("frex"), verbose=TRUE)
 
 assocPrettyOneStep(wd$Up.words,, corpus2,.5)
 
+pf1<-read.csv("pred1.csv",stringsAsFactors=FALSE)
+head(pf1)

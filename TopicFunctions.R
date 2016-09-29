@@ -1,5 +1,9 @@
 #TopicFunctions
 library(lubridate)
+jgc <- function()
+{
+  rJava::.jcall("java/lang/System", method = "gc")
+}    
 
 PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
   corpEntN<-CORPUS_A[sapply(CORPUS_A,function(x) length(content(x)))>0]
@@ -14,7 +18,7 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
   corpEntN[[6]]<-melt(sapply(1:length(corpEntN[[6]]),function(x) paste(corpEntN[[6]][[x]],collapse="")))[,1]
   corpEntN[[7]]<-melt(sapply(1:length(corpEntN[[6]]),function(x) paste(corpEntN[[7]][[x]],collapse="")))[,1]
   corpEntN<-data.frame(corpEntN)
-  colnames(corpEntN)<-names(meta(corpus1[[1]]))
+  colnames(corpEntN)<-names(meta(CORPUS_A[[1]]))
   para_token_annotator <-Annotator(function(s, a = Annotation()) {
     spans <- blankline_tokenizer(s)
     n <- length(spans)
@@ -63,6 +67,41 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
   list("SentFrame"=par2,"Annotations"=allans,"processed"=processed,"out"=out)
 }
 
+jgc()
+AnnotateVerbsTopicJoin<-function(WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME){
+  pos_tag_annotator<- Maxent_POS_Tag_Annotator()
+  #OUT<-BASE_INPUT$out
+  #ANNOTATELIST<-BASE_INPUT$Annotations
+  #PROCESSED<-BASE_INPUT$processed
+  #WT<-allwords
+    toChar<-BASE_INPUT$SentFrame$S[-PROCESSED$docs.removed] %>% .[-OUT$docs.removed]
+    toCharANS<-ANNOTATELIST[-PROCESSED$docs.removed] %>% .[-OUT$docs.removed]
+    KeepA<-unique(unlist(sapply(WT, function(W) which(str_detect(toChar,tolower(W))))))
+      anns<-lapply(KeepA,function(i){
+      ANT<-annotate(as.String(toChar[i]),pos_tag_annotator,toCharANS[i][[1]])
+      wans<-subset(ANT, type=="word")
+      vans<-wans[which(unlist(wans$features)%in%c("VB","VBN","VBZ","VBG","VBN","VBP"))]
+      vanstf<-sapply(1:length(vans), function(i2){TRUE%in%str_detect(as.character(as.String(toChar[i])[vans[i2]]),WT)})
+      vans2<-vans[vanstf==TRUE]
+      vanstf<-do.call(rbind,lapply(1:length(vans2), function(i3){
+        vsent<-subset(ANT,start<=vans2[i3]$start) %>% subset(.,end>=vans2[i3]$end) %>% subset(type=="sentence")
+        #vsent<-subset(anns[[1]], start>=vsent$start) %>% subset(.,end<=vsent$end)
+        #psent<-parse_annotator(as.String(toChar),vsent)
+        #list(vsent,psent)
+        as.String(toChar[i])[vsent]
+        data.frame("Sent"=ifelse(length(vsent)>0,as.character(as.String(toChar[i])[vsent]),NA),"rowid"=i)
+      }))
+      vanstf})
+    anf<-do.call(rbind,anns)  
+    anf<-cbind(anf,OUT$meta[anf$rowid,])
+    anf$top.topics<-BASE_INPUT$top.topics[anf$rowid]
+    anf<-subset(anf, is.na(anf$Sent)==FALSE)
+    anf<-unique(anf)
+    anf}
+
+CombinationFrame<-function(PREPFRAME){
+  ddply(.data=PREPFRAME, .(Orig,rowid),summarize,"Sent"=paste(as.character(Sent),collapse="\n",sep="\n"))
+}
 
 
 AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME){
@@ -86,17 +125,78 @@ AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRA
         data.frame("Sent"=ifelse(length(vsent)>0,as.character(as.String(toChar[i])[vsent]),NA),"rowid"=which(SENTENCEFRAME[-PROCESSED$docs.removed,][-OUT$docs.removed,][which(MAXTOPS==k),][i,]$SC==SENTENCEFRAME[-PROCESSED$docs.removed,][-OUT$docs.removed,]$SC))
       }))
       vanstf})})
-  tcs[[1]]
-  names(tcs)<-[1:30][-droppedLs]
+  names(tcs)<-c(1:MAXTOPS)[-droppedLs]
   droppedLs2<-which(sapply(tcs,length)<1)
   tcs2<-tcs[sapply(tcs, length)>0]
   allcs<-na.omit(melt(tcs2))
   allcs}
 
+
+library(plyr)
+library(dplyr)
+
+recombine<-CombinationFrame(anf)
+library(stringr)
+
+ProcessforAPI<-function(PREPFRAME){
+PREPFRAME$Sent<-str_trim(PREPFRAME$Sent)
+PREPFRAME$Sent<-gsub("\n"," ",PREPFRAME$Sent)
+badcs<-paste(gsub("\\w|\\s|\\.|\\,","",PREPFRAME$Sent),collapse="")
+badcs<-unique(unlist(strsplit(badcs,split="")))
+for(i in 1:length(badcs)){
+  PREPFRAME$Sent<-gsub(badcs[i]," ",PREPFRAME$Sent,fixed=T)
+}
+PREPFRAME$Sent<-gsub("  "," ",PREPFRAME$Sent)
+PREPFRAME}
+
+library(wordnet)
+
+idtopics<-function(STMOBJ,TERM,N){
+  #TERM<-"cassava"
+  #STMOBJ<-st1
+  ptops<-findTopic(STMOBJ,list(TERM),n=N,type="prob")
+  if(length(ptops)>1){
+  ptopsl<-sapply(1:length(ptops), function(i) paste(sageLabels(STMOBJ,n=N)$marginal$prob[ptops,][i,],collapse=" "))
+  mselect<-ptops[which(ptopsl%in%select.list(ptopsl,multiple=T))]
+  } else {mselect<-ptops}
+  cat(paste("\nmodel",mselect,"selected",sep=" ",collapse=","))
+  return(mselect)
+}
+
+
+picktopics<-function(STMOBJ,TERM,N){
+  test<-idtopics(STMOBJ,TERM,N)
+  termlist<-TERM
+  if(menu(c("yes","no"),title="\nCheck For Similar Words?")==1){
+    terms <- getIndexTerms("NOUN", 1, getTermFilter("ExactMatchFilter", TERM, TRUE))
+    newterms<-getSynonyms(terms[[1]]) %>% select.list(.,multiple=TRUE)
+    termlist<-c(termlist,newterms)
+    test<-append(test,sapply(newterms,function(X) tryCatch({idtopics(STMOBJ,X,N)},error=function(e){NA})))
+    test<-na.omit(test)
+  }
+  cat("\nYou are using topics\n",test,"\nbased on selection of",termlist,sep=" ",collapse=" ")
+  list("searchterms"=termlist,"topics"=test)
+  }
+  
+
+data_mapper<<-function(CountryPredictions,OPPORTUNITY){
+  gchars<-ddply(CountryPredictions,.(OpID),summarise,"charsum"=sum(nchars))
+  CountryPredictions<-plyr::join(CountryPredictions,gchars)
+  CountryPredictions$weight<-CountryPredictions$nchars/CountryPredictions$charsum
+  CountryPredictions<-cbind(CountryPredictions[,1:2],CountryPredictions[,3:c(ncol(CountryPredictions)-3)]*CountryPredictions$weight)
+  ftemp<-dplyr::filter(CountryPredictions, OpID%in%OPPORTUNITY)
+  tframe<-reshape2::melt(colSums(ftemp[,3:ncol(ftemp)],na.rm=TRUE)/sum(ftemp[,3:ncol(ftemp)],na.rm=TRUE))
+  tframe$countryids<-row.names(tframe)
+  tframe$ccode2<-plyr::join(data.frame("ISO3166.1.Alpha.2"=tframe$countryids),ccodes)$ISO3166.1.Alpha.3
+  tframe$nameC<-plyr::join(data.frame("ISO3166.1.Alpha.2"=tframe$countryids),ccodes)$official_name_en
+  tframe$hover<-paste(tframe$nameC,": ",round(tframe$value*100)/100,sep="")
+  tframe}
+
+
 FillFolderMan<-function(PREPFRAME,FOLDERNAME){
   library(httr)
   #if(dir.exists("getAlchemy")==FALSE) {dir.create("getAlchemy")}
-  #if(dir.exists(file.path("getAlchemy",FOLDERNAME))==FALSE) {dir.create(file.path("getAlchemy",FOLDERNAME))}
+  #if(dir.exists(file.path(FOLDERNAME,"ALCHEMY"))==FALSE) {dir.create(file.path(FOLDERNAME,"ALCHEMY"))}
   for(i in 1:nrow(PREPFRAME)){
     X<-PREPFRAME$Sent[i]
     req <- POST("http://access.alchemyapi.com/calls/text/TextGetRelations", 
@@ -105,7 +205,7 @@ FillFolderMan<-function(PREPFRAME,FOLDERNAME){
   }}
 
 findBroken<-function(FOLDERNAME){
-flist<-list.files(file.path("getAlchemy",FOLDERNAME))
+flist<-list.files(file.path(FOLDERNAME,"ALCHEMY"))
 bad<-sapply(flist,function(X){
 tfile<-readLines(file.path("getAlchemy",FOLDERNAME,X))
 p1<-str_detect(paste(tfile,collapse=" ",sep=" "),"If you are seeing this message, you are likely making an excessive number of concurrent HTTP connections to this service.  Please check the concurrency limits for your assigned service tier.")
@@ -116,19 +216,20 @@ TRUE%in%c(p1,p2)
 flist[bad]
 }
 
-
 FillFolder<-function(PREPFRAME,FOLDERNAME){
   library(httr)
-  if(dir.exists("getAlchemy")==FALSE) {dir.create("getAlchemy")}
-  if(dir.exists(file.path("getAlchemy",FOLDERNAME))==FALSE) {dir.create(file.path("getAlchemy",FOLDERNAME))}
+  if(dir.exists(file.path(FOLDERNAME,"ALCHEMY"))==FALSE) {dir.create(file.path(workingfolder,"ALCHEMY")}
+  if(dir.exists(file.path(FOLDERNAME,"ALCHEMY"))==FALSE) {dir.create(file.path(FOLDERNAME,"ALCHEMY"))}
   for(i in 1:nrow(PREPFRAME)){
     X<-PREPFRAME$Sent[i]
     req <- POST("http://access.alchemyapi.com/calls/text/TextGetRelations", 
-                body = list(apikey="6837e8ae18678cadd3c42fc55ed938b3818ce470",text=X,keywords=1,outputMode="json",disambiguate=0), encode = "form",write_disk(file.path("getAlchemy",FOLDERNAME,paste("al",i,".json",sep=""))))
-    Sys.sleep(.5)
+                body = list(apikey="6837e8ae18678cadd3c42fc55ed938b3818ce470",text=X,keywords=1,outputMode="json",disambiguate=0), encode = "form",write_disk(file.path(FOLDERNAME,"ALCHEMY",paste("al",i,".txt",sep=""))))
+    Sys.sleep(.75)
+    cat(i)
   }}
 
-FillRetry<-function(PREPFRAME,FOLDERNAME,FILENAMES){
+
+#FillRetry<-function(PREPFRAME,FOLDERNAME,FILENAMES){
   library(httr)
   for(X in FILENAMES){
     Num1<-gsub(".json","",X) %>% gsub("al","",.) %>% as.numeric()
@@ -139,9 +240,21 @@ FillRetry<-function(PREPFRAME,FOLDERNAME,FILENAMES){
     Sys.sleep(.5)
   }}
 
+#FillRetry<-function(PREPFRAME,FOLDERNAME,FILENAMES){
+  library(httr)
+  for(X in FILENAMES){
+    Num1<-gsub(".json","",X) %>% gsub("al","",.) %>% as.numeric()
+    Sent<-PREPFRAME$Sent[Num1]
+    file.remove(file.path("getAlchemy",FOLDERNAME,X))
+    req <- POST("http://access.alchemyapi.com/calls/text/TextGetRelations", 
+                body = list(apikey="6837e8ae18678cadd3c42fc55ed938b3818ce470",text=Sent,keywords=1,outputMode="json",disambiguate=0), encode = "form",write_disk(file.path(FOLDERNAME,"ALCHEMY",X)))
+    Sys.sleep(.5)
+    
+  }}
+
 
 ParseFolderToFrame<-function(FOLDERNAME,PREPFRAME,WT){
-  rels<-lapply(1:length(list.files(file.path("getAlchemy",FOLDERNAME))),function(i) fromJSON(readLines(file.path("getAlchemy",FOLDERNAME,list.files(file.path("getAlchemy",FOLDERNAME))[i])))$relations)
+  rels<-lapply(1:length(list.files(file.path(FOLDERNAME,"ALCHEMY"))),function(i) fromJSON(readLines(file.path(FOLDERNAME,"ALCHEMY",list.files(file.path(FOLDERNAME,"ALCHEMY"))[i])))$relations)
   rels2<-rels[which(sapply(rels,function(x) length(x)>0))]
   joinkey<-lapply(1:length(rels),function(i)  {
     mrow<-max(c(nrow(rels[[i]]$subject$keywords[[1]]),nrow(rels[[i]]$object$keywords[[1]]),length(rels[[i]]$action$verb$text)))
@@ -172,11 +285,12 @@ ParseFolderToFrame<-function(FOLDERNAME,PREPFRAME,WT){
   joinkey$verbkey<-tolower(joinkey$verbkey)
   joinkey_sub<-subset(joinkey, verbkey%in%WT)
   library(dplyr)
-  subcs<-cbind(joinkey_sub,PREPFRAME[as.numeric(list.files(file.path("getAlchemy",FOLDERNAME))[as.numeric(joinkey_sub$whichi)] %>% gsub("al","",.) %>% gsub('.json',"",.,fixed=T)),])
-  subcs_full<-cbind(joinkey,PREPFRAME[as.numeric(list.files(file.path("getAlchemy",FOLDERNAME))[as.numeric(joinkey$whichi)] %>% gsub("al","",.) %>% gsub('.json',"",.,fixed=T)),])
+  subcs<-cbind(joinkey_sub,PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY"))[as.numeric(joinkey_sub$whichi)] %>% gsub("al","",.) %>% gsub('.json',"",.,fixed=T)),])
+  subcs_full<-cbind(joinkey,PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY"))[as.numeric(joinkey$whichi)] %>% gsub("al","",.) %>% gsub('.json',"",.,fixed=T)),])
   list("SmallVerb"=subcs,"FullVerb"=subcs_full)}
+
 frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME){
-  OV<-PREPFRAME[as.numeric(list.files(file.path("getAlchemy",FOLDERNAME)) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
+  OV<-PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY")) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
   OVF<-BASEINPUT$SentFrame[-BASEINPUT$processed$docs.removed,][-BASEINPUT$out$docs.removed,][OV$value,] 
   PARSEFRAME<-cbind(PARSEFRAME,OVF[,c("author","datetimestamp","id","ents")])
   PARSEFRAME<-PARSEFRAME[,c(1,2,3,5,7,8,9,10,11)]
@@ -186,7 +300,6 @@ frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME){
   PARSEFRAME$Verb<-as.factor(PARSEFRAME$Verb)
   PARSEFRAME}
 
-library(DT)
 
 frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME,TOPICMOD){
   # PARSEFRAME<-Frame1[[1]]
@@ -199,7 +312,7 @@ frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME,TOPICMOD){
   # rm(PREPFRAME)
   # TOPICMOD<-st1
   # rm(TOPICMOD)
-  OV<-PREPFRAME[as.numeric(list.files(file.path("getAlchemy",FOLDERNAME)) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
+  OV<-PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY")) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
   OVF<-BASEINPUT$SentFrame[-BASEINPUT$processed$docs.removed,][-BASEINPUT$out$docs.removed,][OV$value,] 
   PARSEFRAME<-cbind(PARSEFRAME,OVF[,c("author","datetimestamp","id","ents")])
   colnames(PARSEFRAME)
@@ -211,7 +324,7 @@ frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME,TOPICMOD){
   PARSEFRAME}
 
 frametable.html<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME,TOPICMOD){
-  OV<-PREPFRAME[as.numeric(list.files(file.path("getAlchemy",FOLDERNAME)) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
+  OV<-PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY")) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
   OVF<-BASEINPUT$SentFrame[-BASEINPUT$processed$docs.removed,][-BASEINPUT$out$docs.removed,][OV$value,] 
   PARSEFRAME<-cbind(PARSEFRAME,OVF[,c("author","datetimestamp","id","ents")])
   PARSEFRAME<-PARSEFRAME[,c(1,2,3,5,7,8,9,10,11)]
@@ -308,3 +421,85 @@ idSimilar<-function(SEARCH,COLUMN,NUM,TOPICMODEL){
   d1<-kmeans(subprobs,NUM)
   names(d1$cluster[d1$cluster==d1$cluster[sid]])
 }
+
+
+#nex<-read.csv("../nonExcel.csv",stringsAsFactors=FALSE)
+#nexjoin<-plyr::join(data.frame("name"=BASE_INPUT$SentFrame$id),data.frame("name"=basename(as.character(nex$path)),"OpID"=as.character(nex$Opportunity.ID)),type="left",match="first")
+#BASE_INPUT$SentFrame$OpID<-nexjoin$OpID
+library(plyr)
+#for these commands, we need to have the opportunity id labeles as OpID in the SentFrame part of BASE_INPUT
+buildcliff<-function() {system('sudo docker run -p "8080:8080" -d --name cliff cliff:2.1.1')}
+startcliff<-function() {system('sudo docker start cliff')}
+checkcliff<-function(){system('sudo docker ps')}
+stopcliff<-function(){system('sudo docker stop cliff')}
+PredictCountryByDoc<-function(BASE_INPUT){
+  fullc<-ddply(BASE_INPUT$SentFrame, .(Orig), summarise, "fullc"=paste(SC, collapse=" ",sep=" "))
+  countries<-vector("list",nrow(fullc))
+  for(i in 1:nrow(fullc)){
+    try({
+      TEXTI<-fullc$fullc[i]
+      ncons<-ceiling(nchar(TEXTI)/ceiling(nchar(TEXTI)/4000))
+      noutstop<-c(1,c(1:ceiling(nchar(TEXTI)/4000))*ncons)
+      stsp<-lapply(1:c(length(noutstop)-1),function(X) c(noutstop[X],noutstop[X+1]))
+      subers<-lapply(stsp,function(X) substr(TEXTI,X[1],X[2]))
+      mres<-lapply(subers,function(X) GET(url="http://localhost:8080/CLIFF-2.1.1/parse/text",query = list(replaceAllDemonyms="true",q=X)))
+      mres<-mres[sapply(mres,function(X) X$status_code==200)]
+      res<-do.call(rbind.fill, lapply(mres,function(X) jsonlite::fromJSON(X[[1]][[1]])$results$places$focus$countries))[,c("countryCode","score")]
+      res<-unlist(sapply(1:nrow(res),function(i) rep(res$countryCode[i],res$score[i])))
+      countries[[i]]<-data.frame(t(as.matrix(table(res)/length(res))))
+      cat(i)})}
+  for(i in which(sapply(countries,length)==0)){
+    countries[[i]]=data.frame("none"=0)}
+  countries<-do.call(rbind.fill,countries)
+  countries$Orig<-fullc$Orig
+  f1<-join(BASE_INPUT$SentFrame[,c("OpID","Orig")],countries)
+  f1<-unique(f1)
+  f1$nchars<-nchar(fullc$fullc)
+  f1
+}
+
+runMap<-function(FILENAMEQUOTED,path.file=FALSE,titleC){shiny::shinyApp(
+  ui = fluidPage(sidebarLayout(
+    sidebarPanel(selectizeInput("OpporID", label = "Opportunity Number", choices = unique(pred2$OpID),multiple=TRUE, selected=pred2$OpID[1]),
+                 selectInput("projection",label="Map Projection",choices=c('equirectangular','mercator', 'orthographic','natural earth','kavrayskiy7','miller', 'robinson','eckert4','azimuthal equal area','azimuthal equidistant','conic equal area','conic conformal','conic equidistant','gnomonic','stereographic','mollweide','hammer','transverse mercator'),selected='mollweide')
+    ),
+    mainPanel(
+      plotlyOutput("plotly"),
+      tableOutput("table")
+    ))),
+  server = function(input, output) {
+    ccodes<<-read.csv(textConnection(getURL("http://data.okfn.org/data/core/country-codes/r/country-codes.csv")),stringsAsFactors=FALSE)
+    output$plotly<-renderPlotly({
+      g <- list(showframe = FALSE,showcoastlines = TRUE,projection = list(type = input$projection))
+      l <- list(color = toRGB("grey"), width = 0.5)
+      d1<-data_mapper(pred2,input$OpporID)
+      plot_ly(d1,z=value,hoverinfo="text", locations = ccode2, type = 'choropleth', marker = list(line = l),color = value, colors = 'Blues',zmax=max(value),zmin=min(value),text=hover,colorbar = list(title = 'Country Relevance'),source="select") %>% layout(title =paste(titleC,"<br>Source:<a href='https://github.com/c4fcm/CLIFF'>CLIFF</a>"), geo = g)
+    })
+    output$table<-renderTable({
+      eventdata<-event_data("plotly_click", source = "select")$pointNumber+1
+      d1<-data_mapper(pred2,input$OpporID)
+      rframe<-data.frame("col1"=pred2$OpID[sort.int(pred2[,d1$countryids[eventdata]],decreasing=TRUE,index.return=TRUE)$ix[1:5]])
+      colnames(rframe)[1]<-paste("Top 5 Opportunities for", d1$nameC[eventdata])
+      rframe})
+  },
+  onStart=function(){
+    suppressWarnings(library(plyr,warn.conflicts=FALSE,quietly=TRUE))
+    suppressWarnings(library(dplyr,warn.conflicts=FALSE,quietly=TRUE))
+    suppressWarnings(library(plotly,warn.conflicts=FALSE,quietly=TRUE))
+    suppressWarnings(library(RCurl,warn.conflicts=FALSE,quietly=TRUE))
+    suppressWarnings(library(DT,warn.conflicts=FALSE,quietly=TRUE))
+    pred2<<-if(path.file==TRUE){read.csv(FILENAMEQUOTED,stringsAsFactors=FALSE) %>% .[,2:ncol(.)]} else {FILENAMEQUOTED}
+    data_mapper<<-function(CountryPredictions,OPPORTUNITY){
+      gchars<-ddply(CountryPredictions,.(OpID),summarise,"charsum"=sum(nchars))
+      CountryPredictions<-plyr::join(CountryPredictions,gchars)
+      CountryPredictions$weight<-CountryPredictions$nchars/CountryPredictions$charsum
+      CountryPredictions<-cbind(CountryPredictions[,1:2],CountryPredictions[,3:c(ncol(CountryPredictions)-3)]*CountryPredictions$weight)
+      ftemp<-dplyr::filter(CountryPredictions, OpID%in%OPPORTUNITY)
+      tframe<-reshape2::melt(colSums(ftemp[,3:ncol(ftemp)],na.rm=TRUE)/sum(ftemp[,3:ncol(ftemp)],na.rm=TRUE))
+      tframe$countryids<-row.names(tframe)
+      tframe$ccode2<-plyr::join(data.frame("ISO3166.1.Alpha.2"=tframe$countryids),ccodes)$ISO3166.1.Alpha.3
+      tframe$nameC<-plyr::join(data.frame("ISO3166.1.Alpha.2"=tframe$countryids),ccodes)$official_name_en
+      tframe$hover<-paste(tframe$nameC,": ",round(tframe$value*100)/100,sep="")
+      tframe}
+  })}
+
