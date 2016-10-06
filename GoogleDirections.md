@@ -72,6 +72,10 @@ sudo docker ps
 sudo docker stop
 ```
 
+For SHINY server, follow build instructions:
+https://github.com/rstudio/shiny-server/wiki/Building-Shiny-Server-from-Source
+
+
 Now, you can log into rstudio-server by visiting the IP address for your instance followed by :8787.
 
 

@@ -45,7 +45,6 @@ inputPanel(
   sliderInput("Kclusters", label = "Estimated number of unique subjects/objects/verbs:",min = 2, max = 150, value = 15, step = 1),
   checkboxInput('Shorten',label='Shorten Strings?', value=TRUE)
 )
-
 renderDataTable({
   if(nchar(input$word)>1){
     t1<-basic_table[basic_table[,input$NOV]%in%idSimilar(input$word,basic_table[,input$NOV],input$Kclusters,st1),]}

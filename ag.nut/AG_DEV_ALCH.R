@@ -7,8 +7,7 @@ library(jsonlite)
 args = commandArgs(trailingOnly=TRUE)
 FillFolder<-function(PREPFRAME,FOLDERNAME){
   library(httr)
-  if(dir.exists("getAlchemy")==FALSE) {dir.create("getAlchemy")}
-  if(dir.exists(file.path("getAlchemy",FOLDERNAME))==FALSE) {dir.create(file.path("getAlchemy",FOLDERNAME))}
+  if(dir.exists(file.path(FOLDERNAME,"ALCHEMY"))==FALSE) {dir.create(file.path(FOLDERNAME,"ALCHEMY"))}
   for(i in args[1]:nrow(PREPFRAME)){
     X<-PREPFRAME$Sent[i]
     req <- POST("http://access.alchemyapi.com/calls/text/TextGetRelations", 
@@ -16,4 +15,6 @@ FillFolder<-function(PREPFRAME,FOLDERNAME){
     Sys.sleep(1)
   }}
 recombine<-readRDS('recombine.rds')
-FillFolder(recombine,"AgNut.Relations")
+
+
+FillFolder(recombine,FOLDERNAME)

@@ -1,3 +1,5 @@
+#
+
 source("textFunctions.R")
 source("TopicFunctions.R")
 
@@ -23,9 +25,9 @@ jgc()
 BASE_INPUT<-PreTopicFrame(fullcorp,10)
 
 #saves files so you can reload.
-dir.create("workingfiles")
-saveRDS(BASE_INPUT, "workingfiles/basefile.rds")
-saveRDS(fullcorp, "workingfiles/basecorpus.rds")
+dir.create("../../AgandNutrition")
+saveRDS(BASE_INPUT, "../../workingfiles/basefile.rds")
+saveRDS(fullcorp, "../../workingfiles/basecorpus.rds")
 
 #here we add opportunity labels to documents 
 
@@ -35,7 +37,7 @@ nexjoin<-plyr::join(data.frame("name"=BASE_INPUT$SentFrame$id),data.frame("name"
 BASE_INPUT$SentFrame$OpID<-nexjoin$OpID
 nexjoin2<-plyr::join(data.frame("name"=BASE_INPUT$out$meta$id),data.frame("name"=basename(as.character(nex$path)),"OpID"=as.character(nex$Opportunity.ID)),type="left",match="first")
 BASE_INPUT$out$meta$OpID<-nexjoin2$OpID
-rm(list("nexjoin","nexjoin2","nex")
+rm(list("nexjoin","nexjoin2","nex"))
 
 buildcliff()
 startcliff()
@@ -65,15 +67,36 @@ allwords<-c(wd$Up.Words,wd$Down.Words)
 AnnotatesLarge<-AnnotateVerbsTopicJoin(allwords,BASE_INPUT$processed,BASE_INPUT$out,BASE_INPUT$Annotations,BASE_INPUT$SentFrame)
 AnnotatesSmaller<-CombinationFrame(AnnotatesLarge)
 rm(AnnotatesLarge)
+
 saveRDS(AnnotatesSmaller,file.path(workingfolder,"AnnotationFrame.rds"))
+
 
 ProcessedANNS<-ProcessforAPI(AnnotatesSmaller)
 
+
 FillFolder(ProcessedANNS,workingfolder)
 
-Frame1<-ParseFolderToFrame(workingfolder,ProcessedANNS,allwords)
+Frame1<-processFolder(workingfolder,ProcessedANNS)
+
+rm(BASE_INPUT)
+rm(BASEINPUT)
 saveRDS(Frame1,file.path(workingfolder,"ParsedFrame.rds"))
 
-Frame1<-readRDS("Frame1out.rds")
+frametable<-function(PARSEFRAME,BASEINPUT,origent){
+   basejoin<-BASEINPUT$out$meta
+   basejoin$TopTopics<-BASEINPUT$top.topics
+   joined<-cbind(PARSEFRAME,basejoin[PARSEFRAME$rowid,])
+   colnames(joined)
+   joined<-joined[,c(c(1:ncol(PARSEFRAME)),18,19,22,27,c(28+origent),ncol(joined))]
+   joined<-joined[,c(1:ncol(joined))[-which(colnames(joined)%in%c("filename","comboID","rowid"))]]
+   joined$ents<-gsub(",",";",joined$ents)
+   joined
+}
+   
+matchtable<-frametable(pfolderSmall,BASE_INPUT,25)
 
+dir.create("../AG_NUTRITION_RESULTS")
+tableapp(matchtable,st1)
+
+save("matchtable","st1",file="../AG_NUTRITION_RESULTS/agnutshinydata.R")
 

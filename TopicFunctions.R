@@ -131,13 +131,6 @@ AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRA
   allcs<-na.omit(melt(tcs2))
   allcs}
 
-
-library(plyr)
-library(dplyr)
-
-recombine<-CombinationFrame(anf)
-library(stringr)
-
 ProcessforAPI<-function(PREPFRAME){
 PREPFRAME$Sent<-str_trim(PREPFRAME$Sent)
 PREPFRAME$Sent<-gsub("\n"," ",PREPFRAME$Sent)
@@ -149,7 +142,6 @@ for(i in 1:length(badcs)){
 PREPFRAME$Sent<-gsub("  "," ",PREPFRAME$Sent)
 PREPFRAME}
 
-library(wordnet)
 
 idtopics<-function(STMOBJ,TERM,N){
   #TERM<-"cassava"
@@ -218,29 +210,26 @@ flist[bad]
 
 FillFolder<-function(PREPFRAME,FOLDERNAME){
   library(httr)
-  if(dir.exists(file.path(FOLDERNAME,"ALCHEMY"))==FALSE) {dir.create(file.path(workingfolder,"ALCHEMY")}
   if(dir.exists(file.path(FOLDERNAME,"ALCHEMY"))==FALSE) {dir.create(file.path(FOLDERNAME,"ALCHEMY"))}
-  for(i in 1:nrow(PREPFRAME)){
+  for(i in args[1]:nrow(PREPFRAME)){
     X<-PREPFRAME$Sent[i]
     req <- POST("http://access.alchemyapi.com/calls/text/TextGetRelations", 
-                body = list(apikey="6837e8ae18678cadd3c42fc55ed938b3818ce470",text=X,keywords=1,outputMode="json",disambiguate=0), encode = "form",write_disk(file.path(FOLDERNAME,"ALCHEMY",paste("al",i,".txt",sep=""))))
-    Sys.sleep(.75)
-    cat(i)
+                body = list(apikey="6837e8ae18678cadd3c42fc55ed938b3818ce470",text=X,keywords=1,outputMode="json",disambiguate=0), encode = "form",write_disk(file.path("getAlchemy",FOLDERNAME,paste("al",i,".txt",sep=""))))
+    Sys.sleep(1)
   }}
 
 
-#FillRetry<-function(PREPFRAME,FOLDERNAME,FILENAMES){
-  library(httr)
+
+FillRetry<-function(PREPFRAME,FOLDERNAME,FILENAMES){
   for(X in FILENAMES){
     Num1<-gsub(".json","",X) %>% gsub("al","",.) %>% as.numeric()
     Sent<-PREPFRAME$Sent[Num1]
     file.remove(file.path("getAlchemy",FOLDERNAME,X))
     req <- POST("http://access.alchemyapi.com/calls/text/TextGetRelations", 
-                body = list(apikey="6837e8ae18678cadd3c42fc55ed938b3818ce470",text=Sent,keywords=1,outputMode="json",disambiguate=0), encode = "form",write_disk(file.path("getAlchemy",FOLDERNAME,X)))
+                body = list(apikey="6837e8ae18678cadd3c42fc55ed938b3818ce470",text=Sent,keywords=1,outputMode="json",disambiguate=0), encode = "form",write_disk(file.path(FOLDERNAME,"ALCHEMY",X)))
     Sys.sleep(.5)
   }}
-
-#FillRetry<-function(PREPFRAME,FOLDERNAME,FILENAMES){
+FillRetry<-function(PREPFRAME,FOLDERNAME,FILENAMES){
   library(httr)
   for(X in FILENAMES){
     Num1<-gsub(".json","",X) %>% gsub("al","",.) %>% as.numeric()
@@ -252,6 +241,16 @@ FillFolder<-function(PREPFRAME,FOLDERNAME){
     
   }}
 
+processFolder<-function(working.filepath, PREPFRAME){
+  tempfname<-list.files(file.path(working.filepath,"ALCHEMY"),full.names=T)
+  nosize<-sapply(tempfname, function(X) file.info(X)$size==0)
+  templist<-pblapply(tempfname[which(nosize==FALSE)], function(X){fromJSON(X,flatten=T)$relations %>% as.data.frame() %>% mutate(.,"filename"=as.character(X))})
+  tempframe<-rbind.pages(templist)
+  tempframe$comboID=str_extract(tempframe$filename,"[0-9]+")
+  PREPFRAME$comboID<-1:nrow(PREPFRAME)
+  recombineOut<-plyr::join(tempframe,PREPFRAME, by="comboID",type="left",match="all")
+  return(recombineOut)
+}
 
 ParseFolderToFrame<-function(FOLDERNAME,PREPFRAME,WT){
   rels<-lapply(1:length(list.files(file.path(FOLDERNAME,"ALCHEMY"))),function(i) fromJSON(readLines(file.path(FOLDERNAME,"ALCHEMY",list.files(file.path(FOLDERNAME,"ALCHEMY"))[i])))$relations)
@@ -406,6 +405,20 @@ clusterWords<-function(COLUMN,NUM,TOPICMODEL){
   data.frame("Word"=row.names(subprobs),"optName"=optName[d1$cluster])
 }
 
+library('wordVectors')
+nearest_to2<-function(topicm,wordvec,n=10,fixword=FALSE,limitwords=NULL){ 
+  mt<-t(exp(topicm$beta$logbeta[[1]]))
+  row.names(mt)<-topicm$vocab
+  if(fixword==FALSE){
+    whichwords<-unique(unlist(sapply(wordvec,function(X){which(stringr::str_detect(row.names(mt),X))})))} else
+    {whichwords<-which(row.names(mt)%in%wordvec)}
+  if(length(limitwords)>0){
+    whichwords<-whichwords[limitwords]
+  }
+  sims = cosineSimilarity(mt, matrix(as.vector(mt[whichwords,]), ncol = ncol(mt)))
+  ords = order(-sims[, 1])
+  list("searchwords"=row.names(mt)[whichwords],"simwords"=structure(1 - sims[ords[1:n]], names = rownames(sims)[ords[1:n]]))
+}
 
 idSimilar<-function(SEARCH,COLUMN,NUM,TOPICMODEL){
   subprobs<-do.call(rbind.fill,lapply(unique(COLUMN), function(X){
@@ -458,6 +471,24 @@ PredictCountryByDoc<-function(BASE_INPUT){
   f1
 }
 
+
+
+library('wordVectors')
+
+nearest_to2<-function(topicm,wordvec,n=10,fixword=FALSE,limitwords=NULL){ 
+  mt<-t(exp(topicm$beta$logbeta[[1]]))
+  row.names(mt)<-topicm$vocab
+  if(fixword==FALSE){
+    whichwords<-unique(unlist(sapply(wordvec,function(X){which(stringr::str_detect(row.names(mt),X))})))} else
+    {whichwords<-which(row.names(mt)%in%wordvec)}
+  if(length(limitwords)>0){
+    whichwords<-whichwords[limitwords]
+  }
+  sims = cosineSimilarity(mt, matrix(as.vector(mt[whichwords,]), ncol = ncol(mt)))
+  ords = order(-sims[, 1])
+  list("searchwords"=row.names(mt)[whichwords],"simwords"=structure(1 - sims[ords[1:n]], names = rownames(sims)[ords[1:n]]))
+}
+
 runMap<-function(FILENAMEQUOTED,path.file=FALSE,titleC){shiny::shinyApp(
   ui = fluidPage(sidebarLayout(
     sidebarPanel(selectizeInput("OpporID", label = "Opportunity Number", choices = unique(pred2$OpID),multiple=TRUE, selected=pred2$OpID[1]),
@@ -503,3 +534,27 @@ runMap<-function(FILENAMEQUOTED,path.file=FALSE,titleC){shiny::shinyApp(
       tframe}
   })}
 
+
+tableapp<-function(basic_table,TOPICMODEL){
+  wordpossibles<-colnames(basic_table)[unlist(sapply(c("subject","action","object"),function(X) which(stringr::str_detect(colnames(basic_table),X))))]
+  basic_table<-basic_table %>% select(-one_of("Sent","Orig"))
+  for(i in which(sapply(1:ncol(basic_table), function(X) class(basic_table[,X]))=="list")){
+    basic_table[,i]<-sapply(basic_table[,i],function(X){paste(unlist(X),collapse=";")})}
+  basic_table$sentence<-stringr::str_trim(basic_table$sentence)
+  shinyApp(ui = fluidPage(sidebarLayout(
+    sidebarPanel(selectInput("NOV", label = "Select Word Type",choices = wordpossibles, selected = wordpossibles[1]),
+                 textInput("word",label= "Word", value=""),
+                 checkboxInput("sent",label="Show Sentence",value=FALSE),
+                 sliderInput("Kclusters", label = "Number of Words",min = 1, max = 25, value = 5, step = 1),
+                 checkboxInput('Shorten',label='Shorten Strings?', value=TRUE)),
+    mainPanel(dataTableOutput("table1")))), 
+    server = function(input, output) {
+      output$table1<-renderDataTable({
+        if(input$sent==TRUE){t1<-basic_table} else {t1<-basic_table %>% select(-one_of("sentence"))}
+        if(nchar(input$word)>1){
+          matchwords<-names(nearest_to2(TOPICMODEL,input$word,n=input$Kclusters,fixword=FALSE,limitwords=NULL)[[2]])
+          t1<-t1[unlist(sapply(matchwords,function(X) {which(stringr::str_detect(t1[,input$NOV],X))})),]}
+        else {t1<-t1} 
+        if(input$Shorten==TRUE){
+          datatable(t1,rownames=FALSE,filter ='bottom',extensions = 'Buttons')} else {datatable(t1,rownames=FALSE,filter ='bottom',extensions = 'Buttons', options = list(dom = 'Bfrtip',scrollX=TRUE,buttons = c('copy', 'csv', 'excel', 'pdf', 'print','colvis')), callback = JS('table.page(3).draw(false);'))}
+      })})}
