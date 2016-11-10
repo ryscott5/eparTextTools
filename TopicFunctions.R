@@ -289,7 +289,7 @@ ParseFolderToFrame<-function(FOLDERNAME,PREPFRAME,WT){
   subcs_full<-cbind(joinkey,PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY"))[as.numeric(joinkey$whichi)] %>% gsub("al","",.) %>% gsub('.json',"",.,fixed=T)),])
   list("SmallVerb"=subcs,"FullVerb"=subcs_full)}
 
-#frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME){
+frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME){
   OV<-PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY")) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
   OVF<-BASEINPUT$SentFrame[-BASEINPUT$processed$docs.removed,][-BASEINPUT$out$docs.removed,][OV$value,] 
   PARSEFRAME<-cbind(PARSEFRAME,OVF[,c("author","datetimestamp","id","ents")])
