@@ -4,15 +4,25 @@ list.of.packages <- c("ggplot2", "Rcpp","tm","ggthemes","SnowballC","rvest","dow
 
 if("StanfordCoreNLP"%in%c(installed.packages()[,"Package"])==FALSE){install.packages('StanfordCoreNLP',repos="http://datacube.wu.ac.at/",type="source")}
 if("openNLPmodels.en"%in%c(installed.packages()[,"Package"])==FALSE){install.packages('openNLPmodels.en',repos="http://datacube.wu.ac.at/",type="source")}
+
 packages.Req <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 
 if(length(packages.Req)) install.packages(packages.Req)
+
 lapply(list.of.packages, function(X) library(X,character=TRUE))
 
 #package depends on xpdf... on mac, install via brew install xpdf and follow instructions.
 
-#the check for tika command will install tika to the current working directory (on a mac)
+try({
+if (!require(wordVectors)) {
+  if (!(require(devtools))) {
+    install.packages("devtools")
+  }
+  devtools::install_github("bmschmidt/wordVectors")
+}})
 
+#the check for tika command will install tika to the current working directory 
+  
 checkForTika<-function(directory=getwd()){if("tika-app-1.13.jar"%in%list.files(path=directory)) {cat("success")} else {download.file("http://apache.claz.org/tika/tika-app-1.13.jar",file.path(directory,"tika-app-1.13.jar"))}}
 
 getTextR<-function(fname,tika=FALSE,tikapath="tika-app-1.13.jar"){

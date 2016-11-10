@@ -43,7 +43,6 @@ To begin this process, first load the textFunctions. For demonstration purposes 
 
 ```{r}
 source("textFunctions.R")
-source("topicFunctions.R")
 source("demo.docs.R")
 
 ```
@@ -51,8 +50,7 @@ source("demo.docs.R")
 Main functions enabling workflow include reading documents into R via the "getTextR" command. The getTextR command takes a file directory as an argument, and returns a textual corpus. It is capable of reading word documents (both doc and docx), pdf documents, and txt documents. Further document types can be added by replacing the "FILETYPE NA" line with additional document if loops. The allDocs() command is a conveniance wrapper which loops through a directory parsing documents and creating a corpus with metadata.
 
 ```{r}
-
-dir.create("figures")
+#dir.create("figures")
 corpus1<-allDocs("demo.docs.folder")
 ```
 
@@ -60,7 +58,6 @@ Documents are read into R as a textual corpus--the method used by the TM package
 
 ```{r}
 lapply(corpus1,function(X){X$meta})[[1]]
-
 ```
 
 ###Cleaning and Parsing Text
@@ -195,9 +192,6 @@ rm(tdm_bi)
 ```
 [Example 13: CLICK HERE](http://students.washington.edu/ryscott5/epar/figures/figures13.html)
 
-#Towards Causal Pathways
-
-
 
 #Towards Causal Patterns
 While description of word frequencies is useful as a baseline for exploring textual documents, such methods rely on a bag-of-words approach, meaning any natural meanings to words or meaning derived from ordering of text is lost. Natural Language Processing provides a methodology for incorporating structure and natural language meanings of words into analysis via detection of common patterns in text.
@@ -206,21 +200,26 @@ The goal of the combined topic modelling and natural language processing process
 
 For using the tools, you first specify the name of a working folder. This is the folder where the files that are created by the code will be saved. Because many of the functions are memory heavy, saving files out of the commands to the working folders helps to limit the computational requirmeents on the computer.
 
-#Specify Working Folder
+[Diagram of Causal Pattern Extraction ](https://storage.googleapis.com/epartexttools.appspot.com/Screenshot%202016-11-10%20at%208.41.39%20AM.png)
+
+##Specify Working Folder
 
 ```{r}
 workingfolder<-"Research.Grants"
+dir.create(file.path("..",workingfolder))
+saveRDS(corpus1,file.path("..",workingfolder,"corpus.rds"))
+source("TopicFunctions.R")
 ```
 
 Next, we can use the readMails command to read emailfiles from a specified folder to a messages folder. We also can read files in from a known path to the fileslist and build a corpus.
 
 ```{r}
 #messages<-readMails("../folderwithemails","../folderwithdocuments")
-fileslist<-lapply(file.path("../AgandNut",list.files("../AgandNut")),getTextR)
-fileslist<-fileslist[sapply(fileslist, function(X){length(X[[1]])})>1]
-tcorp<-do.call(c,fileslist)
+#fileslist<-lapply(file.path("../AgandNut",list.files("../AgandNut")),getTextR)
+#fileslist<-fileslist[sapply(fileslist, function(X){length(X[[1]])})>1]
+#tcorp<-do.call(c,fileslist)
 #fullcorp<-c(tcorp,messages)
-fullcorp<-tcorp
+#fullcorp<-tcorp
 #clean up workspace
 rm(fileslist)
 rm(messages)
@@ -230,10 +229,8 @@ We next prepare the data for processing. This is done by using the PreTopicFrame
 
 ```{r}
 #gets data ready for processing
-BASE_INPUT<-PreTopicFrame(fullcorp,1)
-
-#saves files so you can reload.
-saveRDS(tcorp,file.path("..",workingfolder,"corpus.rds"))
+BASE_INPUT<-PreTopicFrame(corpus1,1)
+#saves files so you can reload
 saveRDS(BASE_INPUT,file.path("..",workingfolder,"base_input1.rds"))
 ```
 For many types of grants, one is interested in categories across grants. These next commands are placeholders for adding such information. If each document is unique, the OpID can be set as a unique entry for each document like below.
@@ -243,7 +240,7 @@ For many types of grants, one is interested in categories across grants. These n
 BASE_INPUT$out$meta$OpID<-BASE_INPUT$out$meta$Orig
 ```
 
-#Geotagging
+##Geotagging
 Because we often want to know where a document talks about, we rely on the Cliff geocoder to tag documents. The code below builds a cliff server, starts the server, and makes predictions about document loctions. This is much different than simply looking for placenames as we generate relevance metrics across documents. Currently, the code is set up to generate a probability for each country and each document, which then can be converted to a total relevance for grants or opportunities.
 
 ```{r}
@@ -256,7 +253,7 @@ saveRDS(BASE_INPUT,file.path(workingfolder,"basefile.rds"))
 write.csv(pred1,file.path(workingfolder,"countrypredictions1.csv"))
 ```
 
-###Topic Model
+##Topic Model
 Once the proper nouns are (mostly) removed from the dataset, we can fit a topic model to the dataset. A topic model is an unsupervised machine learning method of categorizing words into common topics which then can be used to explore what topics different documents refer to. For fitting the topic model, we rely on the R package stm because stm allows for inclusion of covariates in the fitting of the topic model. For example, if a portfolio of projects has already been coded by a set of RAs for certain variables, these variables can be used to inform the modeling of topics.
 
 Fitting a topic model has numerous benefits over simply viewing raw word counts, including that it allows exploration of the content of a batch of documents that can potentially reveal broad patterns missed by human coders. The stm package has its own text cleaning method which repeats many of the processing steps conducted above. Fiting the model can be somewhat slow but it has the advantage of self-generating an optimal number of topics based on Lee and Mimno (2014), while also utilizing a method that is well-suited to a large number of documents. Because there is no empirical basis for the number of topics, this approach provides a good starting point. In the code below, one can interactively select covariates to include in the topic model. Most likely topics are extracted from the theta matrix.
@@ -296,11 +293,11 @@ saveRDS(AnnotatesSmaller,file.path(workingfolder,"AnnotationFrame.rds"))
 ProcessedANNS<-ProcessforAPI(AnnotatesSmaller)
 saveRDS(ProcessedANNS,file.path(workingfolder,"ProcessedFrame.rds"))
 ```
-##Call to AlchemyAPI
-
-#edit runAlchemy and source
+#Call to AlchemyAPI
 
 ```{r}
+FillFolder(ProcessedANNS,workingfolder)
+
 Frame1<-processFolder(workingfolder,ProcessedANNS)
 saveRDS(Frame1,file.path(workingfolder,"ParsedFrame.rds"))
 matchtable<-frametable(Frame1,BASE_INPUT,0)
@@ -311,3 +308,9 @@ matchtable<-frametable(Frame1,BASE_INPUT,0)
 tableapp(matchtable,st1)
 igraphob_object_force("research",matchtable,inputWord=TRUE,sankey=FALSE,verbfilter=c(),strictlimit=FALSE)
 ``
+
+#Working Examples
+
+![Shiny Application of Processes for Agriculture and Nutrition Documents](http://ryscott5.shinyapps.io/Wellcome_Demo)
+![Topic Model for Agriculture and Nutrition Documents](https://storage.googleapis.com/epartexttools.appspot.com/Wellcome/Topic/index.html)
+

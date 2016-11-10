@@ -68,6 +68,7 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
 }
 
 jgc()
+
 AnnotateVerbsTopicJoin<-function(WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME,toptopics){
   pos_tag_annotator<- Maxent_POS_Tag_Annotator()
   #OUT<-BASE_INPUT$out
@@ -288,7 +289,7 @@ ParseFolderToFrame<-function(FOLDERNAME,PREPFRAME,WT){
   subcs_full<-cbind(joinkey,PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY"))[as.numeric(joinkey$whichi)] %>% gsub("al","",.) %>% gsub('.json',"",.,fixed=T)),])
   list("SmallVerb"=subcs,"FullVerb"=subcs_full)}
 
-frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME){
+#frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME){
   OV<-PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY")) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
   OVF<-BASEINPUT$SentFrame[-BASEINPUT$processed$docs.removed,][-BASEINPUT$out$docs.removed,][OV$value,] 
   PARSEFRAME<-cbind(PARSEFRAME,OVF[,c("author","datetimestamp","id","ents")])
@@ -298,7 +299,6 @@ frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME){
   PARSEFRAME$Topic<-as.factor(PARSEFRAME$Topic)
   PARSEFRAME$Verb<-as.factor(PARSEFRAME$Verb)
   PARSEFRAME}
-
 
 frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME,TOPICMOD){
   # PARSEFRAME<-Frame1[[1]]
@@ -405,7 +405,6 @@ clusterWords<-function(COLUMN,NUM,TOPICMODEL){
   data.frame("Word"=row.names(subprobs),"optName"=optName[d1$cluster])
 }
 
-library('wordVectors')
 nearest_to2<-function(topicm,wordvec,n=10,fixword=FALSE,limitwords=NULL){ 
   mt<-t(exp(topicm$beta$logbeta[[1]]))
   row.names(mt)<-topicm$vocab
@@ -619,4 +618,5 @@ frametable<-function(PARSEFRAME,BASEINPUT,origent){
   joined$ents<-gsub(",",";",joined$ents)
   joined
 }
+
 
