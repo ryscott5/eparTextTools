@@ -7,15 +7,13 @@ This tookit provides a set of resources for analyzing textual documents using th
 
 The tools are set up to be run on a Google Cloud compute instance. this has the benefit of allowing you to run processes in the cloud rather than on your own local computer. While setting up and running a Google Instance can be a new trial for those who have never used a Linux shell, 99% of the coding can be done in RStudio simply by visiting the rstudio-server webpage that the Google Cloud Instance Startup code creates. 
 
-In terms of sizing, a 2GPU 7.5GB RAM n1-standard machine should work fine so long as you increase the size of the JAVA heap space. If you need a job to complete more quickly or less quickly, you could by a larger instance. Cloud pricing is [here](https://cloud.google.com/compute/pricing). You can set up the job to be pre-emptable as well. This will save you lots of money and is highly recommended. When using a preemptible instance you must make sure to save your robjects to file regularly as Google can shut down your work at any time. However, this will reduce the computing costs by about 1/5th.
+In terms of sizing, a 2GPU 7.5GB RAM n1-standard machine should work fine so long as you increase the size of the JAVA heap space. If you need a job to complete more quickly, you could buy a larger instance. Cloud pricing is [here](https://cloud.google.com/compute/pricing). You can set up the job to be pre-emptable as well. This will save you lots of money and is highly recommended. When using a preemptible instance you must make sure to save your robjects to file regularly as Google can shut down your work at any time. However, this will reduce the computing costs by about 1/5th.
 
 The tools can be used with Amazon AWS if that is a more familiar format, however, the installation instructions will be somewhat different and you will have to be flexible in porting the cloud_startup code to AWS.
 
-
-
 To run this document, clone the repository to a local directory. To do this, first set up an ssh key with rstudio by going to tools...global options...git/svn...create ssh key and registering the key with your github account. Then, go to file...new projects...version control and enter the ssh site for the github page (the clone link).  Alternatively, you download a zip file of the repository and open the .Rproject file. This document is stored as readme.md with coding in chunks. 
 
-The program depends on a few software installations, notably "antiword" or "tika" and "Apache openNLP". To install these on a mac, one can use homebrew and run the command "brew install antiword". Installing openNLP requires updating the Java JRE file on your make. This can also be done via homebrew on a mac. 
+The program depends on a few software installations, notably "antiword" or "tika" and "Apache openNLP". To install these on a mac, one can use homebrew and run the command "brew install antiword". Installing openNLP requires updating the Java JRE file on your system. This can also be done via homebrew on a mac. 
 
 The document reading code is designed to be able to use the tika library, though this is disabled by default. 
 
@@ -45,7 +43,7 @@ To begin this process, first load the textFunctions. For demonstration purposes 
 
 ```{r}
 source("textFunctions.R")
-
+source("topicFunctions.R")
 source("demo.docs.R")
 
 ```
@@ -80,7 +78,6 @@ For basic description, it is often useful to generate a term document matrix. Th
 
 ```{r}
 tdm<-TermDocumentMatrix(corpus2) %>% removeSparseTerms(.,.6)
-
 
 ```
 Once a term document matrix is available, one can easily begin to create tables and charts to explore the data.
@@ -198,111 +195,119 @@ rm(tdm_bi)
 ```
 [Example 13: CLICK HERE](http://students.washington.edu/ryscott5/epar/figures/figures13.html)
 
+#Towards Causal Pathways
 
-#Natural Language Processing
+
+
+#Towards Causal Patterns
 While description of word frequencies is useful as a baseline for exploring textual documents, such methods rely on a bag-of-words approach, meaning any natural meanings to words or meaning derived from ordering of text is lost. Natural Language Processing provides a methodology for incorporating structure and natural language meanings of words into analysis via detection of common patterns in text.
 
+The goal of the combined topic modelling and natural language processing process is to identify key patterns in program theory adpted by grant opportunities and processes. The tools rely on many of the text characterization tools, but build in text processing capabilities facilitated by Stanford CoreNLP, OpenNLP, IBM Alchemy API, Mediamatter's Cliff-claven, and Wordnet. To run the processes, a the Stanford core nlp tools, OpenNLP and a Docker server for Cliff-claven need to be installed on the instance computer where the model is running. The majority of the functions needed to run the processing proceedures are included in the TopicFunctions.R file, though there is dependence on the textFunctions.R commands for reading in and processing data. Thus, to begin using the tools, both of these files should be called from within R.
+
+For using the tools, you first specify the name of a working folder. This is the folder where the files that are created by the code will be saved. Because many of the functions are memory heavy, saving files out of the commands to the working folders helps to limit the computational requirmeents on the computer.
+
+#Specify Working Folder
+
 ```{r}
-y1<-lapply(corpus1,function(k){list(k,annotate(as.String(k$content),sent_token_annotator))})
-y1<-y1[which(sapply(1:length(y1),function(i){length(y1[[i]][[2]]$type)})>1)]
-y1<-lapply(y1,function(k){list(k[[1]],annotate(as.String(k[[1]]$content),word_token_annotator,k[[2]]))})
-
-basic_annotates<-lapply(y1,function(k){list(k[[1]],annotate(as.String(k[[1]]$content), list(org.annotate,pers.annotate,location.annotate),k[[2]]))})
-
-##Removing entities for corp3
-corpEnt<-lapply(basic_annotates,function(k){as.String(k[[1]]$content)[k[[2]][k[[2]]$type=="entity"]]})
-corpEnt2<-lapply(basic_annotates,function(k){
-bv<-as.String(k[[1]]$content)[subset(k[[2]], type=="entity")]
-for(e in bv){k[[1]]$content<-str_replace_all(k[[1]]$content,fixed(e),"")}
-k})
-
-#corpEnt2<-lapply(corpEnt2, function(k){
-#y1<-annotate(as.String(k[[1]]$content), #list(sent_token_annotator,word_token_annotator))
-#y1<-annotate(as.String(k[[1]]$content), #list(org.annotate,pers.annotate),y1)
-#list(k[[1]],y1)
-#})
-
-corpEnt2<-doc_clean_process(do.call(c, lapply(corpEnt2,function(k) k[[1]])))
-
-locations<-lapply(basic_annotates,function(k){list(k[[1]],k[[2]][which(sapply(subset(k[[2]],type=="entity")$features,function(x) {x=="location"})==TRUE)])})
-
-locuts<-lapply(basic_annotates,function(X){as.String(X[[1]]$content)[X[[2]][sapply(subset(X[[2]],type=="entity")$features,function(x){x$kind=="location"})]]})
-locuts[[1]]
-
+workingfolder<-"Research.Grants"
 ```
-While we later come back to natural language processing for extraction of verbs, subjects, and direct objects, once proper nouns are removed from the dataset one method of analyzing variability across a group of text documents is to build a topic model for the data.
 
+Next, we can use the readMails command to read emailfiles from a specified folder to a messages folder. We also can read files in from a known path to the fileslist and build a corpus.
+
+```{r}
+#messages<-readMails("../folderwithemails","../folderwithdocuments")
+fileslist<-lapply(file.path("../AgandNut",list.files("../AgandNut")),getTextR)
+fileslist<-fileslist[sapply(fileslist, function(X){length(X[[1]])})>1]
+tcorp<-do.call(c,fileslist)
+#fullcorp<-c(tcorp,messages)
+fullcorp<-tcorp
+#clean up workspace
+rm(fileslist)
+rm(messages)
+jgc()
+```{r}
+We next prepare the data for processing. This is done by using the PreTopicFrame command, which removes entities and creates a term document matrix for fitting a structural topic model.
+
+```{r}
+#gets data ready for processing
+BASE_INPUT<-PreTopicFrame(fullcorp,1)
+
+#saves files so you can reload.
+saveRDS(tcorp,file.path("..",workingfolder,"corpus.rds"))
+saveRDS(BASE_INPUT,file.path("..",workingfolder,"base_input1.rds"))
+```
+For many types of grants, one is interested in categories across grants. These next commands are placeholders for adding such information. If each document is unique, the OpID can be set as a unique entry for each document like below.
+
+```{r}
+#here we add opportunity labels to documents
+BASE_INPUT$out$meta$OpID<-BASE_INPUT$out$meta$Orig
+```
+
+#Geotagging
+Because we often want to know where a document talks about, we rely on the Cliff geocoder to tag documents. The code below builds a cliff server, starts the server, and makes predictions about document loctions. This is much different than simply looking for placenames as we generate relevance metrics across documents. Currently, the code is set up to generate a probability for each country and each document, which then can be converted to a total relevance for grants or opportunities.
+
+```{r}
+buildcliff()
+startcliff()
+pred1<-PredictCountryByDoc(BASE_INPUT)
+stopcliff()
+BASE_INPUT$out$meta<-reflectCountryCol(BASE_INPUT$out$meta,pred1,20,FALSE)
+saveRDS(BASE_INPUT,file.path(workingfolder,"basefile.rds"))
+write.csv(pred1,file.path(workingfolder,"countrypredictions1.csv"))
+```
 
 ###Topic Model
 Once the proper nouns are (mostly) removed from the dataset, we can fit a topic model to the dataset. A topic model is an unsupervised machine learning method of categorizing words into common topics which then can be used to explore what topics different documents refer to. For fitting the topic model, we rely on the R package stm because stm allows for inclusion of covariates in the fitting of the topic model. For example, if a portfolio of projects has already been coded by a set of RAs for certain variables, these variables can be used to inform the modeling of topics.
 
-Fitting a topic model has numerous benefits over simply viewing raw word counts, including that it allows exploration of the content of a batch of documents that can potentially reveal broad patterns missed by human coders. The stm package has its own text cleaning method which repeats many of the processing steps conducted above. Fiting the model can be somewhat slow given the settings used below, which includes
+Fitting a topic model has numerous benefits over simply viewing raw word counts, including that it allows exploration of the content of a batch of documents that can potentially reveal broad patterns missed by human coders. The stm package has its own text cleaning method which repeats many of the processing steps conducted above. Fiting the model can be somewhat slow but it has the advantage of self-generating an optimal number of topics based on Lee and Mimno (2014), while also utilizing a method that is well-suited to a large number of documents. Because there is no empirical basis for the number of topics, this approach provides a good starting point. In the code below, one can interactively select covariates to include in the topic model. Most likely topics are extracted from the theta matrix.
 
 ```{r}
+form1<-paste("~as.factor(Orig)",paste(select.list(colnames(BASE_INPUT$out$meta),multiple=TRUE),sep="",collapse="+"),sep="+")
+writeLines(form1,file.path(workingfolder,"formula1.txt"))
 
+jgc()
 
-corpEntS<-sapply(corpEnt2,function(x) as.character(as.String(content(x[[1]]))))
+#to run remotely
+#system("R CMD BATCH --no-restore run_topic_in_background.R", wait=FALSE)
 
-corpEnt3<-corpEnt2
-corpEnt3<-lapply(names(corpEnt2[[1]][[1]]$meta),function(K){meta(do.call(c,lapply(corpEnt2,function(x){x[[1]]})),K)})
+st1<-stm(BASE_INPUT$out$documents,BASE_INPUT$out$vocab,data=BASE_INPUT$out$meta,prevalence=eval(parse(text=form1)),K=0, init.type="Spectral",max.em.its=500)
+saveRDS(st1, file.path(workingfolder,"topicmodel.rds"))
 
-corpEnt3[[1]]<-melt(sapply(1:length(corpEnt3[[1]]),function(x) paste(corpEnt3[[1]][[x]],collapse="")))[,1]
-corpEnt3[[2]]<-melt(sapply(1:length(corpEnt3[[2]]), function(x) ymd_hms(corpEnt3[[2]][[x]]),simplify=T))
-corpEnt3[[2]]<-join(data.frame("L1"=1:length(corpEnt3[[1]])),corpEnt3[[2]])$value
-corpEnt3[[3]]<-melt(sapply(1:length(corpEnt3[[3]]),function(x) paste(corpEnt3[[3]][[x]],collapse="")))[,1]
-corpEnt3[[4]]<-melt(sapply(1:length(corpEnt3[[4]]),function(x) paste(corpEnt3[[4]][[x]],collapse="")))[,1]
-corpEnt3[[5]]<-melt(sapply(1:length(corpEnt3[[5]]),function(x) paste(corpEnt3[[5]][[x]],collapse="")))[,1]
-corpEnt3[[6]]<-melt(sapply(1:length(corpEnt3[[6]]),function(x) paste(corpEnt3[[6]][[x]],collapse="")))[,1]
-corpEnt3[[7]]<-melt(sapply(1:length(corpEnt3[[6]]),function(x) paste(corpEnt3[[7]][[x]],collapse="")))[,1]
-getTokenizers()
-corpEnt3<-data.frame(corpEnt3)
-colnames(corpEnt3)<-names(meta(corpEnt2[[1]][[1]]))
-class(corpEntS)
-?substr
-substr(corpEntS[1],1,1000)
-?textProcessor
-processed <-textProcessor(corpEntS,metadata=corpEnt3,sparselevel=1,)
-missingINF<-unlist(unique(sapply(colnames(corpEnt3),function(x){which(is.na((corpEnt3[,x])))}),simplify=T))
-processed$vocab[2000]
-out <- prepDocuments(processed$documents[-missingINF],processed$vocab,processed$meta[-missingINF],lower.thresh=2)
-
-#st1<-stm(out$documents,out$vocab,K=0, init.type="Spectral")
-st1<-stm(out$documents,out$vocab,data=out$meta, K=10,prevalence=~author+as.numeric(datetimestamp)+heading, init.type="LDA",max.em.its=5)
-
-toLDAvis(st1,out$documents,R=20,plot.opts=list(xlab="Component 1",ylab="Component 2"),lambda.step=.05,out.dir=tempfile(),open.browser=interactive())
-saveWidget(toLDAvis(st1,out$documents,R=20,plot.opts=list(xlab="Component 1",ylab="Component 2"),lambda.step=.05,out.dir="figures/figures14.html"))
-
-ggplot(melt(st1$theta))+geom_bar(aes(x=Var1,y=value,fill=as.factor(Var2)),stat="identity",position="stack")+scale_fill_tableau()+theme_minimal()
-colnames(out$meta)
-
-
-st1R<-estimateEffect(1:10~author+as.numeric(datetimestamp),stmobj=st1,metadata=out$meta,nsims=1, documents=out$documents,)
-
-sapply(1:10,function(i){st1R$parameters[[i]][[1]]$est[32]})
-
+BASE_INPUT$top.topics<-max.col(st1$theta)
 ```
-[Example 14: CLICK HERE](http://students.washington.edu/ryscott5/epar/figures/figures14/index.html)
 
+
+#Extract Causal Words
+
+Here, we read from a table of verbs to the wd dataframe. For the demo we only keep causal verbs. This functionality allows you to edit a google docs frame shared from the address, so you can add, subtract words. You also could replace the reading of the csv with a call to a local dataframe.
 
 ```{r}
-ksearch<-searchK(out$documents, out$vocab, K = c(3,4,5),init.type="LDA")
-
-mselect<-selectModel(out$documents, out$vocab, K = 20, prevalence=~datetimestamp+author,data=out$meta,max.em.its = 75, runs = 20, seed = 8458159)
-
-plotModels(mselect,labels=1:length(mselect$runout))
-
-```
-
-##After making figures, run code below
-```{r}
-lapply(list.files() %>% .[str_detect(.,"figures\\w+.html")],function(X){file.copy(from=X,to=file.path("figures",X),overwrite=TRUE)})
-file.remove(list.files() %>% .[str_detect(.,"figures\\w+.html")])
-```
 wd<-read.csv(textConnection(RCurl::getURL("https://docs.google.com/spreadsheets/d/1ng7I5QoYu_NzegZvO9568M42q52iVCsLz-D0WhVa--8/pub?gid=0&single=true&output=csv")),stringsAsFactors=FALSE)
-findThoughts(st1,texts=out$documents,topics=1,n=1)
-findTopic(st1, wd$Up.Words, n=10, type=c("frex"), verbose=TRUE)
+allwords<-c(wd$Up.Words,wd$Down.Words)
+```
 
-assocPrettyOneStep(wd$Up.words,, corpus2,.5)
+#Annotating
+We next annotate paragraphs, keeping only those with the verbs in the wd dataframe.
+```{r}
+AnnotatesLarge<-AnnotateVerbsTopicJoin(allwords,BASE_INPUT$processed,BASE_INPUT$out,BASE_INPUT$Annotations,BASE_INPUT$SentFrame)
+AnnotatesSmaller<-CombinationFrame(AnnotatesLarge)
+rm(AnnotatesLarge)
+saveRDS(AnnotatesSmaller,file.path(workingfolder,"AnnotationFrame.rds"))
+ProcessedANNS<-ProcessforAPI(AnnotatesSmaller)
+saveRDS(ProcessedANNS,file.path(workingfolder,"ProcessedFrame.rds"))
+```
+##Call to AlchemyAPI
 
-pf1<-read.csv("pred1.csv",stringsAsFactors=FALSE)
-head(pf1)
+#edit runAlchemy and source
+
+```{r}
+Frame1<-processFolder(workingfolder,ProcessedANNS)
+saveRDS(Frame1,file.path(workingfolder,"ParsedFrame.rds"))
+matchtable<-frametable(Frame1,BASE_INPUT,0)
+```
+
+#Interactive Results
+```{r}
+tableapp(matchtable,st1)
+igraphob_object_force("research",matchtable,inputWord=TRUE,sankey=FALSE,verbfilter=c(),strictlimit=FALSE)
+``

@@ -68,13 +68,13 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
 }
 
 jgc()
-AnnotateVerbsTopicJoin<-function(WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME){
+AnnotateVerbsTopicJoin<-function(WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME,toptopics){
   pos_tag_annotator<- Maxent_POS_Tag_Annotator()
   #OUT<-BASE_INPUT$out
   #ANNOTATELIST<-BASE_INPUT$Annotations
   #PROCESSED<-BASE_INPUT$processed
   #WT<-allwords
-    toChar<-BASE_INPUT$SentFrame$S[-PROCESSED$docs.removed] %>% .[-OUT$docs.removed]
+    toChar<-SENTENCEFRAME$S[-PROCESSED$docs.removed] %>% .[-OUT$docs.removed]
     toCharANS<-ANNOTATELIST[-PROCESSED$docs.removed] %>% .[-OUT$docs.removed]
     KeepA<-unique(unlist(sapply(WT, function(W) which(str_detect(toChar,tolower(W))))))
       anns<-lapply(KeepA,function(i){
@@ -94,7 +94,7 @@ AnnotateVerbsTopicJoin<-function(WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME){
       vanstf})
     anf<-do.call(rbind,anns)  
     anf<-cbind(anf,OUT$meta[anf$rowid,])
-    anf$top.topics<-BASE_INPUT$top.topics[anf$rowid]
+    anf$top.topics<-toptopics[anf$rowid]
     anf<-subset(anf, is.na(anf$Sent)==FALSE)
     anf<-unique(anf)
     anf}
@@ -445,6 +445,7 @@ buildcliff<-function() {system('sudo docker run -p "8080:8080" -d --name cliff c
 startcliff<-function() {system('sudo docker start cliff')}
 checkcliff<-function(){system('sudo docker ps')}
 stopcliff<-function(){system('sudo docker stop cliff')}
+
 PredictCountryByDoc<-function(BASE_INPUT){
   fullc<-ddply(BASE_INPUT$SentFrame, .(Orig), summarise, "fullc"=paste(SC, collapse=" ",sep=" "))
   countries<-vector("list",nrow(fullc))
@@ -465,12 +466,21 @@ PredictCountryByDoc<-function(BASE_INPUT){
     countries[[i]]=data.frame("none"=0)}
   countries<-do.call(rbind.fill,countries)
   countries$Orig<-fullc$Orig
+  countries$nchars<-nchar(fullc$fullc)
   f1<-join(BASE_INPUT$SentFrame[,c("OpID","Orig")],countries)
   f1<-unique(f1)
-  f1$nchars<-nchar(fullc$fullc)
   f1
 }
+ 
 
+reflectCountryCol<-function(MATCHFRAME,pred2,howmany,binomial=FALSE){
+  pred2[,3:c(ncol(pred2)-1)][is.na(pred2[,3:c(ncol(pred2)-1)])]<-0
+  if(binomial==TRUE){
+    pred2[,3:c(ncol(pred2)-1)][pred2[,3:c(ncol(pred2)-1)]>0]<-1
+  }
+  maxCs<-colnames(pred2[,3:c(ncol(pred2)-1)])[sort(colSums(pred2[,3:c(ncol(pred2)-1)]),index=TRUE,decreasing=TRUE)$ix][1:howmany]
+  cntjoin<-join(MATCHFRAME,pred2[,c("OpID","Orig",maxCs)], by=c("OpID","Orig"))
+  return(cntjoin)}
 
 
 library('wordVectors')
@@ -558,3 +568,55 @@ tableapp<-function(basic_table,TOPICMODEL){
         if(input$Shorten==TRUE){
           datatable(t1,rownames=FALSE,filter ='bottom',extensions = 'Buttons')} else {datatable(t1,rownames=FALSE,filter ='bottom',extensions = 'Buttons', options = list(dom = 'Bfrtip',scrollX=TRUE,buttons = c('copy', 'csv', 'excel', 'pdf', 'print','colvis')), callback = JS('table.page(3).draw(false);'))}
       })})}
+
+
+igraphob_object_force<-function(WORD,mtable,W,inputWord=TRUE,sankey=FALSE,verbfilter=c(),strictlimit=FALSE){
+  # WORD='production'
+  #mtable<-matchtable
+  #W<-10
+  if(inputWord==TRUE){
+    ntr<-dplyr::filter(mtable,str_detect(tolower(subject.keywords),tolower(WORD)))
+  }
+  else {
+    ntr<-dplyr::filter(mtable,str_detect(tolower(object.keywords),tolower(WORD)))
+  }
+  dt <- data.table(ntr)
+  dt$object.keywords<-sapply(dt$object.keywords,function(X) paste(unlist(X),collapse=";"))
+  dt$subject.keywords<-sapply(dt$subject.keywords,function(X) paste(unlist(X),collapse=";"))
+  dt$action.lemmatized<-sapply(dt$action.lemmatized,function(X) paste(unlist(X),collapse=";"))
+  dt$action.verb.text<-sapply(dt$action.verb.text,function(X) paste(unlist(X),collapse=";"))
+  dt<-dt[,list(action.verb.text = unlist(strsplit(action.verb.text,";")),object.keywords=unlist(strsplit(object.keywords,";")),subject.keywords=unlist(strsplit(subject.keywords,";"))),by = sentence]
+  dt<-na.omit(dt)
+  if(length(verbfilter)>0){
+    dt<-dplyr::filter(dt,action.verb.text%in%verbfilter)
+  }
+  if(strictlimit==TRUE){
+    if(inputWord==TRUE){
+      dt<-dplyr::filter(dt,str_detect(tolower(subject.keywords),tolower(WORD)))} else {dt<-dplyr::filter(dt,str_detect(tolower(object.keywords),tolower(WORD)))}
+  }
+  net1<-graph_from_data_frame(rbind(data.frame("In"=dt$subject.keywords,"Out"=dt$action.verb.text),data.frame("In"=dt$action.verb.text,"Out"=dt$object.keywords)))
+  E(net1)$weight <- 1
+  netsimp<-simplify(net1,edge.attr.comb=list(weight="sum","ignore"))
+  E(netsimp)$width <- E(netsimp)$weight
+  netsimp <- delete_edges(netsimp, E(netsimp)[weight<=W])
+  netsimp<-simplify(netsimp,edge.attr.comb=list(weight="sum","ignore"))
+  bad.vs<-V(netsimp)[degree(netsimp) == 0]
+  netsimp <-delete.vertices(netsimp, bad.vs)
+  d3ob<-netsimp %>% igraph_to_networkD3() 
+  d3ob$nodes$group=sapply(d3ob$nodes$name,function(X) {if(X%in%dt$action.verb.text) {"verb"} else {if(X%in%dt$subject.keyword){"subject"} else {if(X%in%dt$object.keywords){"object"}}}})
+  if(sankey==FALSE){
+    forceNetwork(d3ob$links,d3ob$nodes,"source","target","value",NodeID="name",Group="group",fontSize=24,fontFamily="Arial", opacity = 0.9, bounded = TRUE, opacityNoHover = TRUE,colourScale=JS("d3.scale.ordinal().domain(['verb','subject','object']).range(['#d9d9d9','#b7a57a','#4b2e83'])"))} else {
+      sankeyNetwork(d3ob$links,d3ob$nodes,"source","target","value",NodeID="name",NodeGroup="group",colourScale=JS("d3.scale.ordinal().domain(['verb','subject','object']).range(['#d9d9d9','#b7a57a','#4b2e83'])"),fontSize=24,fontFamily="Arial")}}
+
+
+frametable<-function(PARSEFRAME,BASEINPUT,origent){
+  basejoin<-BASEINPUT$out$meta
+  basejoin$TopTopics<-BASEINPUT$top.topics
+  joined<-cbind(PARSEFRAME,basejoin[PARSEFRAME$rowid,])
+  colnames(joined)
+  joined<-joined[,c(c(1:ncol(PARSEFRAME)),18,19,22,27,c(28+origent),ncol(joined))]
+  joined<-joined[,c(1:ncol(joined))[-which(colnames(joined)%in%c("filename","comboID","rowid"))]]
+  joined$ents<-gsub(",",";",joined$ents)
+  joined
+}
+
