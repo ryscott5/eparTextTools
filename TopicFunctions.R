@@ -43,7 +43,6 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
   allans<-allans[sapply(allans,function(X) length(X)>0)]
   allans<-pblapply(1:nrow(par2),function(i){annotate(par2$S[i],word_token_annotator,allans[[i]])})
   allans<-pblapply(1:nrow(par2),function(i){annotate(par2$S[i],list(org.annotate,pers.annotate,location.annotate),allans[[i]])})
-  
   par2$SnE<-NA
   par2$ents<-NA
   for(i in 1:nrow(par2)){

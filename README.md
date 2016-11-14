@@ -202,10 +202,13 @@ For using the tools, you first specify the name of a working folder. This is the
 ##Specify Working Folder
 
 ```{r}
-workingfolder<-"Research.Grants"
+source('textFunctions.R')
+source('TopicFunctions.R')
+jgc()
+workingfolder<-file.path("..","Research.Grants")
 dir.create(file.path("..",workingfolder))
 saveRDS(corpus1,file.path("..",workingfolder,"corpus.rds"))
-source("TopicFunctions.R")
+corpus1<-readRDS(file.path("..",workingfolder,"corpus.rds"))
 ```
 
 Next, we can use the readMails command to read emailfiles from a specified folder to a messages folder. We also can read files in from a known path to the fileslist and build a corpus.
@@ -226,10 +229,12 @@ We next prepare the data for processing. This is done by using the PreTopicFrame
 
 ```{r}
 #gets data ready for processing
-BASE_INPUT<-PreTopicFrame(corpus1,1)
+BASE_INPUT<-PreTopicFrame(corpus1,1,2)
+
 #saves files so you can reload
-saveRDS(BASE_INPUT,file.path("..",workingfolder,"base_input1.rds"))
+saveRDS(BASE_INPUT,file.path(workingfolder,"base_input1.rds"))
 ```
+
 For many types of grants, one is interested in categories across grants. These next commands are placeholders for adding such information. If each document is unique, the OpID can be set as a unique entry for each document like below.
 
 ```{r}
@@ -243,10 +248,13 @@ Because we often want to know where a document talks about, we rely on the Cliff
 ```{r}
 buildcliff()
 startcliff()
+library(RCurl)
+library(httr)
 pred1<-PredictCountryByDoc(BASE_INPUT)
 stopcliff()
-BASE_INPUT$out$meta<-reflectCountryCol(BASE_INPUT$out$meta,pred1,20,FALSE)
-saveRDS(BASE_INPUT,file.path(workingfolder,"basefile.rds"))
+BASE_INPUT$out$meta<-reflectCountryCol(BASE_INPUT$out$meta,pred1,10,FALSE)
+getwd()
+saveRDS(BASE_INPUT,file.path(workingfolder,"base_input1.rds"))
 write.csv(pred1,file.path(workingfolder,"countrypredictions1.csv"))
 ```
 
@@ -262,7 +270,7 @@ writeLines(form1,file.path(workingfolder,"formula1.txt"))
 jgc()
 
 #to run remotely
-#system("R CMD BATCH --no-restore run_topic_in_background.R", wait=FALSE)
+system("R CMD BATCH --no-restore run_topic_in_background.R",wait=FALSE)
 
 st1<-stm(BASE_INPUT$out$documents,BASE_INPUT$out$vocab,data=BASE_INPUT$out$meta,prevalence=eval(parse(text=form1)),K=0, init.type="Spectral",max.em.its=500)
 saveRDS(st1, file.path(workingfolder,"topicmodel.rds"))
