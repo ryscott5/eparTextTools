@@ -7,9 +7,7 @@
 #    http://shiny.rstudio.com/
 #
 library(data.table)
-library(secure)
 library(devtools)
-library(webshot)
 library(shiny)
 library(igraph)
 library(shinyapps)
@@ -53,7 +51,7 @@ igraphob_object_force<-function(WORD,mtable,W,inputWord=TRUE,sankey=FALSE,verbfi
   if(sankey==FALSE){
     forceNetwork(d3ob$links,d3ob$nodes,"source","target","value",NodeID="name",Group="group",fontSize=24,fontFamily="Arial", opacity = 0.9, bounded = TRUE, opacityNoHover = TRUE,colourScale=JS("d3.scale.ordinal().domain(['verb','subject','object']).range(['#d9d9d9','#b7a57a','#4b2e83'])"))} else {
       sankeyNetwork(d3ob$links,d3ob$nodes,"source","target","value",NodeID="name",NodeGroup="group",colourScale=JS("d3.scale.ordinal().domain(['verb','subject','object']).range(['#d9d9d9','#b7a57a','#4b2e83'])"),fontSize=24,fontFamily="Arial")}}
-matchtable<-readRDS("matchtb2.rds")
+matchtable<-readRDS("matchtable.rds")
 
 # Define UI for application that draws a histogram
 ui <- shinyUI(fluidPage(

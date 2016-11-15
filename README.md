@@ -272,9 +272,9 @@ jgc()
 #to run remotely
 system("R CMD BATCH --no-restore run_topic_in_background.R",wait=FALSE)
 
-st1<-stm(BASE_INPUT$out$documents,BASE_INPUT$out$vocab,data=BASE_INPUT$out$meta,prevalence=eval(parse(text=form1)),K=0, init.type="Spectral",max.em.its=500)
-saveRDS(st1, file.path(workingfolder,"topicmodel.rds"))
-
+#st1<-stm(BASE_INPUT$out$documents,BASE_INPUT$out$vocab,data=BASE_INPUT$out$meta,prevalence=eval(parse(text=form1)),K=0, init.type="Spectral",max.em.its=500)
+#saveRDS(st1, file.path(workingfolder,"topicmodel.rds"))
+st1<-readRDS(file.path(workingfolder,"topicmodel.rds"))
 BASE_INPUT$top.topics<-max.col(st1$theta)
 ```
 
@@ -286,14 +286,17 @@ Here, we read from a table of verbs to the wd dataframe. For the demo we only ke
 ```{r}
 wd<-read.csv(textConnection(RCurl::getURL("https://docs.google.com/spreadsheets/d/1ng7I5QoYu_NzegZvO9568M42q52iVCsLz-D0WhVa--8/pub?gid=0&single=true&output=csv")),stringsAsFactors=FALSE)
 allwords<-c(wd$Up.Words,wd$Down.Words)
+
 ```
 
 #Annotating
 We next annotate paragraphs, keeping only those with the verbs in the wd dataframe.
 ```{r}
-AnnotatesLarge<-AnnotateVerbsTopicJoin(allwords,BASE_INPUT$processed,BASE_INPUT$out,BASE_INPUT$Annotations,BASE_INPUT$SentFrame)
+AnnotatesLarge<-AnnotateVerbsTopicJoin(allwords,BASE_INPUT$processed,BASE_INPUT$out,BASE_INPUT$Annotations,BASE_INPUT$SentFrame,BASE_INPUT$top.topics)
 AnnotatesSmaller<-CombinationFrame(AnnotatesLarge)
 rm(AnnotatesLarge)
+saveRDS(AnnotatesLarge,file.path(workingfolder,"AnnotationLargeFrame.rds"))
+
 saveRDS(AnnotatesSmaller,file.path(workingfolder,"AnnotationFrame.rds"))
 ProcessedANNS<-ProcessforAPI(AnnotatesSmaller)
 saveRDS(ProcessedANNS,file.path(workingfolder,"ProcessedFrame.rds"))
@@ -301,21 +304,32 @@ saveRDS(ProcessedANNS,file.path(workingfolder,"ProcessedFrame.rds"))
 #Call to AlchemyAPI
 
 ```{r}
-FillFolder(ProcessedANNS,workingfolder)
-
+source("../alchey.R")
+system("Rscript --no-restore run_Alchemy.R 1",wait=FALSE)
+library(jsonlite)
+library(shiny)
 Frame1<-processFolder(workingfolder,ProcessedANNS)
 saveRDS(Frame1,file.path(workingfolder,"ParsedFrame.rds"))
 matchtable<-frametable(Frame1,BASE_INPUT,0)
+saveRDS(matchtable,file.path(workingfolder,"matchtable.rds"))
+file.copy("shinyapp",workingfolder,recursive=T)
+file.rename(file.path(workingfolder,"shinyapp","appflow.R"),file.path(workingfolder,"shinyapp","app.R"))
+file.copy(file.path(workingfolder,"matchtable.rds"),file.path(workingfolder,"shinyapp","matchtable.rds"))
+runApp(file.path(workingfolder,"shinyapp"))
 ```
 
 #Interactive Results
 ```{r}
 tableapp(matchtable,st1)
-igraphob_object_force("research",matchtable,inputWord=TRUE,sankey=FALSE,verbfilter=c(),strictlimit=FALSE)
+
+igraphob_object_force("review",matchtable,0,inputWord=TRUE,sankey=FALSE,verbfilter=c(),strictlimit=TRUE)
 ``
 
 #Working Examples
 
 ![Shiny Application of Processes for Agriculture and Nutrition Documents](http://ryscott5.shinyapps.io/Wellcome_Demo)
 ![Topic Model for Agriculture and Nutrition Documents](https://storage.googleapis.com/epartexttools.appspot.com/Wellcome/Topic/index.html)
+
+
+
 

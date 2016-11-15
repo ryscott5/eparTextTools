@@ -5,7 +5,8 @@ library(plyr)
 library(dplyr)
 library(stringr)
 library(jsonlite)
-workingfolder<-"../Ag.Nutrition.Grants"
+source('../alchey.R')
+workingfolder<-"../Research.Grants"
 args = commandArgs(trailingOnly=TRUE)
 FillFolder<-function(PREPFRAME,FOLDERNAME){
   library(httr)
