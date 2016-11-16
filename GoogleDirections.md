@@ -66,7 +66,6 @@ sudo apt-get -y install docker.io
 sudo git clone https://github.com/johnb30/cliff-docker
 cd cliff-docker
 sudo docker build -t cliff:2.1.1 .
-
 docker run -p "8080:8080" -d cliff:2.1.1
 sudo docker ps
 sudo docker stop

@@ -1,8 +1,20 @@
 #TopicFunctions
+
+#' Clean the java environment.
+#'
+#' Function cleans the java environment. This is a great command. Run it whenever you feel like it.
+#' @seealso \code{\link{rJava}} 
+#' @examples
+#' jgc()
 jgc <- function(){
   rJava::.jcall("java/lang/System", method = "gc")
 } 
 
+#' Loads nlp parsers.
+#'
+#'This function loads the parsers for openNLP
+#' @examples
+#' loadparsers()
 loadparsers<-function(){
 sent_token_annotator <<- Maxent_Sent_Token_Annotator()
 word_token_annotator <<- Maxent_Word_Token_Annotator()
@@ -13,6 +25,20 @@ location.annotate<<-Maxent_Entity_Annotator(language = "en", kind="location", pr
 money.annotate<<-Maxent_Entity_Annotator(language = "en", kind="money", probs = FALSE,model = NULL)
 parse_annotator <<- Parse_Annotator()}
 
+
+#'Process a corpus into a topic model ready object
+#'
+#'  This function takes a corpus and creates a processed version of that corpus with entities removed for use in a topic model. Additionally it allows you to specify common entities to count across documents for use as a covariate in the topic model. The object it returns includes a frame of the text, an annotation object, a processed version of the corpus with stems and stopwords removed, and an out object which is the input object for fitting a topic model within the stm package.
+#' @param CORPUS_A Document corpus
+#' @param howmanyentities Count of entities you would like to add as potential covariates for topic model
+#' @return SentFrame data frame with one row for each paragraph chunk
+#' @return Annotations openNLP annotation object
+#' @return processed stm processed documents
+#' @return out stm out documents for use in topic model
+#' @seealso \code{\link{stm}} 
+#' @export
+#' @examples
+#' BASE_INPUT<-PreTopicFrame(corpus1,1)
 PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
   loadparsers()
   corpEntN<-CORPUS_A[sapply(CORPUS_A,function(x) length(content(x)))>0]
@@ -75,7 +101,7 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
   list("SentFrame"=par2,"Annotations"=allans,"processed"=processed,"out"=out)
 }
 
-
+?PreTopicFrame
 AnnotateVerbsTopicJoin<-function(WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME,toptopics){
   loadparsers()
   pos_tag_annotator<- Maxent_POS_Tag_Annotator()

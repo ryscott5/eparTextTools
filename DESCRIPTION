@@ -43,3 +43,6 @@ Imports:
   igraph,
   networkD3
 RoxygenNote: 5.0.1.9000
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
