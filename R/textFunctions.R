@@ -194,15 +194,5 @@ interest_plot_bydoc_char<-function(wordlist,termDocumentMatrix,doccharacteristic
     ggplot(tempframe, aes(variable, value)) + geom_bar(fill="#8ebfad", position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12), panel.background=element_blank())+xlab("")+ylab("Frequency")+scale_fill_pander()
   }}
 
-
 #nlp
-sent_token_annotator <- Maxent_Sent_Token_Annotator()
-word_token_annotator <- Maxent_Word_Token_Annotator()
-pos_tag_annotator<- Maxent_POS_Tag_Annotator()
-org.annotate<-Maxent_Entity_Annotator(language = "en", kind="organization", probs = FALSE,model = NULL)
-pers.annotate<-Maxent_Entity_Annotator(language = "en", kind="person", probs = FALSE,model = NULL)
-location.annotate<-Maxent_Entity_Annotator(language = "en", kind="location", probs = FALSE,model = NULL)
-#misc.annotate<-Maxent_Entity_Annotator(language = "en", kind="misc", probs = FALSE,model = NULL)
-money.annotate<-Maxent_Entity_Annotator(language = "en", kind="money", probs = FALSE,model = NULL)
-parse_annotator <- Parse_Annotator()
 

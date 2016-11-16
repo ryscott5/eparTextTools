@@ -3,9 +3,20 @@ library(lubridate)
 jgc <- function()
 {
   rJava::.jcall("java/lang/System", method = "gc")
-}    
+} 
+
+loadparsers<-function(){
+sent_token_annotator <<- Maxent_Sent_Token_Annotator()
+word_token_annotator <<- Maxent_Word_Token_Annotator()
+pos_tag_annotator<<- Maxent_POS_Tag_Annotator()
+org.annotate<<-Maxent_Entity_Annotator(language = "en", kind="organization", probs = FALSE,model = NULL)
+pers.annotate<<-Maxent_Entity_Annotator(language = "en", kind="person", probs = FALSE,model = NULL)
+location.annotate<<-Maxent_Entity_Annotator(language = "en", kind="location", probs = FALSE,model = NULL)
+money.annotate<<-Maxent_Entity_Annotator(language = "en", kind="money", probs = FALSE,model = NULL)
+parse_annotator <<- Parse_Annotator()}
 
 PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
+  loadparsers()
   corpEntN<-CORPUS_A[sapply(CORPUS_A,function(x) length(content(x)))>0]
   corpus1b<-CORPUS_A[sapply(CORPUS_A,function(x) length(content(x)))>0]
   corpEntN<-lapply(names(corpEntN[[1]]$meta),function(K){meta(corpEntN,K)})
@@ -69,6 +80,7 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
 jgc()
 
 AnnotateVerbsTopicJoin<-function(WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME,toptopics){
+  loadparsers()
   pos_tag_annotator<- Maxent_POS_Tag_Annotator()
   #OUT<-BASE_INPUT$out
   #ANNOTATELIST<-BASE_INPUT$Annotations
@@ -105,6 +117,7 @@ CombinationFrame<-function(PREPFRAME){
 
 
 AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME){
+  loadparsers()
   pos_tag_annotator<- Maxent_POS_Tag_Annotator()
   tcs<-pblapply(1:length(unique(MAXTOPS)), function(k){
     toChar<-SENTENCEFRAME$SC[-PROCESSED$docs.removed][-OUT$docs.removed][which(MAXTOPS==k)]

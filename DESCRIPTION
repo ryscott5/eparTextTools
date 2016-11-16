@@ -1,4 +1,4 @@
-Package:epartexttools
+Package: epartexttools
 Title: Rapid Portfolio Review Toolkit (one line, title case required)
 Version: 0.1
 Authors@R: c(person("Ryan", "Scott", email = "ryscott5@uw.edu",
@@ -43,3 +43,4 @@ Imports:
   data.table,
   igraph,
   networkD3
+RoxygenNote: 5.0.1.9000
