@@ -1,4 +1,4 @@
-Package: EPAR Text Analysis Toolkit (eparTextTools)
+Package:epartexttools
 Title: Rapid Portfolio Review Toolkit (one line, title case required)
 Version: 0.1
 Authors@R: c(person("Ryan", "Scott", email = "ryscott5@uw.edu",

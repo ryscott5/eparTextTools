@@ -21,10 +21,29 @@ if (!require(wordVectors)) {
   devtools::install_github("bmschmidt/wordVectors")
 }})
 
-#the check for tika command will install tika to the current working directory 
-  
+
+#' Check to see if Tika is available.
+#'
+#' @param directory directory to look for tika in. 
+#' @return If false will download tika to working directory.
+#' @seealso \code{\link{http://apache.claz.org/tika}} 
+#' @export
+#' @description The check for tika command will install tika to the current working directory.
+#' @examples
+#' checkForTika()
 checkForTika<-function(directory=getwd()){if("tika-app-1.13.jar"%in%list.files(path=directory)) {cat("success")} else {download.file("http://apache.claz.org/tika/tika-app-1.13.jar",file.path(directory,"tika-app-1.13.jar"))}}
 
+#' Loads and processes doc,docx,pdf,and txt files into tm corpus.
+#'
+#'This command loads files into R from a directory into a corpus. Currently it reads doc, docx, pdf, and txt files.
+#' @param fname Directory name
+#' @param tika Should tika be used? 
+#' @param tikapath Path to the Tika application
+#' @return TM Text Corpus.
+#' @seealso \code{\link{tm::corpus}} 
+#' @export
+#' @examples
+#' corpus1<-getTextR(file.path())
 getTextR<-function(fname,tika=FALSE,tikapath="tika-app-1.13.jar"){
   if(tika==TRUE){
     pdoc<-system(command=paste("java -jar",tikapath,"-t",gsub(" ","\\ ",fname,fixed=TRUE)),intern=TRUE,wait=TRUE)
@@ -33,6 +52,7 @@ getTextR<-function(fname,tika=FALSE,tikapath="tika-app-1.13.jar"){
       if(str_detect(fname,".doc+$")==TRUE){readDOC()(language="en",elem=list(uri=fname))} else {pdoc<-if(str_detect(fname, fixed(".pdf"))==TRUE){readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")} else {if(str_detect(fname,fixed(".txt"))==TRUE){readPlain(elem=list(uri=fname,content=iconv(enc2utf8(readLines(fname)), sub = "byte")),language="en")} else {"FILETYPE NA"}}}}}
   pdoc
 }
+
 readMails<-function(FOLDERCONTAININGDOCS,newmailsdirectory){
   FOLDERCONTAININGDOCS<-"../docs"
   newmailsdirectory<-"../testnewdocs"
