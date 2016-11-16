@@ -39,9 +39,9 @@ This readme file first guides a user through the basic description and classific
 To begin this process, first load the textFunctions. For demonstration purposes we also create a demonstration document dataset using the demo.docs.R code.
 
 ```{r}
+options(java.parameters = "-Xmx2048m")
 devtools::document(roclets=c('rd', 'collate', 'namespace', 'vignette'))
 source("demo.docs.R")
-
 ```
 
 Main functions enabling workflow include reading documents into R via the "getTextR" command. The getTextR command takes a file directory as an argument, and returns a textual corpus. It is capable of reading word documents (both doc and docx), pdf documents, and txt documents. Further document types can be added by replacing the "FILETYPE NA" line with additional document if loops. The allDocs() command is a conveniance wrapper which loops through a directory parsing documents and creating a corpus with metadata.
