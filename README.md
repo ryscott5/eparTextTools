@@ -39,7 +39,7 @@ This readme file first guides a user through the basic description and classific
 To begin this process, first load the textFunctions. For demonstration purposes we also create a demonstration document dataset using the demo.docs.R code.
 
 ```{r}
-source("textFunctions.R")
+devtools::document(roclets=c('rd', 'collate', 'namespace', 'vignette'))
 source("demo.docs.R")
 
 ```

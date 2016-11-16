@@ -1,7 +1,5 @@
 #TopicFunctions
-library(lubridate)
-jgc <- function()
-{
+jgc <- function(){
   rJava::.jcall("java/lang/System", method = "gc")
 } 
 
@@ -77,7 +75,6 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
   list("SentFrame"=par2,"Annotations"=allans,"processed"=processed,"out"=out)
 }
 
-jgc()
 
 AnnotateVerbsTopicJoin<-function(WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME,toptopics){
   loadparsers()
@@ -184,7 +181,7 @@ picktopics<-function(STMOBJ,TERM,N){
   }
   
 
-data_mapper<<-function(CountryPredictions,OPPORTUNITY){
+data_mapper<-function(CountryPredictions,OPPORTUNITY){
   gchars<-ddply(CountryPredictions,.(OpID),summarise,"charsum"=sum(nchars))
   CountryPredictions<-plyr::join(CountryPredictions,gchars)
   CountryPredictions$weight<-CountryPredictions$nchars/CountryPredictions$charsum
@@ -231,17 +228,6 @@ FillFolder<-function(PREPFRAME,FOLDERNAME){
     Sys.sleep(1)
   }}
 
-
-
-FillRetry<-function(PREPFRAME,FOLDERNAME,FILENAMES){
-  for(X in FILENAMES){
-    Num1<-gsub(".json","",X) %>% gsub("al","",.) %>% as.numeric()
-    Sent<-PREPFRAME$Sent[Num1]
-    file.remove(file.path("getAlchemy",FOLDERNAME,X))
-    req <- POST("http://access.alchemyapi.com/calls/text/TextGetRelations", 
-                body = list(apikey="6837e8ae18678cadd3c42fc55ed938b3818ce470",text=Sent,keywords=1,outputMode="json",disambiguate=0), encode = "form",write_disk(file.path(FOLDERNAME,"ALCHEMY",X)))
-    Sys.sleep(.5)
-  }}
 FillRetry<-function(PREPFRAME,FOLDERNAME,FILENAMES){
   library(httr)
   for(X in FILENAMES){
@@ -301,7 +287,7 @@ ParseFolderToFrame<-function(FOLDERNAME,PREPFRAME,WT){
   subcs_full<-cbind(joinkey,PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY"))[as.numeric(joinkey$whichi)] %>% gsub("al","",.) %>% gsub('.json',"",.,fixed=T)),])
   list("SmallVerb"=subcs,"FullVerb"=subcs_full)}
 
-frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME){
+frametable1<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME){
   OV<-PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY")) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
   OVF<-BASEINPUT$SentFrame[-BASEINPUT$processed$docs.removed,][-BASEINPUT$out$docs.removed,][OV$value,] 
   PARSEFRAME<-cbind(PARSEFRAME,OVF[,c("author","datetimestamp","id","ents")])
@@ -312,7 +298,7 @@ frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME){
   PARSEFRAME$Verb<-as.factor(PARSEFRAME$Verb)
   PARSEFRAME}
 
-frametable<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME,TOPICMOD){
+frametable2<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME,TOPICMOD){
   # PARSEFRAME<-Frame1[[1]]
   # rm(PARSEFRAME)
   # BASEINPUT<-BASE_INPUT
@@ -391,7 +377,6 @@ TopicCoreFrame<-function(MAXTOPS,PARSEFRAME){
   })
   cormatsbysub
 }
-
 
 
 SimpFrameList<-function(TCOREFRAME){
@@ -493,8 +478,6 @@ reflectCountryCol<-function(MATCHFRAME,pred2,howmany,binomial=FALSE){
   cntjoin<-join(MATCHFRAME,pred2[,c("OpID","Orig",maxCs)], by=c("OpID","Orig"))
   return(cntjoin)}
 
-
-library('wordVectors')
 
 nearest_to2<-function(topicm,wordvec,n=10,fixword=FALSE,limitwords=NULL){ 
   mt<-t(exp(topicm$beta$logbeta[[1]]))
