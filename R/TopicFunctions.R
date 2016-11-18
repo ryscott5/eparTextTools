@@ -301,7 +301,6 @@ data_mapper<-function(CountryPredictions,OPPORTUNITY){
   tframe$hover<-paste(tframe$nameC,": ",round(tframe$value*100)/100,sep="")
   tframe}
 
-
 FillFolderMan<-function(PREPFRAME,FOLDERNAME){
   library(httr)
   #if(dir.exists("getAlchemy")==FALSE) {dir.create("getAlchemy")}
@@ -542,7 +541,35 @@ idSimilar<-function(SEARCH,COLUMN,NUM,TOPICMODEL){
 #nex<-read.csv("../nonExcel.csv",stringsAsFactors=FALSE)
 #nexjoin<-plyr::join(data.frame("name"=BASE_INPUT$SentFrame$id),data.frame("name"=basename(as.character(nex$path)),"OpID"=as.character(nex$Opportunity.ID)),type="left",match="first")
 #BASE_INPUT$SentFrame$OpID<-nexjoin$OpID
+
+writerun_alch<-function(alchemykey,workingfolder){
+writeLines(text=c(paste('
+rm(list=ls())
+library(httr)
 library(plyr)
+library(dplyr)
+library(stringr)
+library(jsonlite)
+ALKEY<-',alchemykey,sep=""),paste('workingfolder<-','"',file.path(workingfolder),'"',sep=""),'args = commandArgs(trailingOnly=TRUE)
+FillFolder<-function(PREPFRAME,FOLDERNAME){
+library(httr)
+if(dir.exists(file.path(FOLDERNAME,"ALCHEMY"))==FALSE) {dir.create(file.path(FOLDERNAME,"ALCHEMY"))}
+for(i in args[1]:nrow(PREPFRAME)){
+X<-PREPFRAME$Sent[i]
+req <- POST("http://access.alchemyapi.com/calls/text/TextGetRelations", 
+body = list(apikey=ALKEY,text=X,keywords=1,outputMode="json",disambiguate=0), encode = "form",write_disk(file.path(FOLDERNAME,"ALCHEMY",paste("al",i,".txt",sep=""))))
+Sys.sleep(1)
+}}
+recombine<-readRDS(file.path(workingfolder,"ProcessedFrame.rds"))
+FillFolder(recombine,workingfolder)'),con=file.path(workingfolder,"run_Alchemy.R"))
+  }
+RunAlchy<-function(num){
+  system(paste("R CMD BATCH --args",file.path(workingfolder,"run_Alchemy.R"),num),wait=FALSE)
+}
+
+
+
+
 #for these commands, we need to have the opportunity id labeles as OpID in the SentFrame part of BASE_INPUT
 buildcliff<-function() {system('sudo docker run -p "8080:8080" -d --name cliff cliff:2.1.1')}
 startcliff<-function() {system('sudo docker start cliff')}

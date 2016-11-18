@@ -304,22 +304,20 @@ saveRDS(ProcessedANNS,file.path(workingfolder,"ProcessedFrame.rds"))
 #Call to AlchemyAPI
 
 ```{r}
-source("../alchey.R")
-system("Rscript --no-restore run_Alchemy.R 1",wait=FALSE)
+writerun_alch("'test'","../Research.Grants")
+RunAlchy(1)
 library(jsonlite)
 library(shiny)
 Frame1<-processFolder(workingfolder,ProcessedANNS)
 saveRDS(Frame1,file.path(workingfolder,"ParsedFrame.rds"))
 matchtable<-frametable(Frame1,BASE_INPUT,0)
 saveRDS(matchtable,file.path(workingfolder,"matchtable.rds"))
-file.copy("shinyapp",workingfolder,recursive=T)
-file.rename(file.path(workingfolder,"shinyapp","appflow.R"),file.path(workingfolder,"shinyapp","app.R"))
-file.copy(file.path(workingfolder,"matchtable.rds"),file.path(workingfolder,"shinyapp","matchtable.rds"))
-runApp(file.path(workingfolder,"shinyapp"))
+
 ```
 
 #Interactive Results
 ```{r}
+writeShinyFlow(workingfolder,testapp)
 tableapp(matchtable,st1)
 
 igraphob_object_force("review",matchtable,0,inputWord=TRUE,sankey=FALSE,verbfilter=c(),strictlimit=TRUE)
