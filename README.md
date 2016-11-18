@@ -264,13 +264,13 @@ Once the proper nouns are (mostly) removed from the dataset, we can fit a topic 
 Fitting a topic model has numerous benefits over simply viewing raw word counts, including that it allows exploration of the content of a batch of documents that can potentially reveal broad patterns missed by human coders. The stm package has its own text cleaning method which repeats many of the processing steps conducted above. Fiting the model can be somewhat slow but it has the advantage of self-generating an optimal number of topics based on Lee and Mimno (2014), while also utilizing a method that is well-suited to a large number of documents. Because there is no empirical basis for the number of topics, this approach provides a good starting point. In the code below, one can interactively select covariates to include in the topic model. Most likely topics are extracted from the theta matrix.
 
 ```{r}
-form1<-paste("~as.factor(Orig)",paste(select.list(colnames(BASE_INPUT$out$meta),multiple=TRUE),sep="",collapse="+"),sep="+")
-writeLines(form1,file.path(workingfolder,"formula1.txt"))
+writeFormulaforSTM(BASE_INPUT,workingfolder)
 
 jgc()
 
 #to run remotely
-system("R CMD BATCH --no-restore run_topic_in_background.R",wait=FALSE)
+
+
 
 #st1<-stm(BASE_INPUT$out$documents,BASE_INPUT$out$vocab,data=BASE_INPUT$out$meta,prevalence=eval(parse(text=form1)),K=0, init.type="Spectral",max.em.its=500)
 #saveRDS(st1, file.path(workingfolder,"topicmodel.rds"))

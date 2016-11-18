@@ -101,7 +101,20 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
   list("SentFrame"=par2,"Annotations"=allans,"processed"=processed,"out"=out)
 }
 
-?PreTopicFrame
+
+#'Keep only those sentences with desired verbs.
+#'
+#'  This function parses sentences only keeping those sentences that include a verb that is in the list which is specified by the user. More verbs may be kept if they occur in the sentence alongside the desired verb.
+#' @param WT a ilst of verbs
+#' @param PROCESSED an stm processed object.
+#' @return OUT an stm prepped object.
+#' @return ANNOTATELIST openNLP annotation object
+#' @return SENTENCEFRAME SentFrame object returned by PreTopicFrame
+#' @return toptopics TopTopics extracted from an stm topic model.
+#' @seealso \code{\link{stm}} 
+#' @export
+#' @examples
+#' AnnotatesLarge<-AnnotateVerbsTopicJoin(allwords,BASE_INPUT$processed,BASE_INPUT$out,BASE_INPUT$Annotations,BASE_INPUT$SentFrame,BASE_INPUT$top.topics)
 AnnotateVerbsTopicJoin<-function(WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME,toptopics){
   loadparsers()
   pos_tag_annotator<- Maxent_POS_Tag_Annotator()
@@ -134,10 +147,51 @@ AnnotateVerbsTopicJoin<-function(WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME,top
     anf<-unique(anf)
     anf}
 
+#'Keep only those annotations with tagged verbs
+#'
+#' Combines sentences into blocks reducing the size of the dataframe and only keeping those that contain desired verbs. Think of it like a refilter from AnnotateVerbsTopicJoin
+#' @param PREPFRAME the frame object regurned by AnnotateVerbsTopicJoin
 CombinationFrame<-function(PREPFRAME){
   ddply(.data=PREPFRAME, .(Orig,rowid),summarize,"Sent"=paste(as.character(Sent),collapse="\n",sep="\n"))
 }
 
+
+#'Write the formula for the call to the topic model.
+#'
+#' Write the formula for the prevelence covariates for the topic model.
+#' @param BASE_INPUT the baseinput object returned by PreTopicFrame
+#' @param workingfolder the workingfolder where you are saving objects.
+#' @return writes the formula to a text file in the working formula named formula1.
+#' @seealso \code{\link{stm}} 
+#' @export
+#' @examples
+#' writeFormulaforSTM(BASE_INPUT,"../Research.Grants")
+writeFormulaforSTM<-function(BASE_INPUT,workingfolder){
+  form1<-paste("~as.factor(Orig)",paste(select.list(colnames(BASE_INPUT$out$meta),multiple=TRUE),sep="",collapse="+"),sep="+")
+  writeLines(form1,file.path(workingfolder,"formula1.txt"))
+}
+
+#'Run STM in a seperate R session.
+#'
+#' this function will create .R file in the working folder which it then will call, resulting in fitting an stm model within a seperate R session. The output should be viewable in an Rout file.
+#' @param workingfolder the workingfolder where you are saving objects.
+#' @return writes file and starts new r process in background
+#' @seealso \code{\link{stm}} 
+#' @export
+#' @examples
+#' runSTM("../Research.Grants")
+runSTM<-function(workingfolder){
+writeLines(text='
+library(plyr)
+library(dplyr)
+library(stm)
+args = commandArgs(trailingOnly=TRUE)
+workingfolder<-args[1]
+baseinput<-readRDS(file.path(workingfolder,"base_input1.rds"))
+  st1<-stm(baseinput$out$documents,baseinput$out$vocab,data=baseinput$out$meta,prevalence=eval(parse(text=readLines(file.path(workingfolder,"formula1.txt")))),K=0, init.type="Spectral",max.em.its=1000)
+saveRDS(st1, file.path(workingfolder,"topicmodel.rds")',
+           con=file.path(workingfolder,"callstm.R"))
+  system(paste("R CMD BATCH --no-restore --args callstm.R",workingfolder,sep=" "),wait=FALSE)}
 
 AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME){
   loadparsers()
@@ -167,6 +221,12 @@ AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRA
   allcs<-na.omit(melt(tcs2))
   allcs}
 
+#'Clean sentences for sending to alchemy API.
+#'
+#' This function cleans the sentences for sending to alchemy API
+#' @param PREPFRAME object returned by combinationframe or annotateframebytopicjoin
+#' @return a data frame
+#' @export
 ProcessforAPI<-function(PREPFRAME){
 PREPFRAME$Sent<-str_trim(PREPFRAME$Sent)
 PREPFRAME$Sent<-gsub("\n"," ",PREPFRAME$Sent)
@@ -179,6 +239,15 @@ PREPFRAME$Sent<-gsub("  "," ",PREPFRAME$Sent)
 PREPFRAME}
 
 
+
+#'Identify topics with highest term probability
+#'
+#' taking a topic model, this function returns the top topics for that word.
+#' @param STMOBJ stm object
+#' @param TERM  word in character format
+#' @return N number of topics to return
+#' @export
+#' @examples idtopics(st1,"research",10)
 idtopics<-function(STMOBJ,TERM,N){
   #TERM<-"cassava"
   #STMOBJ<-st1
@@ -191,7 +260,14 @@ idtopics<-function(STMOBJ,TERM,N){
   return(mselect)
 }
 
-
+#'Pick topics with suggested words
+#'
+#' Pulls similar words, expanding topic selection ability. Interactive.
+#' @param STMOBJ stm object
+#' @param TERM  word in character format
+#' @return N number of topics to return
+#' @export
+#' @examples idtopics(st1,"research",10)
 picktopics<-function(STMOBJ,TERM,N){
   test<-idtopics(STMOBJ,TERM,N)
   termlist<-TERM
@@ -206,7 +282,12 @@ picktopics<-function(STMOBJ,TERM,N){
   list("searchterms"=termlist,"topics"=test)
   }
   
-
+#'Make a map based on the cliff-claven tagging
+#'
+#' Using the countrypredictions object, retuns a map for an opportunity number.
+#' @param CountryPredictions object returned by PredictCountryByDoc
+#' @param OPPORTUNITY OpID to search for
+#' @return data frame ready for mapping in plotly
 data_mapper<-function(CountryPredictions,OPPORTUNITY){
   gchars<-ddply(CountryPredictions,.(OpID),summarise,"charsum"=sum(nchars))
   CountryPredictions<-plyr::join(CountryPredictions,gchars)
