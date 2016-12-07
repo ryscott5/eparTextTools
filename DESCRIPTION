@@ -41,7 +41,8 @@ Imports:
   plotly,
   data.table,
   igraph,
-  networkD3
+  networkD3,
+  stringr
 RoxygenNote: 5.0.1.9000
 Suggests: knitr,
     rmarkdown

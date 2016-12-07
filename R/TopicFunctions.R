@@ -301,6 +301,7 @@ data_mapper<-function(CountryPredictions,OPPORTUNITY){
   tframe$hover<-paste(tframe$nameC,": ",round(tframe$value*100)/100,sep="")
   tframe}
 
+
 FillFolderMan<-function(PREPFRAME,FOLDERNAME){
   library(httr)
   #if(dir.exists("getAlchemy")==FALSE) {dir.create("getAlchemy")}
@@ -346,8 +347,15 @@ FillRetry<-function(PREPFRAME,FOLDERNAME,FILENAMES){
     
   }}
 
-processFolder<-function(working.filepath, PREPFRAME){
-  tempfname<-list.files(file.path(working.filepath,"ALCHEMY"),full.names=T)
+
+#'Process Documents in the Alchemy Folder
+#'
+#' This function parses the entries in the alchemy api folder and creates a dataframe
+#' @param workingfolder Folder for working in
+#' @param PREPFRAME prepframe object
+#' @return data frame of processed sentences
+processFolder<-function(workingfolder, PREPFRAME){
+  tempfname<-list.files(file.path(workingfolder,"ALCHEMY"),full.names=T)
   nosize<-sapply(tempfname, function(X) file.info(X)$size==0)
   templist<-pblapply(tempfname[which(nosize==FALSE)], function(X){fromJSON(X,flatten=T)$relations %>% as.data.frame() %>% mutate(.,"filename"=as.character(X))})
   tempframe<-rbind.pages(templist)
@@ -356,6 +364,7 @@ processFolder<-function(working.filepath, PREPFRAME){
   recombineOut<-plyr::join(tempframe,PREPFRAME, by="comboID",type="left",match="all")
   return(recombineOut)
 }
+
 
 ParseFolderToFrame<-function(FOLDERNAME,PREPFRAME,WT){
   rels<-lapply(1:length(list.files(file.path(FOLDERNAME,"ALCHEMY"))),function(i) fromJSON(readLines(file.path(FOLDERNAME,"ALCHEMY",list.files(file.path(FOLDERNAME,"ALCHEMY"))[i])))$relations)
@@ -393,6 +402,7 @@ ParseFolderToFrame<-function(FOLDERNAME,PREPFRAME,WT){
   subcs_full<-cbind(joinkey,PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY"))[as.numeric(joinkey$whichi)] %>% gsub("al","",.) %>% gsub('.json',"",.,fixed=T)),])
   list("SmallVerb"=subcs,"FullVerb"=subcs_full)}
 
+
 frametable1<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME){
   OV<-PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY")) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
   OVF<-BASEINPUT$SentFrame[-BASEINPUT$processed$docs.removed,][-BASEINPUT$out$docs.removed,][OV$value,] 
@@ -426,6 +436,7 @@ frametable2<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME,TOPICMOD){
   PARSEFRAME$Verb<-as.factor(PARSEFRAME$Verb)
   PARSEFRAME}
 
+
 frametable.html<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME,TOPICMOD){
   OV<-PREPFRAME[as.numeric(list.files(file.path(FOLDERNAME,"ALCHEMY")) %>% gsub(".json","",.) %>% gsub("al","",.) %>% .[as.numeric(PARSEFRAME$whichi)]),]
   OVF<-BASEINPUT$SentFrame[-BASEINPUT$processed$docs.removed,][-BASEINPUT$out$docs.removed,][OV$value,] 
@@ -436,6 +447,7 @@ frametable.html<-function(PARSEFRAME,BASEINPUT,FOLDERNAME,PREPFRAME,TOPICMOD){
   PARSEFRAME$Topic<-as.factor(PARSEFRAME$Topic)
   PARSEFRAME$Verb<-as.factor(PARSEFRAME$Verb)
   datatable(data=PARSEFRAME,rownames=FALSE,filter="top")}
+
 
 TopicCoreFrame<-function(MAXTOPS,PARSEFRAME){
   library(stringdist)
@@ -542,6 +554,14 @@ idSimilar<-function(SEARCH,COLUMN,NUM,TOPICMODEL){
 #nexjoin<-plyr::join(data.frame("name"=BASE_INPUT$SentFrame$id),data.frame("name"=basename(as.character(nex$path)),"OpID"=as.character(nex$Opportunity.ID)),type="left",match="first")
 #BASE_INPUT$SentFrame$OpID<-nexjoin$OpID
 
+
+
+#'Function to write code to run alchemy
+#'
+#' This function creates a .R file to call to alchemy api.
+#' @param alchemykey key to alchemy api as character
+#' @param workingfolder workingfolder for project
+#' @return a .R file saved in the working folder
 writerun_alch<-function(alchemykey,workingfolder){
 writeLines(text=c(paste('
 rm(list=ls())
@@ -562,13 +582,34 @@ Sys.sleep(1)
 }}
 recombine<-readRDS(file.path(workingfolder,"ProcessedFrame.rds"))
 FillFolder(recombine,workingfolder)'),con=file.path(workingfolder,"run_Alchemy.R"))
-  }
+}
+
+#'Function to run .R file returned by writerun_alch
+#'
+#' This function runs the .R file returned by writerun_alch. It takes as an argument a number which corresponds to a row in the BASE_INPUT dataframe
+#' @param num row number to start function at (this is to allow for restarts in case an error occurs?)
+#' @return NA fills folder with alchemy api calls
 RunAlchy<-function(num){
   system(paste("R CMD BATCH --args",file.path(workingfolder,"run_Alchemy.R"),num),wait=FALSE)
 }
 
 
 
+#'Run this function to install a docker server from within R
+#'
+#' This function calls out using the system command. make sure to clear your workspace and history if you use this.
+#' @param password you should type in your password 3 times.
+#' @return NA installs a docker server
+makeadockercliff<-function(){
+  cwd<-getwd()
+  setwd("~")
+  system('sudo apt-get -y install docker.io',input=readline("Enter your password: "))
+  system('sudo git clone https://github.com/johnb30/cliff-docker
+',input=readline("Enter your password: "))
+  setwd("cliff-docker")
+  system('sudo docker build -t cliff:2.1.1 .',input=readline("Enter your password: "))
+  setwd("~")
+  setwd(cwd)}
 
 #for these commands, we need to have the opportunity id labeles as OpID in the SentFrame part of BASE_INPUT
 buildcliff<-function() {system('sudo docker run -p "8080:8080" -d --name cliff cliff:2.1.1')}
