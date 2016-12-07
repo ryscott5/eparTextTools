@@ -1,0 +1,2232 @@
+
+R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> #fittopicmodel
+> library(plyr)
+> library(dplyr)
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:plyr’:
+
+    arrange, count, desc, failwith, id, mutate, rename, summarise,
+    summarize
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> library(stm)
+stm v1.1.3 (2016-01-14) successfully loaded. See ?stm for help.
+> workingfolder<-"../Research.Grants"
+> baseinput<-readRDS(file.path(workingfolder,"base_input1.rds"))
+>   st1<-stm(baseinput$out$documents,baseinput$out$vocab,data=baseinput$out$meta,prevalence=eval(parse(text=readLines(file.path(workingfolder,"formula1.txt")))),K=0, init.type="Spectral",max.em.its=1000)
+Beginning Initialization.
+	 Calculating the gram matrix...
+	 Finding anchor words...
+ 	
+	 Recovering initialization...
+ 	............................................................................
+Initialization complete.
+....................................................................................................
+Completed E-Step (13 seconds). 
+Completed M-Step (7 seconds). 
+Completing Iteration 1 (approx. per word bound = -7.094) 
+....................................................................................................
+Completed E-Step (13 seconds). 
+Completed M-Step (6 seconds). 
+Completing Iteration 2 (approx. per word bound = -6.565, relative change = 7.454e-02) 
+....................................................................................................
+Completed E-Step (12 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 3 (approx. per word bound = -6.413, relative change = 2.317e-02) 
+....................................................................................................
+Completed E-Step (11 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 4 (approx. per word bound = -6.353, relative change = 9.294e-03) 
+....................................................................................................
+Completed E-Step (10 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 5 (approx. per word bound = -6.321, relative change = 4.997e-03) 
+Topic 1: polici, school, analysi, research, evan 
+ Topic 2: asant, sowley, tiesaa, ghana, mensah 
+ Topic 3: incub, farmer, busi, infodev, enterpris 
+ Topic 4: cassava, yam, cultivar, flour, varieti 
+ Topic 5: indic, measur, index, donor, result 
+ Topic 6: billion, financ, fund, countri, million 
+ Topic 7: model, grow, mean, histor, climat 
+ Topic 8: poverti, growth, econom, measur, gdp 
+ Topic 9: textur, starch, content, prefer, food 
+ Topic 10: associ, question, research, direct, pleas 
+ Topic 11: millet, sorghum, crop, land, product 
+ Topic 12: report, account, fund, year, annual 
+ Topic 13: use, yield, crop, measur, area 
+ Topic 14: chang, climat, temperatur, increas, precipit 
+ Topic 15: herbicid, weed, control, exclus, farmer 
+ Topic 16: system, nation, document, review, govern 
+ Topic 17: data, may, area, expert, resourc 
+ Topic 18: per, cost, averag, estim, hectar 
+ Topic 19: card, ident, nation, biometr, registr 
+ Topic 20: maiz, yield, seed, varieti, improv 
+ Topic 21: retriev, mobil, money, regul, bank 
+ Topic 22: evalu, result, organ, review, perform 
+ Topic 23: potato, sweet, farmer, product, plant 
+ Topic 24: sweetpotato, agricultur, public, diseas, cip 
+ Topic 25: rice, retriev, adapt, crop, product 
+ Topic 26: program, nation, servic, support, implement 
+ Topic 27: aid, bilater, effect, countri, donor 
+ Topic 28: yam, women, crop, farmer, men 
+ Topic 29: data, coverag, estim, popul, use 
+ Topic 30: subsidi, evid, poverti, voucher, household 
+ Topic 31: farm, agricultur, product, cotton, labor 
+ Topic 32: time, work, cite, nutrit, agricultur 
+ Topic 33: tanzania, gender, brief, professor, bill 
+ Topic 34: household, plot, crop, season, proport 
+ Topic 35: household, women, labor, increas, farmer 
+ Topic 36: joshi, reddi, kumar, deining, manfr 
+ Topic 37: product, use, land, household, level 
+ Topic 38: multilater, impact, studi, outcom, posit 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: studi, find, household, remitt, poverti 
+ Topic 42: forest, countri, togo, zambia, leon 
+ Topic 43: cluster, develop, agricultur, agribusi, export 
+ Topic 44: constraint, water, crop, rice, product 
+ Topic 45: journal, potato, sweetpotato, product, sweet 
+ Topic 46: health, vaccin, impact, cost, benefit 
+ Topic 47: cassava, plantain, product, banana, yield 
+ Topic 48: wheat, price, product, increas, market 
+ Topic 49: system, evalu, data, inform, result 
+ Topic 50: regul, provid, custom, countri, bank 
+ Topic 51: faso, burkina, divoir, countri, mean 
+ Topic 52: ibid, cit, convent, ravallion, center 
+ Topic 53: tabl, see, appendix, yam, cowpea 
+ Topic 54: contract, women, studi, farmer, scheme 
+ Topic 55: fertil, soil, use, nutrient, crop 
+ Topic 56: develop, invest, econom, public, financ 
+ Topic 57: climat, chang, region, adapt, crop 
+ Topic 58: food, secur, measur, insecur, hunger 
+ Topic 59: poverti, islam, credit, impact, studi 
+ Topic 60: agricultur, retriev, fao, food, journal 
+ Topic 61: color, firm, banana, varieti, signific 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: agricultur, product, impact, develop, zivin 
+....................................................................................................
+Completed E-Step (10 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 6 (approx. per word bound = -6.301, relative change = 3.266e-03) 
+....................................................................................................
+Completed E-Step (10 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 7 (approx. per word bound = -6.285, relative change = 2.462e-03) 
+....................................................................................................
+Completed E-Step (9 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 8 (approx. per word bound = -6.273, relative change = 1.997e-03) 
+....................................................................................................
+Completed E-Step (9 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 9 (approx. per word bound = -6.262, relative change = 1.702e-03) 
+....................................................................................................
+Completed E-Step (9 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 10 (approx. per word bound = -6.253, relative change = 1.387e-03) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, report, stake, farmer, survey 
+ Topic 3: incub, farmer, busi, infodev, enterpris 
+ Topic 4: yam, cassava, cultivar, flour, varieti 
+ Topic 5: indic, index, measur, develop, use 
+ Topic 6: financ, million, billion, fund, countri 
+ Topic 7: model, grow, mean, region, histor 
+ Topic 8: poverti, growth, econom, incom, measur 
+ Topic 9: textur, starch, food, content, prefer 
+ Topic 10: associ, question, research, direct, pleas 
+ Topic 11: millet, sorghum, crop, product, grain 
+ Topic 12: report, account, fund, one, year 
+ Topic 13: yield, use, crop, product, measur 
+ Topic 14: chang, temperatur, climat, increas, precipit 
+ Topic 15: weed, control, herbicid, use, pesticid 
+ Topic 16: system, nation, review, document, search 
+ Topic 17: data, resourc, may, person, research 
+ Topic 18: per, cost, averag, estim, hectar 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: maiz, yield, varieti, seed, improv 
+ Topic 21: mobil, retriev, money, bank, regul 
+ Topic 22: result, donor, organ, review, evalu 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, diseas, public, research 
+ Topic 25: rice, retriev, adapt, crop, chang 
+ Topic 26: program, nation, servic, implement, support 
+ Topic 27: aid, bilater, countri, effect, donor 
+ Topic 28: women, yam, crop, men, land 
+ Topic 29: data, coverag, popul, estim, mobil 
+ Topic 30: subsidi, evid, poverti, poor, impact 
+ Topic 31: farm, cotton, agricultur, product, labor 
+ Topic 32: time, nutrit, use, work, cite 
+ Topic 33: brief, tanzania, professor, use, bill 
+ Topic 34: household, plot, season, figur, crop 
+ Topic 35: household, labor, women, increas, farmer 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, use, credit, risk 
+ Topic 38: multilater, impact, studi, outcom, effect 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: studi, find, poverti, household, asset 
+ Topic 42: ssa, countri, total, product, zambia 
+ Topic 43: cluster, develop, agricultur, agribusi, export 
+ Topic 44: crop, water, product, constraint, system 
+ Topic 45: journal, potato, sweetpotato, product, yam 
+ Topic 46: health, vaccin, impact, malaria, mortal 
+ Topic 47: cassava, plantain, product, banana, plant 
+ Topic 48: price, wheat, product, increas, consumpt 
+ Topic 49: system, data, evalu, use, inform 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, faso, burkina, divoir, receiv 
+ Topic 52: ibid, cit, retriev, ravallion, center 
+ Topic 53: tabl, see, appendix, crop, estim 
+ Topic 54: contract, women, studi, farmer, land 
+ Topic 55: fertil, soil, use, nutrient, crop 
+ Topic 56: develop, invest, public, good, econom 
+ Topic 57: climat, chang, crop, region, adapt 
+ Topic 58: food, secur, measur, articl, literatur 
+ Topic 59: credit, islam, impact, poverti, microfin 
+ Topic 60: agricultur, retriev, journal, food, develop 
+ Topic 61: varieti, color, textur, content, firm 
+ Topic 62: water, sanit, health, intervent, risk 
+ Topic 63: product, agricultur, includ, countri, develop 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 11 (approx. per word bound = -6.246, relative change = 1.142e-03) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 12 (approx. per word bound = -6.240, relative change = 9.825e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 13 (approx. per word bound = -6.234, relative change = 9.107e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 14 (approx. per word bound = -6.229, relative change = 8.553e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 15 (approx. per word bound = -6.224, relative change = 7.672e-04) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, product, report, tuber 
+ Topic 3: incub, farmer, busi, infodev, enterpris 
+ Topic 4: yam, cassava, cultivar, flour, varieti 
+ Topic 5: indic, index, measur, develop, human 
+ Topic 6: financ, million, billion, countri, fund 
+ Topic 7: region, grow, model, mean, climat 
+ Topic 8: poverti, growth, econom, incom, measur 
+ Topic 9: textur, starch, food, banana, potato 
+ Topic 10: associ, question, research, direct, pleas 
+ Topic 11: millet, sorghum, crop, grain, product 
+ Topic 12: report, account, fund, one, year 
+ Topic 13: yield, product, use, area, measur 
+ Topic 14: chang, temperatur, climat, increas, yield 
+ Topic 15: weed, use, control, pesticid, herbicid 
+ Topic 16: system, review, nation, search, document 
+ Topic 17: may, data, resourc, research, literatur 
+ Topic 18: cost, per, averag, estim, year 
+ Topic 19: card, ident, nation, biometr, use 
+ Topic 20: maiz, yield, varieti, seed, improv 
+ Topic 21: mobil, retriev, money, bank, regul 
+ Topic 22: donor, result, organ, evalu, review 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, search, diseas, research 
+ Topic 25: rice, adapt, crop, retriev, chang 
+ Topic 26: program, nation, servic, implement, support 
+ Topic 27: aid, bilater, multilater, countri, donor 
+ Topic 28: women, crop, men, land, market 
+ Topic 29: data, coverag, popul, estim, mobil 
+ Topic 30: evid, subsidi, poverti, impact, poor 
+ Topic 31: farm, cotton, agricultur, product, labor 
+ Topic 32: time, nutrit, use, activ, work 
+ Topic 33: brief, professor, use, bill, tanzania 
+ Topic 34: household, plot, season, figur, proport 
+ Topic 35: household, increas, labor, farmer, women 
+ Topic 36: deining, joshi, reddi, kumar, baland 
+ Topic 37: product, insur, credit, save, risk 
+ Topic 38: studi, impact, multilater, effect, outcom 
+ Topic 39: group, studi, save, member, intervent 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: studi, poverti, find, household, incom 
+ Topic 42: ssa, countri, product, grown, produc 
+ Topic 43: cluster, develop, agricultur, agribusi, export 
+ Topic 44: crop, water, system, product, environment 
+ Topic 45: journal, potato, sweetpotato, sweet, product 
+ Topic 46: health, vaccin, impact, malaria, mortal 
+ Topic 47: cassava, plantain, banana, product, plant 
+ Topic 48: price, wheat, product, increas, consumpt 
+ Topic 49: system, data, evalu, indic, use 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, faso, tanzania, burkina, divoir 
+ Topic 52: ibid, retriev, cit, octob, ravallion 
+ Topic 53: tabl, see, crop, appendix, estim 
+ Topic 54: contract, women, studi, farmer, farm 
+ Topic 55: fertil, soil, use, nutrient, plant 
+ Topic 56: develop, public, good, invest, global 
+ Topic 57: climat, chang, crop, agricultur, doi 
+ Topic 58: food, secur, measur, articl, hunger 
+ Topic 59: credit, islam, impact, ricewheat, loan 
+ Topic 60: agricultur, retriev, journal, develop, food 
+ Topic 61: varieti, content, prefer, textur, color 
+ Topic 62: water, sanit, health, intervent, risk 
+ Topic 63: product, includ, agricultur, avail, type 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 16 (approx. per word bound = -6.220, relative change = 6.794e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 17 (approx. per word bound = -6.217, relative change = 5.717e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 18 (approx. per word bound = -6.213, relative change = 5.051e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 19 (approx. per word bound = -6.210, relative change = 4.801e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 20 (approx. per word bound = -6.208, relative change = 4.129e-04) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, tuber, product, report 
+ Topic 3: incub, busi, farmer, infodev, enterpris 
+ Topic 4: cassava, yam, cultivar, flour, fufu 
+ Topic 5: indic, index, develop, measur, human 
+ Topic 6: financ, million, billion, countri, fund 
+ Topic 7: region, grow, climat, model, mean 
+ Topic 8: poverti, growth, econom, incom, measur 
+ Topic 9: textur, starch, food, banana, potato 
+ Topic 10: associ, question, research, direct, develop 
+ Topic 11: millet, sorghum, crop, grain, pearl 
+ Topic 12: report, account, fund, one, year 
+ Topic 13: yield, product, area, measur, use 
+ Topic 14: chang, temperatur, climat, increas, yield 
+ Topic 15: weed, use, control, pesticid, pest 
+ Topic 16: system, review, search, document, nation 
+ Topic 17: may, literatur, data, resourc, includ 
+ Topic 18: per, cost, averag, estim, year 
+ Topic 19: card, ident, nation, biometr, use 
+ Topic 20: maiz, yield, varieti, seed, improv 
+ Topic 21: mobil, retriev, money, bank, regul 
+ Topic 22: donor, result, evalu, organ, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, search, research, public 
+ Topic 25: rice, adapt, crop, retriev, irri 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, crop, men, land, market 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, subsidi, impact, develop 
+ Topic 31: farm, cotton, agricultur, labor, product 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, use, bill, brief, mobil 
+ Topic 34: household, plot, season, figur, proport 
+ Topic 35: household, increas, farmer, labor, found 
+ Topic 36: deining, joshi, reddi, kumar, baland 
+ Topic 37: product, insur, credit, save, asset 
+ Topic 38: studi, impact, effect, outcom, evid 
+ Topic 39: group, studi, save, member, intervent 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: studi, poverti, find, household, incom 
+ Topic 42: ssa, product, countri, produc, grown 
+ Topic 43: cluster, develop, agricultur, agribusi, export 
+ Topic 44: crop, water, system, product, environment 
+ Topic 45: journal, potato, sweetpotato, sweet, state 
+ Topic 46: health, vaccin, impact, malaria, mortal 
+ Topic 47: cassava, plantain, banana, product, plant 
+ Topic 48: price, wheat, product, increas, consumpt 
+ Topic 49: system, data, evalu, indic, use 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, faso, malawi, burkina 
+ Topic 52: ibid, retriev, cit, novemb, octob 
+ Topic 53: tabl, crop, see, appendix, estim 
+ Topic 54: contract, women, farmer, studi, farm 
+ Topic 55: fertil, soil, use, nutrient, plant 
+ Topic 56: develop, good, public, invest, global 
+ Topic 57: climat, chang, crop, agricultur, doi 
+ Topic 58: food, secur, measur, articl, hunger 
+ Topic 59: credit, islam, ricewheat, loan, impact 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: prefer, content, varieti, textur, consum 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: type, product, suppli, avail, includ 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 21 (approx. per word bound = -6.205, relative change = 3.787e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 22 (approx. per word bound = -6.203, relative change = 3.526e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 23 (approx. per word bound = -6.201, relative change = 3.362e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 24 (approx. per word bound = -6.199, relative change = 3.346e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 25 (approx. per word bound = -6.197, relative change = 2.930e-04) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, tuber, product, report 
+ Topic 3: incub, busi, infodev, farmer, enterpris 
+ Topic 4: cassava, yam, cultivar, flour, use 
+ Topic 5: indic, index, develop, measur, human 
+ Topic 6: financ, million, billion, countri, fund 
+ Topic 7: region, climat, grow, temperatur, model 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, starch, food, banana, potato 
+ Topic 10: associ, question, research, direct, develop 
+ Topic 11: millet, sorghum, crop, grain, pearl 
+ Topic 12: report, account, fund, one, year 
+ Topic 13: yield, product, area, measur, use 
+ Topic 14: chang, temperatur, climat, increas, yield 
+ Topic 15: weed, use, pesticid, control, pest 
+ Topic 16: system, review, search, document, nation 
+ Topic 17: may, includ, literatur, relat, data 
+ Topic 18: per, cost, estim, year, averag 
+ Topic 19: card, ident, nation, biometr, use 
+ Topic 20: maiz, yield, varieti, improv, seed 
+ Topic 21: mobil, retriev, money, bank, regul 
+ Topic 22: donor, result, evalu, organ, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, search, research, public 
+ Topic 25: rice, crop, adapt, irri, retriev 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, crop, men, land, market 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, subsidi, develop, impact 
+ Topic 31: farm, cotton, agricultur, labor, product 
+ Topic 32: time, nutrit, use, activ, women 
+ Topic 33: professor, use, brief, mobil, women 
+ Topic 34: household, plot, season, figur, proport 
+ Topic 35: household, increas, farmer, labor, found 
+ Topic 36: deining, joshi, reddi, kumar, baland 
+ Topic 37: product, insur, credit, save, asset 
+ Topic 38: studi, impact, effect, outcom, evid 
+ Topic 39: group, studi, save, member, intervent 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: studi, poverti, household, find, remitt 
+ Topic 42: ssa, product, produc, countri, import 
+ Topic 43: cluster, develop, agribusi, agricultur, export 
+ Topic 44: crop, system, water, product, environment 
+ Topic 45: potato, journal, sweetpotato, sweet, state 
+ Topic 46: health, vaccin, impact, malaria, diseas 
+ Topic 47: cassava, plantain, banana, product, plant 
+ Topic 48: price, wheat, product, increas, market 
+ Topic 49: system, data, evalu, indic, use 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, malawi, faso, burkina 
+ Topic 52: ibid, retriev, cit, novemb, world 
+ Topic 53: tabl, crop, see, appendix, estim 
+ Topic 54: contract, women, farmer, farm, studi 
+ Topic 55: fertil, soil, use, nutrient, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, crop, agricultur, doi 
+ Topic 58: food, secur, measur, articl, hunger 
+ Topic 59: islam, credit, ricewheat, loan, gupta 
+ Topic 60: agricultur, journal, retriev, develop, econom 
+ Topic 61: content, prefer, varieti, textur, consum 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: type, suppli, support, follow, avail 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 26 (approx. per word bound = -6.196, relative change = 2.536e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 27 (approx. per word bound = -6.194, relative change = 2.462e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 28 (approx. per word bound = -6.193, relative change = 2.125e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 29 (approx. per word bound = -6.192, relative change = 2.007e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 30 (approx. per word bound = -6.190, relative change = 1.935e-04) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, tuber, product, report 
+ Topic 3: incub, busi, infodev, enterpris, farmer 
+ Topic 4: yam, cassava, flour, cultivar, alata 
+ Topic 5: indic, index, develop, measur, human 
+ Topic 6: financ, million, billion, countri, fund 
+ Topic 7: region, climat, grow, temperatur, model 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, starch, food, banana, potato 
+ Topic 10: associ, research, question, direct, develop 
+ Topic 11: millet, sorghum, crop, grain, pearl 
+ Topic 12: report, account, fund, one, year 
+ Topic 13: yield, product, area, harvest, crop 
+ Topic 14: chang, temperatur, climat, increas, yield 
+ Topic 15: weed, use, pest, pesticid, control 
+ Topic 16: system, review, search, document, nation 
+ Topic 17: may, includ, literatur, relat, limit 
+ Topic 18: per, estim, year, averag, cost 
+ Topic 19: card, ident, nation, biometr, use 
+ Topic 20: maiz, yield, varieti, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, organ, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, research, public, search 
+ Topic 25: rice, crop, adapt, research, product 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, crop, men, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, subsidi, develop, impact 
+ Topic 31: farm, cotton, labor, agricultur, product 
+ Topic 32: time, nutrit, use, activ, women 
+ Topic 33: professor, use, mobil, women, gender 
+ Topic 34: household, plot, season, figur, proport 
+ Topic 35: household, farmer, increas, found, labor 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, credit, save, financi 
+ Topic 38: studi, impact, effect, signific, find 
+ Topic 39: group, studi, save, member, intervent 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: studi, poverti, household, find, remitt 
+ Topic 42: ssa, product, produc, import, crop 
+ Topic 43: cluster, develop, agribusi, export, agricultur 
+ Topic 44: crop, system, water, environment, land 
+ Topic 45: potato, journal, sweetpotato, sweet, state 
+ Topic 46: vaccin, health, impact, malaria, diseas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: price, wheat, product, increas, market 
+ Topic 49: system, data, evalu, indic, collect 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, malawi, faso, burkina 
+ Topic 52: ibid, retriev, novemb, cit, world 
+ Topic 53: tabl, crop, see, appendix, estim 
+ Topic 54: contract, women, farm, farmer, studi 
+ Topic 55: fertil, soil, use, nutrient, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, crop, agricultur, doi 
+ Topic 58: food, secur, measur, articl, hunger 
+ Topic 59: islam, credit, ricewheat, loan, system 
+ Topic 60: agricultur, journal, retriev, develop, econom 
+ Topic 61: content, varieti, prefer, textur, consum 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, type, follow, end 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 31 (approx. per word bound = -6.189, relative change = 1.851e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 32 (approx. per word bound = -6.188, relative change = 1.819e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 33 (approx. per word bound = -6.187, relative change = 1.920e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 34 (approx. per word bound = -6.186, relative change = 1.976e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 35 (approx. per word bound = -6.185, relative change = 2.052e-04) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, product, tuber, report 
+ Topic 3: incub, busi, infodev, enterpris, farmer 
+ Topic 4: yam, cassava, flour, cultivar, alata 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, million, billion, countri, fund 
+ Topic 7: region, climat, temperatur, grow, model 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, starch, food, banana, potato 
+ Topic 10: associ, research, question, direct, develop 
+ Topic 11: millet, sorghum, pearl, grain, crop 
+ Topic 12: report, account, fund, one, year 
+ Topic 13: yield, product, area, harvest, crop 
+ Topic 14: chang, temperatur, climat, increas, yield 
+ Topic 15: weed, use, pest, pesticid, control 
+ Topic 16: system, review, search, document, result 
+ Topic 17: may, includ, relat, literatur, limit 
+ Topic 18: per, estim, year, averag, cost 
+ Topic 19: card, ident, nation, biometr, use 
+ Topic 20: maiz, yield, varieti, seed, improv 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, organ, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, research, public, search 
+ Topic 25: rice, adapt, crop, research, product 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, subsidi, impact 
+ Topic 31: farm, cotton, labor, agricultur, product 
+ Topic 32: time, nutrit, use, activ, women 
+ Topic 33: professor, use, mobil, women, phone 
+ Topic 34: household, plot, season, figur, proport 
+ Topic 35: household, farmer, increas, found, labor 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, credit, financi, save 
+ Topic 38: studi, impact, effect, find, signific 
+ Topic 39: group, studi, save, member, intervent 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, studi, household, find, remitt 
+ Topic 42: ssa, product, crop, produc, import 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, system, water, land, environment 
+ Topic 45: potato, sweetpotato, journal, sweet, system 
+ Topic 46: vaccin, health, impact, malaria, increas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: price, wheat, product, increas, market 
+ Topic 49: system, data, evalu, indic, collect 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, malawi, faso, burkina 
+ Topic 52: retriev, ibid, novemb, cit, world 
+ Topic 53: tabl, crop, see, plant, appendix 
+ Topic 54: contract, women, farm, farmer, studi 
+ Topic 55: fertil, soil, use, nutrient, plant 
+ Topic 56: public, good, develop, invest, global 
+ Topic 57: climat, chang, crop, agricultur, doi 
+ Topic 58: food, secur, measur, articl, poverti 
+ Topic 59: islam, credit, ricewheat, loan, system 
+ Topic 60: agricultur, journal, retriev, develop, econom 
+ Topic 61: content, varieti, prefer, textur, consum 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, follow, type, end 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 36 (approx. per word bound = -6.183, relative change = 1.983e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 37 (approx. per word bound = -6.182, relative change = 1.762e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 38 (approx. per word bound = -6.181, relative change = 1.599e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 39 (approx. per word bound = -6.180, relative change = 1.650e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 40 (approx. per word bound = -6.179, relative change = 1.582e-04) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, farmer 
+ Topic 4: yam, cassava, flour, cultivar, alata 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, million, billion, countri, fund 
+ Topic 7: region, climat, temperatur, grow, model 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, starch, food, banana, potato 
+ Topic 10: associ, research, question, direct, develop 
+ Topic 11: millet, sorghum, pearl, grain, product 
+ Topic 12: report, account, fund, one, year 
+ Topic 13: yield, product, harvest, area, crop 
+ Topic 14: chang, temperatur, climat, increas, yield 
+ Topic 15: weed, use, pest, pesticid, control 
+ Topic 16: review, system, search, document, includ 
+ Topic 17: may, includ, literatur, relat, limit 
+ Topic 18: per, estim, year, averag, cost 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: maiz, yield, varieti, seed, improv 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, measur, organ 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, research, search 
+ Topic 25: rice, crop, adapt, product, research 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, impact, retriev 
+ Topic 31: farm, cotton, labor, agricultur, product 
+ Topic 32: time, nutrit, use, activ, women 
+ Topic 33: professor, use, mobil, women, phone 
+ Topic 34: household, plot, season, figur, proport 
+ Topic 35: household, farmer, increas, found, farm 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, financi, credit, save 
+ Topic 38: studi, effect, impact, find, signific 
+ Topic 39: group, studi, save, member, intervent 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, find 
+ Topic 42: ssa, product, crop, import, produc 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, system, water, land, environment 
+ Topic 45: potato, sweetpotato, journal, sweet, system 
+ Topic 46: vaccin, health, impact, malaria, increas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: price, wheat, product, increas, market 
+ Topic 49: system, data, evalu, indic, collect 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, malawi, faso, burkina 
+ Topic 52: retriev, ibid, novemb, cit, world 
+ Topic 53: tabl, crop, plant, see, area 
+ Topic 54: contract, women, farm, farmer, studi 
+ Topic 55: fertil, soil, use, nutrient, plant 
+ Topic 56: public, good, develop, invest, global 
+ Topic 57: climat, chang, crop, agricultur, retriev 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, credit, ricewheat, loan, system 
+ Topic 60: agricultur, journal, retriev, develop, econom 
+ Topic 61: content, varieti, prefer, textur, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, follow, end, type 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 41 (approx. per word bound = -6.178, relative change = 1.613e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 42 (approx. per word bound = -6.177, relative change = 1.575e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 43 (approx. per word bound = -6.176, relative change = 1.646e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 44 (approx. per word bound = -6.175, relative change = 1.506e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 45 (approx. per word bound = -6.174, relative change = 1.358e-04) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, farmer 
+ Topic 4: yam, cassava, flour, cultivar, alata 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, million, billion, countri, fund 
+ Topic 7: region, climat, temperatur, grow, model 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, starch, food, banana, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, pearl, grain, product 
+ Topic 12: report, account, fund, one, year 
+ Topic 13: yield, product, area, crop, harvest 
+ Topic 14: chang, temperatur, climat, increas, yield 
+ Topic 15: use, weed, pest, pesticid, control 
+ Topic 16: review, search, document, system, includ 
+ Topic 17: may, includ, literatur, relat, limit 
+ Topic 18: per, year, estim, averag, cost 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: maiz, yield, varieti, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, measur, report 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, research, diseas 
+ Topic 25: rice, adapt, crop, product, research 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, impact, retriev 
+ Topic 31: farm, cotton, labor, agricultur, product 
+ Topic 32: time, nutrit, use, activ, women 
+ Topic 33: professor, use, mobil, women, phone 
+ Topic 34: household, plot, season, figur, proport 
+ Topic 35: household, farmer, increas, found, farm 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, financi, credit, save 
+ Topic 38: studi, effect, impact, find, signific 
+ Topic 39: group, studi, save, member, intervent 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: ssa, crop, product, import, maiz 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, system, water, land, product 
+ Topic 45: potato, sweetpotato, journal, sweet, system 
+ Topic 46: vaccin, health, impact, malaria, increas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: price, wheat, product, increas, market 
+ Topic 49: system, data, evalu, collect, plan 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, malawi, faso, burkina 
+ Topic 52: retriev, ibid, novemb, cit, world 
+ Topic 53: tabl, crop, plant, see, area 
+ Topic 54: contract, women, farm, farmer, market 
+ Topic 55: fertil, soil, nutrient, use, plant 
+ Topic 56: public, good, develop, invest, global 
+ Topic 57: climat, chang, crop, agricultur, retriev 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, credit, ricewheat, loan, system 
+ Topic 60: agricultur, journal, retriev, develop, econom 
+ Topic 61: content, varieti, textur, prefer, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, follow, end, design 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 46 (approx. per word bound = -6.174, relative change = 1.200e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 47 (approx. per word bound = -6.173, relative change = 1.187e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 48 (approx. per word bound = -6.172, relative change = 1.178e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 49 (approx. per word bound = -6.171, relative change = 1.324e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 50 (approx. per word bound = -6.171, relative change = 1.177e-04) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, farmer 
+ Topic 4: yam, cassava, flour, cultivar, alata 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, million, billion, countri, fund 
+ Topic 7: region, climat, temperatur, grow, model 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, starch, food, banana, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, report, fund, one, year 
+ Topic 13: yield, product, area, crop, measur 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: use, weed, pest, pesticid, control 
+ Topic 16: review, search, document, includ, result 
+ Topic 17: may, includ, literatur, relat, limit 
+ Topic 18: per, year, estim, averag, cost 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: maiz, yield, varieti, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, measur, report 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, research, fund 
+ Topic 25: rice, adapt, crop, product, research 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, impact, retriev 
+ Topic 31: farm, cotton, labor, agricultur, product 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, mobil, use, women, phone 
+ Topic 34: household, plot, season, figur, proport 
+ Topic 35: household, farmer, increas, found, farm 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, financi, credit, save 
+ Topic 38: studi, effect, impact, find, signific 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, ssa, product, maiz, import 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, system, water, land, product 
+ Topic 45: potato, sweetpotato, journal, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, increas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: price, wheat, product, increas, market 
+ Topic 49: system, data, evalu, collect, plan 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, malawi, faso, burkina 
+ Topic 52: retriev, ibid, novemb, world, cit 
+ Topic 53: crop, tabl, plant, harvest, area 
+ Topic 54: contract, women, farm, farmer, market 
+ Topic 55: fertil, soil, nutrient, use, plant 
+ Topic 56: public, good, develop, invest, global 
+ Topic 57: climat, chang, crop, agricultur, retriev 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, credit, ricewheat, loan, system 
+ Topic 60: agricultur, journal, retriev, develop, econom 
+ Topic 61: content, varieti, textur, prefer, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, follow, end, design 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 51 (approx. per word bound = -6.170, relative change = 1.130e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 52 (approx. per word bound = -6.169, relative change = 1.048e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 53 (approx. per word bound = -6.169, relative change = 8.950e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 54 (approx. per word bound = -6.168, relative change = 1.017e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 55 (approx. per word bound = -6.168, relative change = 9.970e-05) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, cultivar, alata 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, million, billion, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, starch, banana, food, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, report, fund, one, bank 
+ Topic 13: yield, product, area, crop, measur 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: use, weed, pest, pesticid, control 
+ Topic 16: review, search, document, includ, result 
+ Topic 17: may, includ, relat, literatur, limit 
+ Topic 18: year, per, estim, averag, cost 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, maiz, varieti, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, research, fund 
+ Topic 25: rice, adapt, crop, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, cotton, product 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, mobil, use, women, phone 
+ Topic 34: household, plot, season, figur, proport 
+ Topic 35: household, farmer, increas, found, farm 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, financi, credit, poverti 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, ssa, product, maiz, grown 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, system, land, product 
+ Topic 45: potato, sweetpotato, journal, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, increas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: price, wheat, product, increas, market 
+ Topic 49: system, data, evalu, plan, collect 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, malawi, faso, burkina 
+ Topic 52: retriev, ibid, novemb, world, cit 
+ Topic 53: crop, tabl, plant, harvest, area 
+ Topic 54: contract, women, farm, farmer, market 
+ Topic 55: fertil, soil, nutrient, use, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, crop, retriev 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, credit, ricewheat, loan, system 
+ Topic 60: agricultur, journal, retriev, develop, econom 
+ Topic 61: content, varieti, textur, prefer, starch 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, end, follow, design 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 56 (approx. per word bound = -6.167, relative change = 1.001e-04) 
+....................................................................................................
+Completed E-Step (7 seconds). 
+Completed M-Step (5 seconds). 
+Completing Iteration 57 (approx. per word bound = -6.166, relative change = 9.821e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 58 (approx. per word bound = -6.166, relative change = 8.924e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 59 (approx. per word bound = -6.165, relative change = 1.028e-04) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 60 (approx. per word bound = -6.165, relative change = 9.208e-05) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, cultivar, consum 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, million, billion, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, starch, banana, food, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, report, fund, one, bank 
+ Topic 13: yield, product, area, measur, crop 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: use, weed, pest, pesticid, crop 
+ Topic 16: review, search, includ, document, result 
+ Topic 17: may, includ, relat, literatur, limit 
+ Topic 18: year, per, estim, averag, cost 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, maiz, varieti, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, research, fund 
+ Topic 25: rice, crop, adapt, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, cotton 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, mobil, use, women, phone 
+ Topic 34: household, plot, season, figur, zone 
+ Topic 35: household, farmer, increas, found, farm 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, financi, poverti, credit 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, ssa, product, maiz, grown 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, system, product 
+ Topic 45: potato, sweetpotato, journal, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, increas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: price, wheat, product, increas, market 
+ Topic 49: system, data, evalu, plan, monitor 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, malawi, faso, burkina 
+ Topic 52: retriev, ibid, novemb, world, index 
+ Topic 53: crop, tabl, plant, harvest, area 
+ Topic 54: contract, women, cotton, farm, farmer 
+ Topic 55: fertil, soil, nutrient, use, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, crop, retriev 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, credit, ricewheat, loan, system 
+ Topic 60: agricultur, journal, retriev, develop, econom 
+ Topic 61: content, varieti, textur, starch, prefer 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, end, follow, design 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 61 (approx. per word bound = -6.164, relative change = 8.780e-05) 
+....................................................................................................
+Completed E-Step (9 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 62 (approx. per word bound = -6.164, relative change = 8.419e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 63 (approx. per word bound = -6.163, relative change = 7.481e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 64 (approx. per word bound = -6.163, relative change = 7.188e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 65 (approx. per word bound = -6.162, relative change = 6.679e-05) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, consum, prefer 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, million, billion, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, starch, banana, food, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, report, fund, one, bank 
+ Topic 13: yield, product, area, measur, crop 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: use, weed, pest, pesticid, crop 
+ Topic 16: review, search, includ, document, result 
+ Topic 17: may, includ, relat, mani, literatur 
+ Topic 18: year, per, estim, averag, total 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, maiz, varieti, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, research, fund 
+ Topic 25: rice, crop, adapt, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, mobil, use, women, phone 
+ Topic 34: household, season, figur, plot, zone 
+ Topic 35: household, farmer, increas, found, farm 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, financi, poverti, credit 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, ssa, product, maiz, grown 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, system, product 
+ Topic 45: sweetpotato, potato, journal, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, increas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: price, wheat, product, increas, market 
+ Topic 49: system, data, evalu, plan, monitor 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, malawi, faso, burkina 
+ Topic 52: retriev, ibid, novemb, world, octob 
+ Topic 53: crop, tabl, plant, harvest, plot 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, nutrient, use, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, crop, doi 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, credit, ricewheat, loan, system 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, varieti, textur, starch, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, end, design, follow 
+....................................................................................................
+Completed E-Step (7 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 66 (approx. per word bound = -6.162, relative change = 6.189e-05) 
+....................................................................................................
+Completed E-Step (7 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 67 (approx. per word bound = -6.161, relative change = 5.920e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 68 (approx. per word bound = -6.161, relative change = 5.875e-05) 
+....................................................................................................
+Completed E-Step (7 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 69 (approx. per word bound = -6.161, relative change = 5.736e-05) 
+....................................................................................................
+Completed E-Step (7 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 70 (approx. per word bound = -6.160, relative change = 5.450e-05) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, consum, prefer 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, million, billion, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, starch, banana, food, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, fund, report, one, bank 
+ Topic 13: yield, product, measur, area, crop 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: use, weed, pest, pesticid, crop 
+ Topic 16: review, search, includ, document, result 
+ Topic 17: may, includ, relat, mani, also 
+ Topic 18: year, per, estim, averag, total 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, maiz, varieti, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, research, fund 
+ Topic 25: rice, crop, adapt, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, mobil, use, women, phone 
+ Topic 34: household, season, figur, zone, raini 
+ Topic 35: household, farmer, increas, found, farm 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, financi, poverti, credit 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, product, ssa, maiz, area 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, system, product 
+ Topic 45: sweetpotato, potato, journal, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, increas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: price, wheat, product, increas, market 
+ Topic 49: system, data, evalu, plan, govern 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, malawi, faso, burkina 
+ Topic 52: retriev, ibid, world, octob, novemb 
+ Topic 53: crop, tabl, plant, harvest, plot 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, nutrient, use, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, crop, doi 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, credit, ricewheat, loan, system 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, varieti, starch, textur, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, end, rais, design 
+....................................................................................................
+Completed E-Step (7 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 71 (approx. per word bound = -6.160, relative change = 5.514e-05) 
+....................................................................................................
+Completed E-Step (7 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 72 (approx. per word bound = -6.160, relative change = 5.443e-05) 
+....................................................................................................
+Completed E-Step (7 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 73 (approx. per word bound = -6.159, relative change = 5.485e-05) 
+....................................................................................................
+Completed E-Step (7 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 74 (approx. per word bound = -6.159, relative change = 5.512e-05) 
+....................................................................................................
+Completed E-Step (7 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 75 (approx. per word bound = -6.159, relative change = 6.017e-05) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, consum, prefer 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, billion, million, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, starch, food, banana, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, fund, bank, one, report 
+ Topic 13: yield, product, measur, area, crop 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: use, weed, pest, pesticid, crop 
+ Topic 16: review, search, includ, document, result 
+ Topic 17: may, includ, relat, mani, also 
+ Topic 18: year, per, estim, averag, total 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, maiz, varieti, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, research, fund 
+ Topic 25: rice, crop, adapt, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, mobil, use, women, phone 
+ Topic 34: household, season, figur, zone, raini 
+ Topic 35: household, farmer, increas, found, farm 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, financi, poverti, credit 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, product, ssa, maiz, area 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, system, product 
+ Topic 45: sweetpotato, potato, journal, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, increas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: wheat, price, product, increas, market 
+ Topic 49: system, data, evalu, plan, govern 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, malawi, faso, burkina 
+ Topic 52: retriev, ibid, octob, world, novemb 
+ Topic 53: crop, plant, plot, harvest, tabl 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, nutrient, use, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, crop, doi 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, credit, ricewheat, loan, system 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, starch, varieti, textur, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, rais, design, end 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 76 (approx. per word bound = -6.158, relative change = 6.064e-05) 
+....................................................................................................
+Completed E-Step (7 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 77 (approx. per word bound = -6.158, relative change = 5.622e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 78 (approx. per word bound = -6.158, relative change = 5.039e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 79 (approx. per word bound = -6.157, relative change = 4.959e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 80 (approx. per word bound = -6.157, relative change = 4.670e-05) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, consum, prefer 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, billion, million, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, starch, food, banana, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, fund, bank, one, year 
+ Topic 13: yield, product, measur, area, use 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: use, weed, pest, pesticid, crop 
+ Topic 16: review, search, includ, document, result 
+ Topic 17: may, includ, also, mani, relat 
+ Topic 18: year, estim, per, averag, total 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, maiz, varieti, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, research, fund 
+ Topic 25: rice, crop, adapt, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, mobil, use, women, phone 
+ Topic 34: household, season, figur, zone, raini 
+ Topic 35: household, farmer, increas, found, farm 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, financi, poverti, credit 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, maiz, product, ssa, area 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, system, product 
+ Topic 45: sweetpotato, potato, journal, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, diseas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: wheat, price, product, increas, market 
+ Topic 49: system, data, evalu, plan, govern 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, malawi, faso, burkina 
+ Topic 52: retriev, ibid, octob, world, price 
+ Topic 53: crop, plot, plant, harvest, tabl 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, nutrient, use, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, crop, doi 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, ricewheat, credit, loan, system 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, starch, varieti, textur, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, rais, design, end 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 81 (approx. per word bound = -6.157, relative change = 4.412e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 82 (approx. per word bound = -6.157, relative change = 4.267e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 83 (approx. per word bound = -6.156, relative change = 3.922e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 84 (approx. per word bound = -6.156, relative change = 4.044e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 85 (approx. per word bound = -6.156, relative change = 4.075e-05) 
+Topic 1: polici, analysi, school, research, evan 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, consum, prefer 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, billion, million, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, banana, food, starch, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, fund, bank, one, year 
+ Topic 13: yield, product, measur, area, use 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: use, weed, pest, pesticid, crop 
+ Topic 16: review, includ, search, document, literatur 
+ Topic 17: may, includ, also, mani, relat 
+ Topic 18: year, estim, per, averag, total 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, maiz, varieti, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, research, fund 
+ Topic 25: rice, crop, adapt, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, use, mobil, women, phone 
+ Topic 34: household, season, figur, zone, raini 
+ Topic 35: household, farmer, increas, found, farm 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, financi, poverti, save 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, maiz, product, ssa, area 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, system, product 
+ Topic 45: sweetpotato, journal, potato, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, diseas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: wheat, price, product, increas, market 
+ Topic 49: system, data, evalu, plan, govern 
+ Topic 50: regul, provid, custom, consum, countri 
+ Topic 51: countri, tanzania, malawi, tabl, faso 
+ Topic 52: retriev, ibid, price, octob, world 
+ Topic 53: crop, plot, plant, harvest, tabl 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, nutrient, use, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, crop, doi 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, ricewheat, credit, loan, system 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, starch, varieti, textur, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, rais, design, get 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 86 (approx. per word bound = -6.156, relative change = 4.203e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 87 (approx. per word bound = -6.155, relative change = 4.108e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 88 (approx. per word bound = -6.155, relative change = 3.939e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 89 (approx. per word bound = -6.155, relative change = 3.863e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 90 (approx. per word bound = -6.155, relative change = 3.740e-05) 
+Topic 1: polici, analysi, school, evan, research 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, prefer, consum 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, billion, million, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, banana, food, starch, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, fund, bank, one, year 
+ Topic 13: yield, product, measur, area, use 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: use, weed, pest, pesticid, control 
+ Topic 16: review, includ, search, document, literatur 
+ Topic 17: may, includ, also, mani, relat 
+ Topic 18: year, estim, per, averag, total 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, varieti, maiz, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, research, fund 
+ Topic 25: rice, crop, adapt, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, use, mobil, women, phone 
+ Topic 34: household, season, figur, zone, raini 
+ Topic 35: household, farmer, increas, found, farm 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, financi, poverti, save 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, maiz, product, ssa, area 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, soil, product 
+ Topic 45: sweetpotato, journal, potato, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, diseas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: wheat, price, product, increas, market 
+ Topic 49: system, data, evalu, plan, govern 
+ Topic 50: regul, provid, consum, custom, countri 
+ Topic 51: countri, tanzania, malawi, tabl, faso 
+ Topic 52: retriev, ibid, price, octob, world 
+ Topic 53: crop, plot, plant, harvest, area 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, nutrient, use, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, doi, crop 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, ricewheat, credit, system, loan 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, starch, varieti, textur, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, rais, design, get 
+....................................................................................................
+Completed E-Step (7 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 91 (approx. per word bound = -6.154, relative change = 3.767e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 92 (approx. per word bound = -6.154, relative change = 3.587e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 93 (approx. per word bound = -6.154, relative change = 1.983e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 94 (approx. per word bound = -6.154, relative change = 4.906e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 95 (approx. per word bound = -6.154, relative change = 2.305e-05) 
+Topic 1: polici, analysi, school, evan, research 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, prefer, consum 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, billion, million, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, banana, food, starch, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, fund, bank, one, year 
+ Topic 13: yield, product, measur, area, use 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: use, weed, pest, pesticid, control 
+ Topic 16: review, includ, search, literatur, document 
+ Topic 17: may, also, mani, includ, relat 
+ Topic 18: year, estim, per, averag, total 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, varieti, maiz, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, research, fund 
+ Topic 25: rice, crop, adapt, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, use, mobil, women, phone 
+ Topic 34: household, season, figur, zone, raini 
+ Topic 35: household, farmer, increas, found, farm 
+ Topic 36: deining, joshi, kumar, reddi, baland 
+ Topic 37: product, insur, financi, poverti, save 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, maiz, product, ssa, area 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, soil, product 
+ Topic 45: sweetpotato, journal, potato, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, diseas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: wheat, price, product, increas, market 
+ Topic 49: system, evalu, data, plan, govern 
+ Topic 50: regul, provid, consum, custom, countri 
+ Topic 51: countri, tanzania, malawi, tabl, faso 
+ Topic 52: retriev, ibid, price, octob, world 
+ Topic 53: crop, plot, plant, harvest, maiz 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, nutrient, use, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, doi, crop 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, ricewheat, credit, system, fas 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, starch, textur, varieti, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, rais, design, get 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 96 (approx. per word bound = -6.153, relative change = 5.559e-05) 
+....................................................................................................
+Completed E-Step (7 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 97 (approx. per word bound = -6.153, relative change = 4.443e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 98 (approx. per word bound = -6.153, relative change = 4.420e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 99 (approx. per word bound = -6.152, relative change = 3.514e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 100 (approx. per word bound = -6.152, relative change = 3.092e-05) 
+Topic 1: polici, analysi, school, evan, research 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, prefer, consum 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, billion, million, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, banana, food, starch, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, fund, bank, one, year 
+ Topic 13: yield, product, measur, area, use 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: use, weed, pest, pesticid, plant 
+ Topic 16: review, includ, search, literatur, document 
+ Topic 17: may, also, mani, can, includ 
+ Topic 18: year, estim, per, averag, total 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, varieti, maiz, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, fund, research 
+ Topic 25: rice, crop, adapt, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, use, mobil, women, phone 
+ Topic 34: household, season, figur, zone, raini 
+ Topic 35: household, farmer, increas, found, credit 
+ Topic 36: deining, joshi, reddi, kumar, baland 
+ Topic 37: product, insur, financi, poverti, save 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, maiz, product, ssa, area 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, soil, product 
+ Topic 45: sweetpotato, journal, potato, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, diseas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: wheat, price, product, increas, market 
+ Topic 49: system, evalu, data, plan, govern 
+ Topic 50: regul, provid, consum, custom, countri 
+ Topic 51: countri, tanzania, malawi, tabl, faso 
+ Topic 52: retriev, ibid, price, world, octob 
+ Topic 53: crop, plot, plant, harvest, maiz 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, nutrient, use, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, doi, crop 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, ricewheat, credit, system, fas 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, starch, textur, varieti, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, rais, design, get 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 101 (approx. per word bound = -6.152, relative change = 3.313e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 102 (approx. per word bound = -6.152, relative change = 3.338e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 103 (approx. per word bound = -6.152, relative change = 3.753e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 104 (approx. per word bound = -6.151, relative change = 3.368e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 105 (approx. per word bound = -6.151, relative change = 3.048e-05) 
+Topic 1: polici, analysi, school, evan, research 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, prefer, consum 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, billion, million, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, banana, food, starch, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, fund, bank, one, year 
+ Topic 13: yield, product, measur, area, use 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: use, weed, pest, pesticid, plant 
+ Topic 16: review, includ, search, literatur, document 
+ Topic 17: may, also, can, mani, relat 
+ Topic 18: year, estim, per, averag, total 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, varieti, maiz, improv, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, plant, product 
+ Topic 24: sweetpotato, agricultur, public, fund, research 
+ Topic 25: rice, crop, adapt, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, estim 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, use, mobil, women, phone 
+ Topic 34: household, season, figur, zone, raini 
+ Topic 35: household, farmer, increas, found, credit 
+ Topic 36: deining, joshi, reddi, kumar, baland 
+ Topic 37: product, insur, financi, poverti, save 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, wast, sanit, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, maiz, product, ssa, area 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, soil, product 
+ Topic 45: sweetpotato, journal, potato, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, diseas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: wheat, price, product, increas, market 
+ Topic 49: system, data, evalu, plan, govern 
+ Topic 50: regul, provid, consum, custom, countri 
+ Topic 51: countri, tanzania, malawi, tabl, faso 
+ Topic 52: retriev, ibid, price, world, octob 
+ Topic 53: crop, plot, plant, harvest, maiz 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, nutrient, use, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, doi, crop 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, ricewheat, credit, fas, system 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, starch, textur, varieti, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, rais, design, get 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 106 (approx. per word bound = -6.151, relative change = 1.736e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 107 (approx. per word bound = -6.151, relative change = 4.449e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 108 (approx. per word bound = -6.151, relative change = 3.052e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 109 (approx. per word bound = -6.150, relative change = 2.857e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 110 (approx. per word bound = -6.150, relative change = 3.060e-05) 
+Topic 1: polici, analysi, school, evan, research 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, prefer, consum 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, billion, million, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, banana, food, starch, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, fund, bank, one, year 
+ Topic 13: yield, product, measur, area, use 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: use, weed, pest, pesticid, plant 
+ Topic 16: review, includ, search, literatur, document 
+ Topic 17: may, also, can, mani, relat 
+ Topic 18: year, estim, per, averag, total 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, varieti, improv, maiz, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, product, plant 
+ Topic 24: sweetpotato, agricultur, public, fund, research 
+ Topic 25: rice, crop, adapt, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, area 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, use, mobil, women, phone 
+ Topic 34: household, figur, season, zone, raini 
+ Topic 35: household, farmer, increas, found, credit 
+ Topic 36: deining, joshi, reddi, baland, kumar 
+ Topic 37: product, insur, financi, poverti, save 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, sanit, wast, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, maiz, product, ssa, area 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, soil, product 
+ Topic 45: sweetpotato, journal, potato, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, diseas 
+ Topic 47: cassava, plantain, banana, product, diseas 
+ Topic 48: wheat, price, product, increas, market 
+ Topic 49: system, data, evalu, plan, govern 
+ Topic 50: regul, provid, consum, custom, countri 
+ Topic 51: countri, tanzania, tabl, malawi, faso 
+ Topic 52: retriev, ibid, price, octob, world 
+ Topic 53: crop, plot, plant, harvest, maiz 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, use, nutrient, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, doi, crop 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, ricewheat, credit, fas, system 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, starch, textur, varieti, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, rais, design, get 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 111 (approx. per word bound = -6.150, relative change = 3.252e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 112 (approx. per word bound = -6.150, relative change = 3.086e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 113 (approx. per word bound = -6.150, relative change = 2.773e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 114 (approx. per word bound = -6.150, relative change = 2.779e-05) 
+....................................................................................................
+Completed E-Step (9 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 115 (approx. per word bound = -6.149, relative change = 3.108e-05) 
+Topic 1: polici, analysi, school, evan, research 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, prefer, consum 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, billion, million, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, banana, food, starch, genet 
+ Topic 10: associ, research, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, fund, bank, one, year 
+ Topic 13: yield, product, measur, area, use 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: weed, use, pest, pesticid, plant 
+ Topic 16: review, includ, search, literatur, document 
+ Topic 17: may, also, can, mani, relat 
+ Topic 18: year, estim, per, averag, total 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, varieti, improv, maiz, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, product, plant 
+ Topic 24: sweetpotato, agricultur, public, fund, research 
+ Topic 25: rice, crop, adapt, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, area 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, use, mobil, women, phone 
+ Topic 34: household, figur, zone, raini, season 
+ Topic 35: household, farmer, increas, found, credit 
+ Topic 36: deining, joshi, reddi, baland, kumar 
+ Topic 37: product, insur, financi, poverti, save 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, sanit, wast, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, maiz, ssa, product, area 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, soil, product 
+ Topic 45: sweetpotato, journal, potato, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, diseas 
+ Topic 47: cassava, plantain, banana, product, root 
+ Topic 48: wheat, price, product, increas, market 
+ Topic 49: system, evalu, data, plan, govern 
+ Topic 50: regul, provid, consum, custom, countri 
+ Topic 51: countri, tanzania, tabl, malawi, faso 
+ Topic 52: retriev, ibid, price, octob, world 
+ Topic 53: plot, crop, plant, harvest, maiz 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, use, nutrient, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, doi, retriev 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, ricewheat, credit, fas, system 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, starch, textur, varieti, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, rais, design, failur 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 116 (approx. per word bound = -6.149, relative change = 3.276e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 117 (approx. per word bound = -6.149, relative change = 3.300e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 118 (approx. per word bound = -6.149, relative change = 3.154e-05) 
+....................................................................................................
+Completed E-Step (9 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 119 (approx. per word bound = -6.149, relative change = 3.162e-05) 
+....................................................................................................
+Completed E-Step (9 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 120 (approx. per word bound = -6.148, relative change = 3.530e-05) 
+Topic 1: polici, analysi, school, evan, research 
+ Topic 2: yam, farmer, product, tuber, seed 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, prefer, consum 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, billion, million, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, banana, food, starch, genet 
+ Topic 10: research, associ, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, fund, bank, one, year 
+ Topic 13: yield, product, measur, area, use 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: weed, use, pest, plant, pesticid 
+ Topic 16: review, includ, search, literatur, result 
+ Topic 17: may, also, can, mani, relat 
+ Topic 18: year, estim, per, averag, total 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, varieti, improv, maiz, seed 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, product, plant 
+ Topic 24: sweetpotato, agricultur, public, fund, research 
+ Topic 25: rice, crop, adapt, product, food 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, area 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, use, mobil, women, phone 
+ Topic 34: household, figur, zone, proport, raini 
+ Topic 35: household, farmer, increas, found, credit 
+ Topic 36: deining, joshi, reddi, baland, kumar 
+ Topic 37: product, insur, financi, poverti, save 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, sanit, wast, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, maiz, ssa, product, area 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, soil, product 
+ Topic 45: sweetpotato, journal, potato, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, diseas 
+ Topic 47: cassava, plantain, banana, product, root 
+ Topic 48: wheat, price, product, increas, market 
+ Topic 49: system, evalu, data, plan, govern 
+ Topic 50: regul, provid, consum, custom, countri 
+ Topic 51: countri, tanzania, tabl, malawi, faso 
+ Topic 52: retriev, ibid, price, octob, world 
+ Topic 53: plot, crop, plant, harvest, maiz 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, use, nutrient, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, doi, retriev 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, ricewheat, credit, fas, system 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, starch, textur, varieti, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, rais, failur, design 
+....................................................................................................
+Completed E-Step (9 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 121 (approx. per word bound = -6.148, relative change = 3.274e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 122 (approx. per word bound = -6.148, relative change = 3.360e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 123 (approx. per word bound = -6.148, relative change = 4.457e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 124 (approx. per word bound = -6.147, relative change = 4.103e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 125 (approx. per word bound = -6.147, relative change = 3.467e-05) 
+Topic 1: polici, analysi, school, evan, research 
+ Topic 2: yam, farmer, product, tuber, market 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, consum, prefer 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, billion, million, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, banana, food, starch, genet 
+ Topic 10: research, associ, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, fund, bank, one, year 
+ Topic 13: yield, product, measur, area, use 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: weed, use, pest, plant, pesticid 
+ Topic 16: review, includ, search, literatur, result 
+ Topic 17: may, also, can, mani, relat 
+ Topic 18: year, estim, per, averag, total 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, varieti, improv, seed, maiz 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, product, plant 
+ Topic 24: sweetpotato, agricultur, public, fund, research 
+ Topic 25: rice, crop, adapt, food, product 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, area 
+ Topic 30: poverti, evid, develop, retriev, impact 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, use, mobil, women, phone 
+ Topic 34: household, figur, zone, proport, agricultur 
+ Topic 35: household, farmer, increas, found, credit 
+ Topic 36: deining, joshi, reddi, baland, kumar 
+ Topic 37: product, financi, insur, poverti, save 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, sanit, wast, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, maiz, ssa, product, area 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, soil, product 
+ Topic 45: sweetpotato, journal, potato, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, diseas 
+ Topic 47: cassava, plantain, banana, product, root 
+ Topic 48: wheat, price, product, increas, market 
+ Topic 49: system, evalu, data, plan, govern 
+ Topic 50: regul, provid, consum, custom, countri 
+ Topic 51: countri, tanzania, tabl, malawi, faso 
+ Topic 52: retriev, ibid, price, octob, world 
+ Topic 53: plot, crop, plant, season, harvest 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, use, nutrient, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, doi, retriev 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, ricewheat, credit, fas, system 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, starch, textur, varieti, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, rais, failur, design 
+....................................................................................................
+Completed E-Step (9 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 126 (approx. per word bound = -6.147, relative change = 3.484e-05) 
+....................................................................................................
+Completed E-Step (9 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 127 (approx. per word bound = -6.147, relative change = 3.372e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 128 (approx. per word bound = -6.147, relative change = 2.316e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 129 (approx. per word bound = -6.146, relative change = 2.963e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 130 (approx. per word bound = -6.146, relative change = 3.263e-05) 
+Topic 1: polici, analysi, school, evan, research 
+ Topic 2: yam, farmer, product, tuber, market 
+ Topic 3: incub, busi, infodev, enterpris, develop 
+ Topic 4: yam, cassava, flour, consum, prefer 
+ Topic 5: index, indic, develop, measur, human 
+ Topic 6: financ, billion, million, countri, fund 
+ Topic 7: region, climat, temperatur, grow, precipit 
+ Topic 8: poverti, growth, econom, gdp, measur 
+ Topic 9: textur, banana, food, starch, genet 
+ Topic 10: research, associ, direct, question, develop 
+ Topic 11: millet, sorghum, grain, pearl, product 
+ Topic 12: account, fund, bank, one, year 
+ Topic 13: yield, product, measur, area, use 
+ Topic 14: chang, climat, temperatur, increas, yield 
+ Topic 15: weed, use, pest, plant, pesticid 
+ Topic 16: review, includ, search, literatur, result 
+ Topic 17: may, also, can, mani, howev 
+ Topic 18: year, estim, per, averag, increas 
+ Topic 19: card, ident, nation, biometr, identif 
+ Topic 20: yield, varieti, improv, seed, maiz 
+ Topic 21: mobil, money, retriev, bank, regul 
+ Topic 22: donor, result, evalu, report, measur 
+ Topic 23: potato, sweet, farmer, product, plant 
+ Topic 24: sweetpotato, agricultur, public, fund, research 
+ Topic 25: rice, crop, adapt, food, product 
+ Topic 26: program, nation, servic, implement, popul 
+ Topic 27: aid, multilater, bilater, countri, donor 
+ Topic 28: women, men, crop, land, labor 
+ Topic 29: data, coverag, popul, mobil, area 
+ Topic 30: poverti, evid, develop, retriev, journal 
+ Topic 31: farm, labor, agricultur, product, ecolog 
+ Topic 32: time, nutrit, use, activ, household 
+ Topic 33: professor, use, mobil, women, phone 
+ Topic 34: household, figur, zone, proport, agricultur 
+ Topic 35: household, farmer, increas, found, credit 
+ Topic 36: deining, joshi, reddi, baland, manfr 
+ Topic 37: product, insur, financi, poverti, save 
+ Topic 38: studi, effect, impact, signific, find 
+ Topic 39: group, studi, save, member, report 
+ Topic 40: sludg, treatment, sanit, wast, pit 
+ Topic 41: poverti, household, studi, remitt, incom 
+ Topic 42: crop, maiz, ssa, product, area 
+ Topic 43: cluster, develop, agribusi, export, smallhold 
+ Topic 44: crop, water, land, soil, product 
+ Topic 45: sweetpotato, journal, potato, sweet, product 
+ Topic 46: vaccin, health, impact, malaria, diseas 
+ Topic 47: cassava, plantain, banana, product, root 
+ Topic 48: wheat, price, product, increas, market 
+ Topic 49: system, evalu, data, plan, govern 
+ Topic 50: regul, consum, provid, custom, countri 
+ Topic 51: countri, tanzania, tabl, malawi, faso 
+ Topic 52: retriev, ibid, price, octob, world 
+ Topic 53: plot, crop, season, plant, raini 
+ Topic 54: cotton, contract, women, farm, farmer 
+ Topic 55: fertil, soil, use, nutrient, plant 
+ Topic 56: good, public, develop, invest, global 
+ Topic 57: climat, chang, agricultur, doi, retriev 
+ Topic 58: food, secur, measur, poverti, hunger 
+ Topic 59: islam, ricewheat, credit, fas, system 
+ Topic 60: agricultur, retriev, journal, develop, econom 
+ Topic 61: content, starch, textur, varieti, found 
+ Topic 62: water, sanit, health, intervent, wastewat 
+ Topic 63: support, suppli, rais, failur, design 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 131 (approx. per word bound = -6.146, relative change = 3.042e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 132 (approx. per word bound = -6.146, relative change = 2.450e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Completing Iteration 133 (approx. per word bound = -6.146, relative change = 2.390e-05) 
+....................................................................................................
+Completed E-Step (8 seconds). 
+Completed M-Step (4 seconds). 
+Model Converged 
+> saveRDS(st1, file.path(workingfolder,"topicmodel.rds"))
+> 
+> 
+> 
+> 
+> proc.time()
+    user   system  elapsed 
+4624.768    7.676 4634.407 
