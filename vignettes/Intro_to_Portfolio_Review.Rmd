@@ -13,11 +13,38 @@ This tookit provides a set of resources for analyzing textual documents using th
 
 ## Introduction
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+  Granting agencies, foundations, and donors often possess large quantities of textual data which they are unable to quickly and efficiently operationalize into meaningful evidence about theories of program change. After a foundation has spent millions of dollars on hundreds of projects, in hundreds of locations, employing thousands of different indicators and outcome measures, based on variously well-articulated theories of change, it is impossible with any reasonable level of confidence to 1. estimate the collective impact of a portfolio of investments within a foundation; 2. estimate the collective impact of investments across foundations; and 3. know that non-consenting individuals have not been made worse off (despite good intent). This is a problem of measurement and accountability for foundations and the public. 
+   Portfolio management is a common method for organizing an investment strategy. Portfolio management allows publics and foundations to identify assets and funding amounts connect spending to theories and outcomes (Sleet, Moffett, and Stevens 2008). Approaches to portfolio management such as the Balanced Scorecard have been useful in directing private and public financial investments in a manner that aligns financial goals with mission goals (Robert S. Kaplan 2001; Hoque 2014/3). These tools aim to connect programs to specific objectives and measures, providing organizations with clear and measureable objectives across multiple value areas. Transparency can help foundations to confront commonly identified missteps of public foundations including mission ambiguity (Eisenberg 1984) and institutional myth (Meyer and Rowan 1977), However, use of such evaluative tools tend to be one-off, tailor made to individual foundations, used to justify spending, or adopted by only the largest research foundations (Hyndman and McConville 2016); (Sleet, Moffett, and Stevens 2008; Schmitz and Schillo 2005; Horton and Mackay 2003). 
+  Portfolio management can either be prospective and retrospective, helping to plan future activities strategies or technologies in light of current assets and risks (Oliveira and Rozenfeld 2010; R. S. Kaplan and Norton 1995). We term the application of portfolio assessment to characterize past actions and assessments with the purpose of influencing prospective management portfolio review. However, portfolio review is limited within foundations. Previously, large organizations possessing diverse funding areas have been challenged by a lack of tools for scaling portfolio reviews across widely differing domains of investment as well as by cognitive and practical limitations of the boundedly rational actors who must run such organizations (“Selznick%20ASQ%201996.pdf,” n.d.; Simon 1972). Faced with limited time, diverse mission goals, and thousands of objectives, analyzing a portfolio of projects is simply too time consuming, costly, and threatening for program managers who, given limited time frames of employment, must optimize resource allocation not necessarily return on investment. 
+    Current portfolio review methods rely on hand coding of project documents—a process that takes countless manhours and limits the ability of foundations to apply porfolio review in adaptive decision making settings. As a result, foundations need better tools for analyzing spending and performance information across portfolios. This includes developing methodologies for portfolio review that are cost effective, scaleable, and rapidly deployable so that foundations can learn from current and past investments, comparing spending and impact against expectations and against each other in order to target funding to programs with proven effectiveness, identify gaps in theory, and exploit under-utilized opportunities.
+   However, the field of public administration is increasingly adopting the use of text mining methodologies and computational social scientific approaches for characterizing large textual databases. These methods provide an avenue for scaling portfolio review to a much wider array of organizations who traditionally lacked resources for conduct of retrospective portfolio management strategies.
+   We propose and demonstrate the use of data analytic tools including natural language processing and both supervised and unsupervised machine learning to rapidly characterize funding documents identifying theories of change, tying these theories of change to funding levels, and identifying how funding of specific interventions resulted in changes in outcomes of concern to various foundations. The novelty of this new approach is we plan to utilize data analytic tools to automate many of the above processes, providing a manner of reducing the labor and time costs facing a foundation hoping to conduct a portfolio review. Thus, while our methodologies are not novel, nor are portfolio reviews new concepts, we believe that the application of data analytic tools within foundation portfolio review has the potential to dramatically improve the connection between theory and investment for public organizations. Natural language processing and machine learning are common tools for language extraction and coding across a growing range of fields including health, economics, and political science (Carvalho, Freitas, and da Silva 2013)(Turian 2013; Wilkerson, Smith, and Stramp 2013; Lee 2000). Specifically, tools allowing for extraction of relations between words are promising for portfolio review because they allow connecting actors, actions, and outcomes identified within programmatic documents to corresponding investments (Turian 2013).
 
-## Styles
+## Portfolio Review Focus
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+We begin by addressing the basic question, "how have the research projects conducted by the Evans School Policy Analysis and Research (EPAR) group informed the three aims of the research focus, specifically gender, technology and ___________, and what potential synergies exist across these current research topics which may inform the comparative advantage of the EPAR research group?"
+
+#Planned method of study
+## Q1 What research grants target gender, technology and _____?
+
+## Q2 Where is there alignment between causal pathways identified withins the three research foci?
+
+## Q3 What are unique causal pathways identified within each of the three research foci?
+
+## Q4 What causal pathways exist outside of the domains of gender, tech and ____ that could be potentially integrated into the EPAR research strategy?
+
+#Method
+
+###Q1: Topic Modelling and Human Tagging
+###Q2: Network Correlation
+###Q3: Network Correlation
+###Q4: Topic Modelling and Semantic Network Mapping
+
+
+
+
+
+
 
     output: 
       rmarkdown::html_vignette:
