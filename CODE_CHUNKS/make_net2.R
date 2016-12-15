@@ -1,6 +1,7 @@
 #start with first noun
 #build tree to all verbs, all nouns
-
+library(devtools)
+library(roxygen2)
 library(stringr)
 library(data.table)
 library(igraph)
