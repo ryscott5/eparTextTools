@@ -597,7 +597,7 @@ RunAlchy<-function(num){
 
 #'Run this function to install a docker server from within R
 #'
-#' This function calls out using the system command. make sure to clear your workspace and history if you use this.
+#' This function calls out using the system command. make sure to clear your workspace and history if you use this. However, what a cool function, right?
 #' @param password you should type in your password 3 times.
 #' @return NA installs a docker server
 makeadockercliff<-function(){
@@ -611,7 +611,10 @@ makeadockercliff<-function(){
   setwd("~")
   setwd(cwd)}
 
-#for these commands, we need to have the opportunity id labeles as OpID in the SentFrame part of BASE_INPUT
+
+#'These commands start and run a cliff-docker server. 
+#'
+#'These commands collectively build, ensure a server is working, and stop a running docker server for gecoding. Once you have run buildcliff and startcliff, you can run the PredictCountryByDoc command to predict which countries documents correspond to. For these commands, we need to have the opportunity id labels as OpID in the SentFrame part of BASE_INPUT
 buildcliff<-function() {system('sudo docker run -p "8080:8080" -d --name cliff cliff:2.1.1')}
 startcliff<-function() {system('sudo docker start cliff')}
 checkcliff<-function(){system('sudo docker ps')}

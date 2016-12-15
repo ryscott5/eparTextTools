@@ -42,7 +42,8 @@ Imports:
   data.table,
   igraph,
   networkD3,
-  stringr
+  stringr,
+  RSQLite
 RoxygenNote: 5.0.1.9000
 Suggests: knitr,
     rmarkdown

@@ -5,6 +5,7 @@ library(stringr)
 library(data.table)
 library(igraph)
 library(networkD3)
+library(RSQLite)
 
 matchtable<-readRDS("../Research.Grants/matchtable.rds")
 
@@ -75,6 +76,7 @@ igraphob_object2<-function(WORD,mtable,W,inputWord=TRUE,sankey=FALSE,verbfilter=
   bad.vs<-V(netsimp)[degree(netsimp) == 0]
   netsimp <-delete.vertices(netsimp, bad.vs)
   netsimp}
+
 temp<-igraphob_object2("nutri",matchtable,W=0,strictlimit=T)
 temp<-as_adjacency_matrix(temp)
 
@@ -226,12 +228,15 @@ dt2$subject.keywords<-sapply(dt2$subject.keywords,function(X) paste(unlist(X),co
 dt2$action.lemmatized<-sapply(dt2$action.lemmatized,function(X) paste(unlist(X),collapse=";"))
 dt2$action.verb.text<-sapply(dt2$action.verb.text,function(X) paste(unlist(X),collapse=";"))
 dt2<-dt2[,list(action.verb.text = tolower(unlist(strsplit(action.verb.text,";"))),object.keywords=tolower(unlist(strsplit(object.keywords,";"))),subject.keywords=tolower(unlist(strsplit(subject.keywords,";"))),Topic=TopTopics,Orig=Orig),by = sentence]
+dt2<-dt2[,list(action.lemmatized = tolower(unlist(strsplit(action.lemmatized,";"))),object.keywords=tolower(unlist(strsplit(object.keywords,";"))),subject.keywords=tolower(unlist(strsplit(subject.keywords,";"))),Topic=TopTopics,Orig=Orig),by = sentence]
+
 dt2<-na.omit(dt2)
 dt3<-unique(dt2)
+rm(dt3)
 dt2<-dplyr::select(dt2, -sentence)
 library("wordnet")
 library(pbapply)
-
+head(dt2)
 callwnetverbs<-pblapply(unique(dt2$action.verb.text),function(X){
   #X<-unique(dt2$action.verb.text)[3]
   X2<-getTermFilter("WildcardFilter", X, TRUE) %>% getIndexTerms("VERB", 1, .)
@@ -239,35 +244,79 @@ callwnetverbs<-pblapply(unique(dt2$action.verb.text),function(X){
     getSynonyms(X2[[1]])} else {list()}
 })
 library(dplyr)
-library(dplyr)
-install.packages("RSQLite")
+
+install_wordNetsql<-function()
+  
+  
 my_db <- dplyr::src_sqlite("../sqlite-31.db", create = F)
 wordtab<-tbl(my_db, sql("SELECT * from words"))
-wordtab<-filter(wordtab, lemma%in%dt2$action.verb.text)
-head(matchtable)
+
+
+wordtab<-dplyr::filter(wordtab, lemma%in%dt2$action.verb.text)
+
+dt2$action.lemmatized<-sapply(str_split(dt2$action.lemmatized," "), function(X) X[length(X)])
+
+wordtab<-filter(wordtab, lemma%in%dt2$action.lemmatized)
+
 vtab<-select(tbl(my_db, sql("SELECT * from verbnetroles")) %>% filter(., wordid%in%collect(select(wordtab,wordid))$wordid),wordid,class)
-vtab<-collect(left_join(wordtab,vtab))
-vtab<-unique(vtab)
+vtab<-unique(collect(vtab))
+vtab<-left_join(collect(wordtab),collect(vtab))
+head(vtab)
+str_extract(vtab$class, "[0-9]+")
+base_guideline<-read.csv(textConnection(RCurl::getURL("https://docs.google.com/spreadsheets/d/1JBkTjHTW7YTRfHuJ-lZqjotK0XkvtdyI5tld-PUaQkw/pub?gid=0&single=true&output=csv")))
+head(base_guideline)
+head(vtab)
+colnames(base_guideline)[3]<-"class"
+vtab<-left_join(vtab,base_guideline)
+head(vtab)
+
 cldf<-filter(collect(tbl(my_db,sql("SELECT * from vnclasses"))),str_detect(class,"\\b([0-9][0-9]$|[0-9][0-9]\\.1)\\b$"))
-cldf<-filter(cldf,nchar(str_extract(class,"[\\d\\.]+"))<=4)
+cldf<-filter(collect(tbl(my_db,sql("SELECT * from vnclasses"))),str_detect(class,"[0-9]+$"))
+head(cldf)
+
+#cldf<-filter(cldf,nchar(str_extract(class,"[\\d\\.]+"))<=4)
+
+base_guideline<-read.csv(textConnection(RCurl::getURL("https://docs.google.com/spreadsheets/d/1JBkTjHTW7YTRfHuJ-lZqjotK0XkvtdyI5tld-PUaQkw/pub?gid=0&single=true&output=csv")))
+
+head(base_guideline)
+head(cldf)
 cldf$classid<-str_extract(cldf$class,"[0-9]+")
 cldf$word<-str_extract(cldf$class,"[a-z]+")
+head(cldf)
+vtab$Verb.Class<-vtab$class
+nrow(vtab)
 vtab$classid<-str_extract(vtab$class,"[0-9]+")
+head(vtab)
 vtab<-dplyr::left_join(vtab,select(cldf,c(classid,word)))
+head(vtab)
 vtab<-unique(vtab)
+head(vtab)
 vtab<-na.omit(vtab)
-dt2$lemma<-dt2$action.verb.text
+dt2$lemma<-dt2$lemma
+head(vtab)
 dt2<-plyr::join(dt2,select(vtab,c(lemma,word)),match="first")
 dt2$word[which(dt2$lemma=="be")]<-"exist"
+
 
 callwn2L<-lapply(names(table(dt2$word)),function(X){
   callwn2<-graph_from_data_frame(data.frame(select(filter(dt2,word==X),c(subject.keywords,object.keywords))),directed=TRUE)
 E(callwn2)$weight <- 1
+
 callwn2<-simplify(callwn2, edge.attr.comb=list(weight="sum"))
 callwn2
 })
+
 names(callwn2L)<-names(table(dt2$word))
-plot(callwn2L$dedicate)
+callwn2L$acquiesce
+
+
+
+
+
+
+
+
+
 
 
 callwn2<-lapply(callwnetverbs,function(X) c(X))
