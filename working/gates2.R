@@ -26,6 +26,7 @@ read_docxtm<-function (file, skip = 0) {
   xml_metadata<-xml_metadata %>% as_list() 
   PlainTextDocument(x=pvalues,author=xml_metadata$creator[[1]],description=tempdes,datetimestamp=xml_metadata$modified[[1]], id=file)}
 
+
 readfiletab_gates<-function(tfile){
   print(tfile)
   propnar1<-read_docx(tfile)
@@ -45,20 +46,29 @@ readfiletab_gates<-function(tfile){
 cell_extractor<-function(docxml,string1,string2){paste(docxml[c(which(str_detect(docxml, string1))+1):c(which(str_detect(docxml, string2))-1)],collapse="\n")}
 
 gates_template_extractor<-function(file){
-  print(file)
-  file<-tfiles[1]
+file<-tfiles[2]
+print(file)
 tmp <- tempfile()
 if (!dir.create(tmp)) 
   stop("Temporary directory could not be established.")
 utils::unzip(file, exdir = tmp)
 xmlfile <- file.path(tmp, "word", "document.xml")
+xmlfile_head<-file.path(tmp, "word", "header1.xml")
+dochead<-XML::xmlTreeParse(xmlfile_head, useInternalNodes = TRUE)
+xml2::as_list(read_xml(file.path(tmp, "word", "header1.xml")))[[1]][[2]]
+
 doc <- XML::xmlTreeParse(xmlfile, useInternalNodes = TRUE)
 xml_metadata<-read_xml(file.path(tmp, "docProps", "core.xml")) 
 unlink(tmp, recursive = TRUE)
 nodeSet <- XML::getNodeSet(doc, "//w:p")
+doclist<-as_list(read_xml(file.path(tmp, "word", "document.xml"))) 
+doclist[[1]][[1]]
 pvalues <- sapply(nodeSet, XML::xmlValue)
+if(pvalues[1]=="Concept"){
 data.frame("Executive Summary"=cell_extractor(pvalues,"Provide a brief summary of your proposal.","Problem Statement"),"Problem Statement"=cell_extractor(pvalues,"Describe the problem","Scope and Approach"), "Scope and Approach"=cell_extractor(pvalues,"Scope and Approach","Measurement and Evaluation"),"Learning objetives"=cell_extractor(pvalues,"List the specific learning","If you are planning a formal evaluation"), "Formal eval plan"=cell_extractor(pvalues,"If you are planning a formal evaluation","Describe the resources"), "Resources"=cell_extractor(pvalues,"If you are planning a formal evaluation","Describe the resources"), "Risks"=cell_extractor(pvalues,"describe any significant risks","Organizational Fit and Capacity"), "OrgFit"=cell_extractor(pvalues,"What experience does your organization have to implement","Geographic Areas to Be Served"),"Location Beneficiaries"=cell_extractor(pvalues,"List all countries and regions/states that would benefit","Geographic Location of Work"),"Location Work Areas"=cell_extractor(pvalues,"List all countries and regions/states where this work","Intellectual Property"),"Intellectual Property"=cell_extractor(pvalues,"Intellectual Property","Clinical Studies"),"Data"=cell_extractor(pvalues,"We anticipate this investment","Results Framework"))
-}
+  } else {NA}}
+
+
 pvalues[c(which(str_detect(pvalues,"List all countries and regions/states where this work"))+10)]
 outcome_extractor<-function(file){
  #file<-"../epar/PracticeDocs2/files/OPP1140962_2015_Ombech_Proposal_Narrative.docx"
@@ -78,6 +88,7 @@ temptab
            }
   
 gates<-bind_rows(lapply(tfiles,readfiletab_gates))
+tfiles[3]
 gates2<-lapply(tfiles,gates_template_extractor)
 gates3<-bind_rows(lapply(tfiles,outcome_extractor))
 
