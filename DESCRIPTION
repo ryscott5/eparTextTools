@@ -46,7 +46,6 @@ Imports:
   RSQLite,
   docxtractr,
   xml2
-
 RoxygenNote: 5.0.1.9000
 Suggests: knitr,
     rmarkdown
