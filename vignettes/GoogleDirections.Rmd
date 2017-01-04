@@ -21,7 +21,9 @@ Use a Debian Jessie boot disk. I might think about expanding the storage on the 
 
 ![Screenshot 1](Figures/Screenshot 2016-12-15 at 8.48.10 AM.png)
 
-![Screenshot 2](Figures/Screenshot 2016-12-15 at 8.30.55 AM.png)
+![Screenshot 2](Figures/Screenshot 2017-01-04 at 8.15.51 AM.png)
+
+Make sure, under "Access scopes", to select "Allow Full Access to All Cloud APIs".
 
 Once you have created your instance, you use the instance via the google bash or ssh console. This looks just like a terminal on a mac. Once you are into the google ssh program which should open in chrome, follow the remainder of the directions.
 

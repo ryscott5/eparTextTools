@@ -32,7 +32,15 @@ We begin by addressing the basic question, "how have the research projects condu
 Within each of the three-research foci, we demonstrate how the tools we are developing can be applied for addressing a key question that may face an organization like ours.
 
 ##Planned method of study
-## Q1 What research grants target gender, adoption, and measurement?
+## Q1 What research targets gender, adoption, and measurement?
+
+We begin by reading in a corpus. The epar demonstration corpus can be read in and downloaded using the example_documents command which will create a folder titled "demo.docs.folder" in the current working directory. The downloaded documents can then be loaded usingthe allDocs() command.
+
+```{r, echo=FALSE, results='asis',eval=FALSE}
+example_documents()
+corpus1<-allDocs("demo.docs.folder")
+
+```
   
 
 

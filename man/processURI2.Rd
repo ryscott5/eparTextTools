@@ -6,6 +6,9 @@
 \usage{
 processURI2(uri)
 }
+\arguments{
+\item{uri}{the path to the uri to be processed.}
+}
 \value{
 uri
 }

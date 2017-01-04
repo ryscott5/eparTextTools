@@ -14,6 +14,10 @@ expandJava<-function(){options(java.parameters = "-Xmx2048m")}
 
 #package depends on xpdf... on mac, install via brew install xpdf and follow instructions.
 
+
+
+
+
 demandwordvec<-function(){
   try({if (!require(wordVectors)) {
   if (!(require(devtools))) {
@@ -21,6 +25,22 @@ demandwordvec<-function(){
   }
   devtools::install_github("bmschmidt/wordVectors")
 }})
+}
+
+
+
+#' Build Example Data.
+#'
+#' @return a folder of documents
+#' @export
+#' @description  This function creates a folder if documents in the working directory.
+#' @examples
+#' example_documents()
+example_documents<-function(){
+ data(demo.docs)
+if(file.exists("demo.docs.folder")==FALSE){dir.create("demo.docs.folder")}
+demo.docs<-demo.docs[which(file.exists(paste("demo.docs.folder/",sapply(demo.docs$links, function(X){tail(unlist(strsplit(X,split="/",fixed=TRUE)),n=1)}),sep=""))==FALSE)]
+lapply(demo.docs$links, function(X){download(X, destfile=file.path("demo.docs.folder",tail(unlist(strsplit(X,split="/",fixed=TRUE)),n=1)))})
 }
 
 
@@ -50,8 +70,8 @@ getTextR<-function(fname,tika=FALSE,tikapath="tika-app-1.13.jar"){
   if(tika==TRUE){
     pdoc<-system(command=paste("java -jar",tikapath,"-t",gsub(" ","\\ ",fname,fixed=TRUE)),intern=TRUE,wait=TRUE)
   } else {
-    pdoc<-if(str_detect(fname,".docx+$")==TRUE){read_docxtm(fname)} else {
-      if(str_detect(fname,".doc+$")==TRUE){readDOC()(language="en",elem=list(uri=fname))} else {pdoc<-if(str_detect(fname, fixed(".pdf"))==TRUE){readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")} else {if(str_detect(fname,fixed(".txt"))==TRUE){readPlain(elem=list(uri=fname,content=iconv(enc2utf8(readLines(fname)), sub = "byte")),language="en")} else {"FILETYPE NA"}}}}}
+    pdoc<-if(stringr::str_detect(fname,".docx+$")==TRUE){read_docxtm(fname)} else {
+      if(stringr::str_detect(fname,".doc+$")==TRUE){tm::readDOC()(language="en",elem=list(uri=fname))} else {pdoc<-if(stringr::str_detect(fname, stringr::fixed(".pdf"))==TRUE){readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")} else {if(stringr::str_detect(fname,stringr::fixed(".txt"))==TRUE){tm::readPlain(elem=list(uri=fname,content=iconv(enc2utf8(readLines(fname)), sub = "byte")),language="en")} else {"FILETYPE NA"}}}}}
   pdoc
 }
 
@@ -124,7 +144,7 @@ read_docxtm<-function (file, skip = 0) {
 
 #' Worker function for processing URI info. From tm package.
 #'
-#' @param uri
+#' @param uri the path to the uri to be processed.
 #' @return uri
 #' @seealso \code{\link{tm}} 
 #' @export
