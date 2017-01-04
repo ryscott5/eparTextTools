@@ -19,7 +19,7 @@ Next, click "create instance".
 
 Use a Debian Jessie boot disk. I might think about expanding the storage on the disk to 15 but 10 will do for now. Upgrade to two CPUs. Also, pick a region (just always be consistent which you pick across a project). Finally, make sure you set the instance to be pre-emptible. This is really really really important. Google Recommends not preempting so you will need to change that menu item. When the server is running, it charges you money. The best way to avoid this is to run the server only when you need it. In practice, this is very very affordable though I recommend setting a budget notification in your cloud console to warn you in case you've left it on. I've been running two servers off and on and have never paid more than $10 a month. A pre-emptible instance automatically shuts down after 24hrs which ends up being a good protective layer. Attached below are images of some acceptable baseline settings for the server.
 
-![Screenshot 1](Figures/Screenshot 2016-12-15 at 8.48.10 AM.png)
+![Screenshot 1](Figures/Screenshot 2016-12-15 at 8.30.55 AM.png)
 
 ![Screenshot 2](Figures/Screenshot 2017-01-04 at 8.15.51 AM.png)
 
