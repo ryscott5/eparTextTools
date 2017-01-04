@@ -76,7 +76,10 @@ pip install https://github.com/mattgwwalker/msg-extractor/zipball/master
 Try this command to make sure the packages are set up proprly for installing packages for rstudio
 
 ```bash
-R CMD Sys.setenv(PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig")
+R 
+Sys.setenv(PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig")
+quit()
+n
 ```
 
 Next add a password for yourself where USERID is the userid you'd like to use. Replace that with your google id and follow prompts.
@@ -84,6 +87,11 @@ Next add a password for yourself where USERID is the userid you'd like to use. R
 ```bash
 sudo passwd USERID
 ```
+Now, you can log into rstudio-server by visiting the IP address for your instance followed by :8787.  Navigate to the external ip address of your cloud instance followed by :8787. So, for an external ip of X.X.X.X, enter X.X.X.X:8787 in a web browser and then login to the login page. Do not add https to the front of the IP address or it wont work.
+
+If this works, this is the base setup for Rstudio on a cloud. The rest of this code installs tools which enable us to do geotagging and some other nice elements.
+
+##Geotagging
 
 Next we are going to install docker and the cliff geoserver. This will allow you to geocode documents.
 
@@ -97,14 +105,25 @@ sudo docker ps
 sudo docker stop
 ```
 
-Now, you can log into rstudio-server by visiting the IP address for your instance followed by :8787. Do not add https to the front of the IP address or it wont work.
+##Ipython Notebook
+To install anaconda which may be useful, use
+```bash
+wget https://repo.continuum.io/archive/Anaconda3-4.2.0-Linux-x86_64.sh
+bash Anaconda3-4.2.0-Linux-x86_64.sh 
+source ~/.bashrc
+gcloud compute firewall-rules create allow-jupyter --allow tcp:8989
+jupyter notebook --generate-config
+python
+from notebook.auth import passwd
+passwd()
+quit()
+#Add hashed password to under c.NotebookApp.password
+nano .jupyter/jupyter_notebook_config.py
+# should look like u'hashed password' then make sure to uncomment line.
+```
 
-For SHINY server, follow build instructions:
-https://github.com/rstudio/shiny-server/wiki/Building-Shiny-Server-from-Source
 
-
-
-Future Code for Tensorflow
+##Future Code for Tensorflow
 ```bash
 wget https://github.com/bazelbuild/bazel/releases/download/0.2.2b/bazel_0.2.2b-linux-x86_64.deb
 sudo dpkg -i bazel_0.2.2b-linux-x86_64.deb
