@@ -82,14 +82,18 @@ quit()
 n
 ```
 
-Next add a password for yourself where USERID is the userid you'd like to use. Replace that with your google id and follow prompts. The most straightforward thing to do is to replace USERID with your name, ie: "ryan". You will then be prompted for a password.
+Next add a password for yourself where USERID is the userid you'd like to use. Replace that with your google id and follow prompts. The most straightforward thing to do is to replace USERID with your Google ID. Or, you can add a user by using the command ```sudo adduser USERID sudo```. You will then be prompted for a password. The by far easiest option is to just use your default google id which you are logged in with. If there is a "." in your username, replace it with "_"
 
 ```bash
 sudo passwd USERID
 ```
+
+
 Now, you can log into rstudio-server by visiting the IP address for your instance followed by :8787.  Navigate to the external ip address of your cloud instance followed by :8787. So, for an external ip of X.X.X.X, enter X.X.X.X:8787 in a web browser and then login to the login page. Do not add https to the front of the IP address or it wont work.
 
 If this works, this is the base setup for Rstudio on a cloud. The rest of this code installs tools which enable us to do geotagging and some other nice elements.
+
+You can add other users to your instance or share instances. See https://cloud.google.com/compute/docs/access/add-remove-change-permissions-for-team-members.
 
 ##Geotagging
 

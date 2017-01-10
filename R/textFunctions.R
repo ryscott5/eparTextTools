@@ -291,20 +291,26 @@ wfplots<-function(termDocumentMatrix,typePlot=1,wordcount,minfreq=5,shortendoc=F
 #' @param termDocumentMatrix tm TermDocumentMatrix object
 #' @param wordcount How many words to graph 
 #' @param minfreq minimum number of times a word should occur to be reported
-#' @param shortendoc Should document names be shortened?
+#' @param pickwords list of words to be included in heatmap. Default is all words sorted by frequency.
+#' @param col_labels document labels in order of tdm columns
+#' @param dendrows draw a dendogram for rows 
+#' @param dendcolumns draw a dendogram fo columns
 #' @return a d3heatmap object.
 #' @seealso \code{\link{d3heatmap}} 
 #' @export
 #' @description  This function creates a d3 interactive heatmap
 #' @examples
-#' word_heatmap(TermDocumentMatrix(corpus1),10,minfreq=5)
-word_heatmap<-function(termDocumentMatrix,wordcount,minfreq=2,xaxisfont=10,col_labels=stringr::str_sub(colnames(termDocumentMatrix),-10,-1)){
+#' word_heatmap(TermDocumentMatrix(corpus1),10)
+word_heatmap<-function(termDocumentMatrix,wordcount,minfreq=2,col_labels=paste(1:ncol(termDocumentMatrix),stringr::str_sub(colnames(termDocumentMatrix),-10,-1)),dendrows=TRUE,dendcolumns=TRUE,pickwords=c()){
+  if(length(pickwords)<=0){
   mfcomframe<-data.frame(as.matrix(termDocumentMatrix[findFreqTerms(termDocumentMatrix, lowfreq=minfreq),]))
   mfcomframe<-mfcomframe[sort(rowSums(mfcomframe),index.return=TRUE,decreasing=TRUE)$ix[1:wordcount],]
+  } else { 
+    mfcomframe<-data.frame(as.matrix(termDocumentMatrix[pickwords,]))
+  }                           
   mfcomframe$word<-row.names(mfcomframe)
   mtcells<-as.matrix(termDocumentMatrix[mfcomframe$word,])
-  d3heatmap::d3heatmap(termDocumentMatrix[mfcomframe$word,], scale="column",colors="Blues",Rowv=FALSE,xaxis_font_size = xaxisfont, labCol=col_labels)}
-
+  d3heatmap::d3heatmap(termDocumentMatrix[mfcomframe$word,], scale="column",colors="Purples",Rowv=dendrows,Colv=dendcolumns, labCol=col_labels)}
 
 #' Creates ggplot of wordcounts!
 #'
