@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ryan P Scott" />
 
-<meta name="date" content="2017-01-04" />
+<meta name="date" content="2017-01-10" />
 
 <title>An Introduction to Computer Assisted Portfolio Review</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">An Introduction to Computer Assisted Portfolio Review</h1>
 <h4 class="author"><em>Ryan P Scott</em></h4>
-<h4 class="date"><em>2017-01-04</em></h4>
+<h4 class="date"><em>2017-01-10</em></h4>
 
 
 
@@ -94,7 +94,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="q1-what-research-targets-gender-adoption-and-measurement" class="section level2">
 <h2>Q1 What research targets gender, adoption, and measurement?</h2>
-<p>We begin by reading in a corpus. The epar demonstration corpus can be read in and downloaded using the example_documents command which will create a folder titled “demo.docs.folder” in the current working directory. The downloaded documents can then be loaded usingthe allDocs() command.</p>
+<p>We begin by reading in a corpus. The EPAR demonstration corpus can be read in and downloaded using the example_documents command which will create a folder titled “demo.docs.folder” in the current working directory. The downloaded documents can then be loaded usingthe allDocs() command. Documents are read into R as a textual corpus–the method used by the TM package. This enables preservation of document metatdata alongside document text. Metadata such as ids and timestamps is stored in the .$meta location of each corpus.</p>
+<p>Currently, allDocs supports parsing of txt, pdf,docx, doc, or txt files. However, it is itself a wrapper which reads a directory files using the getTextR function, which itself utilizes modified versions of the read_doc, readPDF, or readPlain functions from the tm package, and the read_docx function from qdapTools. Once documents are read in, the metadata from the documents can be extracted by loooping through elements included within the document, for example;</p>
+<p>This method of reading in documents treats all documents as unstructured and keeps all elements of text included within a document. It is thus useful for characterizing batches of documents for which there is no common structure. If a common structure does exist for documents, then elements of a document can be extracted using pattern matching (via stringr) or via the tools described in the “Structured Document Analysis” vignette.</p>
+<div id="cleaning-and-parsing-text" class="section level3">
+<h3>Cleaning and Parsing Text</h3>
+<p>Texts are stored in the corpus as character strings facilitating use of different analysis packages. For addressing the first research question– “What research targets gender, adoption and measurement?” a basic text mining approach that relies on word frequencies, counts, and occurances of words may be optimal. For this, we may want to perform common tasks such as removing whitespace, eliminating stopwords, removing punctuation, and stemming documents. All of these are accomplished rapidly by the doc_clean_process() command.</p>
+</div>
 </div>
 <div id="q2-where-is-there-alignment-between-causal-pathways-identified-withins-the-three-research-foci" class="section level2">
 <h2>Q2 Where is there alignment between causal pathways identified withins the three research foci?</h2>

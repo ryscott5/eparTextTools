@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ryan P Scott" />
 
-<meta name="date" content="2017-01-04" />
+<meta name="date" content="2017-01-10" />
 
 <title>Creating a Google Cloud Compute Engine for Running the Text Tools</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Creating a Google Cloud Compute Engine for Running the Text Tools</h1>
 <h4 class="author"><em>Ryan P Scott</em></h4>
-<h4 class="date"><em>2017-01-04</em></h4>
+<h4 class="date"><em>2017-01-10</em></h4>
 
 
 
@@ -126,9 +126,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="kw">sudo</span> apt-get -y install libemail-outlook-message-perl libemail-sender-perl
 <span class="kw">pip</span> install https://github.com/mattgwwalker/msg-extractor/zipball/master</code></pre></div>
 <p>Try this command to make sure the packages are set up proprly for installing packages for rstudio</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">R</span> CMD Sys.setenv(PKG_CONFIG_PATH=<span class="st">&quot;/usr/lib/x86_64-linux-gnu/pkgconfig&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">R</span> 
+<span class="kw">Sys.setenv</span>(PKG_CONFIG_PATH=<span class="st">&quot;/usr/lib/x86_64-linux-gnu/pkgconfig&quot;</span>)
+<span class="fu">quit()</span>
+<span class="kw">n</span></code></pre></div>
 <p>Next add a password for yourself where USERID is the userid you’d like to use. Replace that with your google id and follow prompts.</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">sudo</span> passwd USERID</code></pre></div>
+<p>Now, you can log into rstudio-server by visiting the IP address for your instance followed by :8787. Navigate to the external ip address of your cloud instance followed by :8787. So, for an external ip of X.X.X.X, enter X.X.X.X:8787 in a web browser and then login to the login page. Do not add https to the front of the IP address or it wont work.</p>
+<p>If this works, this is the base setup for Rstudio on a cloud. The rest of this code installs tools which enable us to do geotagging and some other nice elements.</p>
+<div id="geotagging" class="section level2">
+<h2>Geotagging</h2>
 <p>Next we are going to install docker and the cliff geoserver. This will allow you to geocode documents.</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">sudo</span> apt-get -y install docker.io
 <span class="kw">sudo</span> git clone https://github.com/johnb30/cliff-docker
@@ -137,9 +144,25 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="kw">docker</span> run -p <span class="st">&quot;8080:8080&quot;</span> -d cliff:2.1.1
 <span class="kw">sudo</span> docker ps
 <span class="kw">sudo</span> docker stop</code></pre></div>
-<p>Now, you can log into rstudio-server by visiting the IP address for your instance followed by :8787. Do not add https to the front of the IP address or it wont work.</p>
-<p>For SHINY server, follow build instructions: <a href="https://github.com/rstudio/shiny-server/wiki/Building-Shiny-Server-from-Source" class="uri">https://github.com/rstudio/shiny-server/wiki/Building-Shiny-Server-from-Source</a></p>
-<p>Future Code for Tensorflow</p>
+</div>
+<div id="ipython-notebook" class="section level2">
+<h2>Ipython Notebook</h2>
+<p>To install anaconda which may be useful, use</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">wget</span> https://repo.continuum.io/archive/Anaconda3-4.2.0-Linux-x86_64.sh
+<span class="kw">bash</span> Anaconda3-4.2.0-Linux-x86_64.sh 
+<span class="kw">source</span> ~/.bashrc
+<span class="kw">gcloud</span> compute firewall-rules create allow-jupyter --allow tcp:8989
+<span class="kw">jupyter</span> notebook --generate-config
+<span class="kw">python</span>
+<span class="kw">from</span> notebook.auth import passwd
+<span class="fu">passwd()</span>
+<span class="fu">quit()</span>
+<span class="co">#Add hashed password to under c.NotebookApp.password</span>
+<span class="kw">nano</span> .jupyter/jupyter_notebook_config.py
+<span class="co"># should look like u'hashed password' then make sure to uncomment line.</span></code></pre></div>
+</div>
+<div id="future-code-for-tensorflow" class="section level2">
+<h2>Future Code for Tensorflow</h2>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">wget</span> https://github.com/bazelbuild/bazel/releases/download/0.2.2b/bazel_0.2.2b-linux-x86_64.deb
 <span class="kw">sudo</span> dpkg -i bazel_0.2.2b-linux-x86_64.deb
 <span class="co">#Then run</span>
@@ -159,6 +182,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="kw">sudo</span> update-alternatives --config javac
 <span class="kw">sudo</span> apt-get install python-dev
 <span class="kw">bazel</span> test syntaxnet/... util/utf8/...</code></pre></div>
+</div>
 </div>
 
 

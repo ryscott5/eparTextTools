@@ -207,14 +207,13 @@ allDocs<-function(directory){do.call(c,lapply(file.path(directory,list.files(dir
 #' doc_clean_process(corpus1)
 doc_clean_process<-function(corpusname){
   stopWords <- function(x) removeWords(x, stopwords("en"))
-  funs <- list(stripWhitespace,
-               stopWords,
-               removePunctuation,
-               stemDocument,
-               content_transformer(tolower))
-  corpus2<-tm_map(corpusname, FUN = tm_reduce, tmFuns = funs, mc.cores=1)
+  funs <- list(tm::stripWhitespace,
+               tm::stopwords,
+               tm::removePunctuation,
+               tm::stemDocument,
+               tm::content_transformer(tolower))
+  corpus2<-tm::tm_map(corpusname, FUN = tm::tm_reduce, tmFuns = funs, mc.cores=1)
   corpus2}
-
 
 #' Makes a pretty word association table .
 #'
