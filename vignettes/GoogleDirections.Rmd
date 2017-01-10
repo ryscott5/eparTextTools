@@ -82,7 +82,7 @@ quit()
 n
 ```
 
-Next add a password for yourself where USERID is the userid you'd like to use. Replace that with your google id and follow prompts.
+Next add a password for yourself where USERID is the userid you'd like to use. Replace that with your google id and follow prompts. The most straightforward thing to do is to replace USERID with your name, ie: "ryan". You will then be prompted for a password.
 
 ```bash
 sudo passwd USERID

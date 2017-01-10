@@ -7,6 +7,7 @@
 
 ## ---- echo=FALSE, results='asis',eval=FALSE------------------------------
 #  corpus2<-doc_clean_process(corpus1)
+#  tdm<-TermDocumentMatrix(corpus2) %>% removeSparseTerms(.,.6)
 
 ## ---- fig.show='hold'----------------------------------------------------
 plot(1:10)

@@ -8,13 +8,18 @@ Description: This tookit provides a set of resources for analyzing textual docum
 Depends: R (>= 3.1.0)
 License: https://www.tldrlegal.com/l/mit
 LazyData: true
-Imports:
+Depends:
+  tm,
   ggplot2, 
   Rcpp,
   tm,
   ggthemes,
   SnowballC,
   rvest,
+  stringr,
+  plyr,
+  dplyr,
+Imports:
   downloader,
   DT,
   wordcloud,

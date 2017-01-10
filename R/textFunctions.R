@@ -206,13 +206,13 @@ allDocs<-function(directory){do.call(c,lapply(file.path(directory,list.files(dir
 #' @examples
 #' doc_clean_process(corpus1)
 doc_clean_process<-function(corpusname){
-  stopWords <- function(x) removeWords(x, stopwords("en"))
-  funs <- list(tm::stripWhitespace,
-               tm::stopwords,
-               tm::removePunctuation,
-               tm::stemDocument,
-               tm::content_transformer(tolower))
-  corpus2<-tm::tm_map(corpusname, FUN = tm::tm_reduce, tmFuns = funs, mc.cores=1)
+  stopWords <- function(x) removeWords(x, tm::stopwords("en"))
+  funs <- list(stripWhitespace,
+               stopWords,
+               removePunctuation,
+               stemDocument,
+               content_transformer(tolower))
+  corpus2<-tm::tm_map(corpusname, FUN = tm_reduce, tmFuns = funs, mc.cores=1)
   corpus2}
 
 #' Makes a pretty word association table .
@@ -298,14 +298,12 @@ wfplots<-function(termDocumentMatrix,typePlot=1,wordcount,minfreq=5,shortendoc=F
 #' @description  This function creates a d3 interactive heatmap
 #' @examples
 #' word_heatmap(TermDocumentMatrix(corpus1),10,minfreq=5)
-word_heatmap<-function(termDocumentMatrix,wordcount,minfreq=2){
+word_heatmap<-function(termDocumentMatrix,wordcount,minfreq=2,xaxisfont=10,col_labels=stringr::str_sub(colnames(termDocumentMatrix),-10,-1)){
   mfcomframe<-data.frame(as.matrix(termDocumentMatrix[findFreqTerms(termDocumentMatrix, lowfreq=minfreq),]))
   mfcomframe<-mfcomframe[sort(rowSums(mfcomframe),index.return=TRUE,decreasing=TRUE)$ix[1:wordcount],]
   mfcomframe$word<-row.names(mfcomframe)
   mtcells<-as.matrix(termDocumentMatrix[mfcomframe$word,])
-  d3heatmap(termDocumentMatrix[mfcomframe$word,], scale="column",colors="Blues",Rowv=FALSE,xaxis_font_size=8)}
-
-
+  d3heatmap::d3heatmap(termDocumentMatrix[mfcomframe$word,], scale="column",colors="Blues",Rowv=FALSE,xaxis_font_size = xaxisfont, labCol=col_labels)}
 
 
 #' Creates ggplot of wordcounts!

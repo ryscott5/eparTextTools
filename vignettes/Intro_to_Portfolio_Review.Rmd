@@ -51,11 +51,20 @@ lapply(corpus1,function(X){X$meta})[[1]]
 This method of reading in documents treats all documents as unstructured and keeps all elements of text included within a document. It is thus useful for characterizing batches of documents for which there is no common structure. If a common structure does exist for documents, then elements of a document can be extracted using pattern matching (via stringr) or via the tools described in the "Structured Document Analysis" vignette. 
 
 ###Cleaning and Parsing Text
-Texts are stored in the corpus as character strings facilitating use of different analysis packages. For addressing the first research question-- "What research targets gender, adoption and measurement?" a basic text mining approach that relies on word frequencies, counts, and occurances of words may be optimal. For this, we may want to perform common tasks such as removing whitespace, eliminating stopwords, removing punctuation, and stemming documents. All of these are accomplished rapidly by the doc_clean_process() command.
+Texts are stored in the corpus as character strings facilitating use of different analysis packages. For addressing the first research question-- "What research targets gender, adoption and measurement?" a basic text mining approach that relies on word frequencies, counts, and occurances of words may be optimal. For this, we may want to perform common tasks such as removing whitespace, eliminating stopwords, removing punctuation, and stemming documents. All of these are accomplished rapidly by the doc_clean_process() command which streamlines functionality from the tm package for rapid portfolio review. The second command, TermDocumentMatrix creates a word frequency matrix and removes sparse terms allowing graphical and exploratory analysis of text.
 
 ```{r, echo=FALSE, results='asis',eval=FALSE}
 corpus2<-doc_clean_process(corpus1)
+tdm<-TermDocumentMatrix(corpus2) %>% removeSparseTerms(.,.6)
 ```
+
+To begin exploring documents, we can unilize the d3heatmap package to construct a heatmap of which words are the most common (y axis) across a set of documents (x axis) where the user can select the number of words they are interested in (6 in demo).
+```{r,echo=FALSE, results='asis',eval=FALSE}
+word_heatmap(tdm,6,xaxisfont=10)
+colnames(tdm)
+```
+word_heatmap
+By using piping, the documents
 
 
 
