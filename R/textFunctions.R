@@ -28,7 +28,6 @@ demandwordvec<-function(){
 }
 
 
-
 #' Build Example Data.
 #'
 #' @return a folder of documents
@@ -39,10 +38,9 @@ demandwordvec<-function(){
 example_documents<-function(){
  data(demo.docs)
 if(file.exists("demo.docs.folder")==FALSE){dir.create("demo.docs.folder")}
-demo.docs<-demo.docs[which(file.exists(paste("demo.docs.folder/",sapply(demo.docs$links, function(X){tail(unlist(strsplit(X,split="/",fixed=TRUE)),n=1)}),sep=""))==FALSE)]
-lapply(demo.docs$links, function(X){download(X, destfile=file.path("demo.docs.folder",tail(unlist(strsplit(X,split="/",fixed=TRUE)),n=1)))})
+demo.docs2<-demo.docs[which(file.exists(file.path("demo.docs.folder",sapply(demo.docs$links, function(X){tail(unlist(strsplit(X,split="/",fixed=TRUE)),n=1)})))==FALSE),]
+lapply(demo.docs2$links, function(X){try(downloader::download(X, destfile=file.path("demo.docs.folder",tail(unlist(strsplit(X,split="/",fixed=TRUE)),n=1))))})
 }
-
 
 #' Check to see if Tika is available.
 #'
@@ -233,8 +231,7 @@ assocPTable<-function(assoctable,corpus,ngram=FALSE){
   dft$Match<-as.character(dft$Match)
   #dft$Word[dft$Word%in%c(names(assoctable)[sapply(assoctable,length)>0])]<-stemCompletion(dft$Word[dft$Word%in%c(names(assoctable)[sapply(assoctable,length)>0])],dictionary=corpus,type="prevalent")
   dft$Match[dft$Word%in%c(names(assoctable)[sapply(assoctable,length)>0])]<-stemCompletion(dft$Match[dft$Word%in%c(names(assoctable)[sapply(assoctable,length)>0])],dictionary=corpus,type="prevalent")
-  datatable(data=dft,rownames=FALSE,filter="top")}
-
+  DT::datatable(data=dft,rownames=FALSE,filter="top")}
 
 #' Makes a pretty word association table all in one step.
 #'
@@ -273,9 +270,9 @@ wfplots<-function(termDocumentMatrix,typePlot=1,wordcount,minfreq=5,shortendoc=F
   mfcomframe$word<-factor(mfcomframe$word, levels = mfcomframe$word)
   mfcomframe<-melt(mfcomframe,id=c("word"))
   if(shortendoc==TRUE){
-    mfcomframe$variable<-as.factor(mfcomframe$variable)
-    levels(mfcomframe$variable)<-1:length(levels(mfcomframe$variable))}
-  ?substring
+    mfcomframe$variable<-as.character(mfcomframe$variable)
+    mfcomframe$variable<-stringr::str_trunc(mfcomframe$variable,side="left",width=20,ellipsis="...")
+  }
   if(typePlot==1){
     plotout<-ggplot(mfcomframe)+geom_bar(aes(x=word,y=value,fill=variable),position="stack",stat="identity")+coord_flip()+theme_pander()+scale_fill_tableau(name="Document")+ylab("Frequency")+xlab("Word")}
   if(typePlot!=1){
@@ -348,11 +345,39 @@ interest_plot_bydoc<-function(wordlist,termDocumentMatrix){
   tempframe<-data.frame(as.matrix(termDocumentMatrix[wordlist,]))
   tempframe$word<-row.names(tempframe)
   tempframe<-melt(tempframe,id=c("word"))
+  tempframe$variable<-as.character(tempframe$variable) %>% stringr::str_trunc(.,20,side="left")
   if(length(wordlist)>1){
     ggplot(tempframe, aes(variable, value, fill=word)) + geom_bar(position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12),panel.background=element_blank())+xlab("")+ylab("Frequency")+scale_fill_pander()
   } else {
     ggplot(tempframe, aes(variable, value)) + geom_bar(fill="#8ebfad", position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12), panel.background=element_blank())+xlab("")+ylab("Frequency")+scale_fill_pander()
   }}
+
+#' Generates tornado plot
+#'
+#' @param termmatrix tm TermDocumentMatrix object
+#' @param pickword a vector of words to select based on
+#' @param frequency how often should the words occur in the document
+#' @param nwords how many frequent words should be graphed?
+#' @return a ggplot2 object
+#' @seealso \code{\link{ggplot2}} 
+#' @export
+#' @description  This function makes a tornado plot comparing documents based on selected word frequencies. For example, can compare documents containing the word "gender" to all other documents
+#' @examples
+#' interest_plot_bydoc("research",TermDocumentMatrix(corpus1))
+tornadoCompare<-function(termmatrix,pickword,frequency,nwords) {
+  words_gender<-as.matrix(termmatrix[,as.vector(termmatrix[pickword,])>frequency]) %>% rowSums()
+  words_gender<-words_gender/sum(words_gender)
+  words_notgender<-as.matrix(tdm[,as.vector(termmatrix[pickword,])<=frequency]) %>% rowSums()
+  words_notgender<-words_notgender/sum(words_notgender)
+  bothgen<-cbind2(words_gender,words_notgender)
+  bothgen<-as.TermDocumentMatrix(bothgen,weighting=weightTf) 
+  bothgen$dimnames$Docs<-c("Chosen","Inverse")
+  top10<-unique(c(sapply(1:2,function(X) sort(bothgen[,X]$v,decreasing=TRUE,index.return=T)$ix[1:nwords])))
+  bothgen<-melt(as.matrix(bothgen[top10,]))
+  bothgen$value[bothgen$Docs=="Inverse"]<-bothgen$value[bothgen$Docs=="Inverse"]*-1
+  ggplot(bothgen)+geom_bar(aes(x=Terms,y=value,fill=as.factor(Docs)),stat="identity",position=position_dodge(width=0.0))+coord_flip()+theme_minimal()+scale_fill_brewer("Document",palette="Dark2")+ylab("relative frequency")
+}
+
 
 
 #' Creates ggplot of wordcounts by document, allowing external characteristics.

@@ -2,7 +2,10 @@
 title: "An Introduction to Computer Assisted Portfolio Review"
 author: "Ryan P Scott"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 7
+    fig_height: 6
 vignette: >
   %\VignetteIndexEntry{An Introduction to Computer Assisted Portfolio Review}
   %\VignetteEngine{knitr::rmarkdown}
@@ -15,15 +18,15 @@ This tookit provides a set of resources for analyzing textual documents using th
 
   Granting agencies, foundations, and donors often possess large quantities of textual data which they are unable to quickly and efficiently operationalize into meaningful evidence about theories of program change. After a foundation has spent millions of dollars on hundreds of projects, in hundreds of locations, employing thousands of different indicators and outcome measures, based on variously well-articulated theories of change, it is impossible with any reasonable level of confidence to 1. estimate the collective impact of a portfolio of investments within a foundation; 2. estimate the collective impact of investments across foundations; and 3. know that non-consenting individuals have not been made worse off (despite good intent). This is a problem of measurement and accountability for foundations and the public. 
   
-   Portfolio management is a common method for organizing an investment strategy. Portfolio management allows publics and foundations to identify assets and funding amounts connect spending to theories and outcomes (Sleet, Moffett, and Stevens 2008). Approaches to portfolio management such as the Balanced Scorecard have been useful in directing private and public financial investments in a manner that aligns financial goals with mission goals (Robert S. Kaplan 2001; Hoque 2014/3). These tools aim to connect programs to specific objectives and measures, providing organizations with clear and measureable objectives across multiple value areas. Transparency can help foundations to confront commonly identified missteps of public foundations including mission ambiguity (Eisenberg 1984) and institutional myth (Meyer and Rowan 1977), However, use of such evaluative tools tend to be one-off, tailor made to individual foundations, used to justify spending, or adopted by only the largest research foundations (Hyndman and McConville 2016); (Sleet, Moffett, and Stevens 2008; Schmitz and Schillo 2005; Horton and Mackay 2003). 
+Portfolio management is a common method for organizing an investment strategy. Portfolio management allows publics and foundations to identify assets and funding amounts connect spending to theories and outcomes (Sleet, Moffett, and Stevens 2008). Approaches to portfolio management such as the Balanced Scorecard have been useful in directing private and public financial investments in a manner that aligns financial goals with mission goals (Robert S. Kaplan 2001; Hoque 2014/3). These tools aim to connect programs to specific objectives and measures, providing organizations with clear and measureable objectives across multiple value areas. Transparency can help foundations to confront commonly identified missteps of public foundations including mission ambiguity (Eisenberg 1984) and institutional myth (Meyer and Rowan 1977), However, use of such evaluative tools tend to be one-off, tailor made to individual foundations, used to justify spending, or adopted by only the largest research foundations (Hyndman and McConville 2016); (Sleet, Moffett, and Stevens 2008; Schmitz and Schillo 2005; Horton and Mackay 2003). 
    
-  Portfolio management can either be prospective and retrospective, helping to plan future activities strategies or technologies in light of current assets and risks (Oliveira and Rozenfeld 2010; R. S. Kaplan and Norton 1995). We term the application of portfolio assessment to characterize past actions and assessments with the purpose of influencing prospective management portfolio review. However, portfolio review is limited within foundations. Previously, large organizations possessing diverse funding areas have been challenged by a lack of tools for scaling portfolio reviews across widely differing domains of investment as well as by cognitive and practical limitations of the boundedly rational actors who must run such organizations (Selznick 1996; Simon 1972). Faced with limited time, diverse mission goals, and thousands of objectives, analyzing a portfolio of projects is simply too time consuming, costly, and threatening for program managers who, given limited time frames of employment, must optimize resource allocation not necessarily return on investment. 
+Portfolio management can either be prospective and retrospective, helping to plan future activities strategies or technologies in light of current assets and risks (Oliveira and Rozenfeld 2010; R. S. Kaplan and Norton 1995). We term the application of portfolio assessment to characterize past actions and assessments with the purpose of influencing prospective management portfolio review. However, portfolio review is limited within foundations. Previously, large organizations possessing diverse funding areas have been challenged by a lack of tools for scaling portfolio reviews across widely differing domains of investment as well as by cognitive and practical limitations of the boundedly rational actors who must run such organizations (Selznick 1996; Simon 1972). Faced with limited time, diverse mission goals, and thousands of objectives, analyzing a portfolio of projects is simply too time consuming, costly, and threatening for program managers who, given limited time frames of employment, must optimize resource allocation not necessarily return on investment. 
   
-    Current portfolio review methods rely on hand coding of project documents—a process that takes countless manhours and limits the ability of foundations to apply porfolio review in adaptive decision making settings. As a result, foundations need better tools for analyzing spending and performance information across portfolios. This includes developing methodologies for portfolio review that are cost effective, scaleable, and rapidly deployable so that foundations can learn from current and past investments, comparing spending and impact against expectations and against each other in order to target funding to programs with proven effectiveness, identify gaps in theory, and exploit under-utilized opportunities.
+Current portfolio review methods rely on hand coding of project documents—a process that takes countless manhours and limits the ability of foundations to apply porfolio review in adaptive decision making settings. As a result, foundations need better tools for analyzing spending and performance information across portfolios. This includes developing methodologies for portfolio review that are cost effective, scaleable, and rapidly deployable so that foundations can learn from current and past investments, comparing spending and impact against expectations and against each other in order to target funding to programs with proven effectiveness, identify gaps in theory, and exploit under-utilized opportunities.
     
-   However, the field of public administration is increasingly adopting the use of text mining methodologies and computational social scientific approaches for characterizing large textual databases. These methods provide an avenue for scaling portfolio review to a much wider array of organizations who traditionally lacked resources for conduct of retrospective portfolio management strategies.
+However, the field of public administration is increasingly adopting the use of text mining methodologies and computational social scientific approaches for characterizing large textual databases. These methods provide an avenue for scaling portfolio review to a much wider array of organizations who traditionally lacked resources for conduct of retrospective portfolio management strategies.
    
-   We propose and demonstrate the use of data analytic tools including natural language processing and both supervised and unsupervised machine learning to rapidly characterize funding documents identifying theories of change, tying these theories of change to funding levels, and identifying how funding of specific interventions resulted in changes in outcomes of concern to various foundations. The novelty of this new approach is we plan to utilize data analytic tools to automate many of the above processes, providing a manner of reducing the labor and time costs facing a foundation hoping to conduct a portfolio review. Thus, while our methodologies are not novel, nor are portfolio reviews new concepts, we believe that the application of data analytic tools within foundation portfolio review has the potential to dramatically improve the connection between theory and investment for public organizations. Natural language processing and machine learning are common tools for language extraction and coding across a growing range of fields including health, economics, and political science (Carvalho, Freitas, and da Silva 2013; Turian 2013; Wilkerson, Smith, and Stramp 2013; Lee 2000). Specifically, tools allowing for extraction of relations between words are promising for portfolio review because they allow connecting actors, actions, and outcomes identified within programmatic documents to corresponding investments (Turian 2013).
+We propose and demonstrate the use of data analytic tools including natural language processing and both supervised and unsupervised machine learning to rapidly characterize funding documents identifying theories of change, tying these theories of change to funding levels, and identifying how funding of specific interventions resulted in changes in outcomes of concern to various foundations. The novelty of this new approach is we plan to utilize data analytic tools to automate many of the above processes, providing a manner of reducing the labor and time costs facing a foundation hoping to conduct a portfolio review. Thus, while our methodologies are not novel, nor are portfolio reviews new concepts, we believe that the application of data analytic tools within foundation portfolio review has the potential to dramatically improve the connection between theory and investment for public organizations. Natural language processing and machine learning are common tools for language extraction and coding across a growing range of fields including health, economics, and political science (Carvalho, Freitas, and da Silva 2013; Turian 2013; Wilkerson, Smith, and Stramp 2013; Lee 2000). Specifically, tools allowing for extraction of relations between words are promising for portfolio review because they allow connecting actors, actions, and outcomes identified within programmatic documents to corresponding investments (Turian 2013).
 
 ## Portfolio Review Focus
 
@@ -31,20 +34,26 @@ We begin by addressing the basic question, "how have the research projects condu
 
 Within each of the three-research foci, we demonstrate how the tools we are developing can be applied for addressing a key question that may face an organization like ours.
 
+The package can be installed by using the command,
+```{r,eval=FALSE}
+devtools::install_github("ryscott5/epartexttools")
+library(epartexttools)
+```
+
 ##Planned method of study
 ## Q1 What research targets gender, adoption, and measurement?
 
 We begin by reading in a corpus. The EPAR demonstration corpus can be read in and downloaded using the example_documents command which will create a folder titled "demo.docs.folder" in the current working directory. The downloaded documents can then be loaded usingthe allDocs() command. Documents are read into R as a textual corpus--the method used by the TM package. This enables preservation of document metatdata alongside document text. Metadata such as ids and timestamps is stored in the .$meta location of each corpus.
 
 
-```{r, echo=FALSE, results='asis'}
+```{r, echo=TRUE, results='hide'}
 example_documents()
 corpus1<-allDocs("demo.docs.folder")
 ```
   
 Currently, allDocs supports parsing of txt, pdf,docx, doc, or txt files. However, it is itself a wrapper which reads a directory files using the getTextR function, which itself utilizes modified versions of the read_doc, readPDF, or readPlain functions from the tm package, and the read_docx function from qdapTools. Once documents are read in, the metadata from the documents can be extracted by loooping through elements included within the document, for example;
 
-```{r, echo=FALSE, results='asis'}
+```{r, echo=TRUE, results='hide',eval=FALSE}
 lapply(corpus1,function(X){X$meta})[[1]]
 ```
 
@@ -53,22 +62,64 @@ This method of reading in documents treats all documents as unstructured and kee
 ###Cleaning and Parsing Text
 Texts are stored in the corpus as character strings facilitating use of different analysis packages. For addressing the first research question-- "What research targets gender, adoption and measurement?" a basic text mining approach that relies on word frequencies, counts, and occurances of words may be optimal. For this, we may want to perform common tasks such as removing whitespace, eliminating stopwords, removing punctuation, and stemming documents. All of these are accomplished rapidly by the doc_clean_process() command which streamlines functionality from the tm package for rapid portfolio review. The second command, TermDocumentMatrix creates a word frequency matrix and removes sparse terms allowing graphical and exploratory analysis of text.
 
-```{r, echo=FALSE, results='asis',eval=FALSE}
+```{r, echo=TRUE, results='asis'}
 corpus2<-doc_clean_process(corpus1)
 tdm<-TermDocumentMatrix(corpus2) %>% removeSparseTerms(.,.6)
 ```
 
 To begin exploring documents, we can unilize the d3heatmap package to construct a heatmap of which words are the most common (y axis) across a set of documents (x axis) where the user can select the number of words they are interested in (6 in demo).
-```{r,echo=FALSE, results='asis',eval=FALSE}
+
+```{r,echo=TRUE, results='asis'}
 word_heatmap(tdm,6)
-colnames(tdm)
+
 word_heatmap(tdm,pickwords=c("women","gender","access","land","right","work","labor","yield","security"))
 ```
 
 The tdm object can be edited to narrow the graphical information presented, for example if we are only interested words within documents which contain the word women, we can use piping to structure the tdm for the graph. The following code creates a heatmap for documents where gender and women both occur at least once, but then clusters those documents based on the 20 most common words across the entire corpus. 
 
-```{r}
+```{r,echo=TRUE, results='asis'}
 tdm[,as.vector(tdm["gender",])>1] %>% .[,as.vector(.["women",])>1] %>% word_heatmap(.,20)
+```
+
+If static figures are needed, with wfplots(), one can create a basic ggplot() object describing the most frequent terms across documents, or the documents in which the most frequent terms are likely to occur. The objects created by the command can be edited by adding on additional functions, by filtering the term document matrix, or by changing the typePlot. 
+
+```{r}
+wfplots(tdm[,c(2,10,12)],typePlot=2, 5,shortendoc=TRUE)
+```
+
+```{r}
+tdm[,as.vector(tdm["gender",])>20] %>% .[,as.vector(.["women",])>10] %>% wfplots(.,typePlot=2,10,shortendoc=TRUE)
+```
+
+```{r}
+tdm[,as.vector(tdm["gender",])>20] %>% .[,as.vector(.["women",])>10] %>% wfplots(.,typePlot=1,10,shortendoc=TRUE)+ggtitle("Change X versus Y")
+```
+
+```{r}
+interest_plot_bydoc(c("women","farmer","school"),tdm[,1:5])+coord_flip() 
+```
+
+```{r}
+interest_plot_bydoc(c("women","farmer","school"),tdm[,1:5]) %>% plotly::ggplotly() 
+```
+
+By editing the term document matrix to include weighting, each of these commands can be used while taking the length of documents into account.
+
+```{r}
+TermDocumentMatrix(corpus2[1:10],control=list(weighting=function(x) weightSMART(x))) %>% interest_plot_bydoc(c("women","farmer","school"),.) %>% plotly::ggplotly() 
+```
+
+These approaches can provide useful exploration, but to get at the key research questions, it can be beneficial to begin to explore how documents are related. If we are interested in identifying research that targets gender, adoption, and measurement respectively, we might first start by exploring words related to gender. 
+
+```{r}
+assocPrettyOneStep("gender",tdm, corpus2,.5)
+```
+
+Based on the table, we can observe that the word "equal" is strongly associated with the word gender. We might use this information to cluster our term document matrix and compare documents where "gender" and "equal" occur frequently to other documents.
+
+```{r}
+
+tornadoCompare(tdm,c("gender","equal","femal"),20,10)
 ```
 
 

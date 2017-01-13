@@ -116,7 +116,6 @@ ggsave("figures/figures5.png")
 ![http://students.washington.edu/ryscott5/epar/figures/figures5.png](figures/figures5.png)
 
 The same is true for the interest_plot command, which allows the user to specify words they are interested in viewing across documents rather than relying on specific frequencies. 
-
 ```{r}
 tdm$dimnames$Docs<-substring(tdm$dimnames$Docs,nchar(tdm$dimnames$Docs)-20)
 interest_plot(c("women","farmer","school"),tdm, by.var=c("Identity","Program","Identity"), "Classification")

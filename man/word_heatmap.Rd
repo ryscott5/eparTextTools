@@ -4,7 +4,10 @@
 \alias{word_heatmap}
 \title{TermDocumentMatrix to interactive heatmap.}
 \usage{
-word_heatmap(termDocumentMatrix, wordcount, minfreq = 2)
+word_heatmap(termDocumentMatrix, wordcount, minfreq = 2,
+  col_labels = paste(1:ncol(termDocumentMatrix),
+  stringr::str_sub(colnames(termDocumentMatrix), -10, -1)), dendrows = TRUE,
+  dendcolumns = TRUE, pickwords = c())
 }
 \arguments{
 \item{termDocumentMatrix}{tm TermDocumentMatrix object}
@@ -13,7 +16,13 @@ word_heatmap(termDocumentMatrix, wordcount, minfreq = 2)
 
 \item{minfreq}{minimum number of times a word should occur to be reported}
 
-\item{shortendoc}{Should document names be shortened?}
+\item{col_labels}{document labels in order of tdm columns}
+
+\item{dendrows}{draw a dendogram for rows}
+
+\item{dendcolumns}{draw a dendogram fo columns}
+
+\item{pickwords}{list of words to be included in heatmap. Default is all words sorted by frequency.}
 }
 \value{
 a d3heatmap object.
@@ -22,7 +31,7 @@ a d3heatmap object.
 This function creates a d3 interactive heatmap
 }
 \examples{
-word_heatmap(TermDocumentMatrix(corpus1),10,minfreq=5)
+word_heatmap(TermDocumentMatrix(corpus1),10)
 }
 \seealso{
 \code{\link{d3heatmap}}

@@ -19,6 +19,7 @@ Depends:
   stringr,
   plyr,
   dplyr,
+  reshape2
 Imports:
   downloader,
   DT,
