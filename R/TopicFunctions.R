@@ -194,13 +194,13 @@ writeLines(text='
 library(plyr)
 library(dplyr)
 library(stm)
-args = commandArgs(trailingOnly=TRUE)
+args = commandArgs(TRUE)
 workingfolder<-args[1]
 baseinput<-readRDS(file.path(workingfolder,"base_input1.rds"))
   st1<-stm(baseinput$out$documents,baseinput$out$vocab,data=baseinput$out$meta,prevalence=eval(parse(text=readLines(file.path(workingfolder,"formula1.txt")))),K=0, init.type="Spectral",max.em.its=1000)
 saveRDS(st1, file.path(workingfolder,"topicmodel.rds")',
            con=file.path(workingfolder,"callstm.R"))
-  system(paste("R CMD BATCH --no-restore --args callstm.R",workingfolder,sep=" "),wait=FALSE)}
+  system(paste("R CMD BATCH --no-restore","'--args",paste(paste("'",workingfolder,"'",sep=""),"'",sep=""),file.path(".",workingfolder,"callstm.R"),sep=" "),wait=FALSE)}
 
 AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME){
   loadparsers()
@@ -653,8 +653,6 @@ PredictCountryByDoc<-function(BASE_INPUT){
   f1<-unique(f1)
   f1
 }
- 
-
 reflectCountryCol<-function(MATCHFRAME,pred2,howmany,binomial=FALSE){
   pred2[,3:c(ncol(pred2)-1)][is.na(pred2[,3:c(ncol(pred2)-1)])]<-0
   if(binomial==TRUE){
@@ -663,6 +661,51 @@ reflectCountryCol<-function(MATCHFRAME,pred2,howmany,binomial=FALSE){
   maxCs<-colnames(pred2[,3:c(ncol(pred2)-1)])[sort(colSums(pred2[,3:c(ncol(pred2)-1)]),index=TRUE,decreasing=TRUE)$ix][1:howmany]
   cntjoin<-join(MATCHFRAME,pred2[,c("OpID","Orig",maxCs)], by=c("OpID","Orig"))
   return(cntjoin)}
+runMap<-function(FILENAMEQUOTED,path.file=FALSE,titleC){
+  shiny::shinyApp(
+    ui = fluidPage(sidebarLayout(
+      sidebarPanel(selectizeInput("OpporID", label = "Opportunity Number", choices = unique(pred2$OpID),multiple=TRUE, selected=pred2$OpID[1]),
+                   selectInput("projection",label="Map Projection",choices=c('equirectangular','mercator', 'orthographic','natural earth','kavrayskiy7','miller', 'robinson','eckert4','azimuthal equal area','azimuthal equidistant','conic equal area','conic conformal','conic equidistant','gnomonic','stereographic','mollweide','hammer','transverse mercator'),selected='mollweide')
+      ),
+      mainPanel(
+        plotlyOutput("plotly"),
+        tableOutput("table")
+      ))),
+    server = function(input, output) {
+      ccodes<<-read.csv(textConnection(RCurl::getURL("http://data.okfn.org/data/core/country-codes/r/country-codes.csv")),stringsAsFactors=FALSE)
+      output$plotly<-renderPlotly({
+        g <- list(showframe = FALSE,showcoastlines = TRUE,projection = list(type = input$projection))
+        l <- list(color = toRGB("grey"), width = 0.5)
+        d1<-data_mapper(pred2,input$OpporID)
+        plot_ly(d1,z=value,hoverinfo="text", locations = ccode2, type = 'choropleth', marker = list(line = l),color = value, colors = 'Blues',zmax=max(value),zmin=min(value),text=hover,colorbar = list(title = 'Country Relevance'),source="select") %>% layout(title =paste(titleC,"<br>Source:<a href='https://github.com/c4fcm/CLIFF'>CLIFF</a>"), geo = g)
+      })
+      output$table<-renderTable({
+        eventdata<-event_data("plotly_click", source = "select")$pointNumber+1
+        d1<-data_mapper(pred2,input$OpporID)
+        rframe<-data.frame("col1"=pred2$OpID[sort.int(pred2[,d1$countryids[eventdata]],decreasing=TRUE,index.return=TRUE)$ix[1:5]])
+        colnames(rframe)[1]<-paste("Top 5 Opportunities for", d1$nameC[eventdata])
+        rframe})
+    },
+    onStart=function(){
+      suppressWarnings(library(plyr,warn.conflicts=FALSE,quietly=TRUE))
+      suppressWarnings(library(dplyr,warn.conflicts=FALSE,quietly=TRUE))
+      suppressWarnings(library(plotly,warn.conflicts=FALSE,quietly=TRUE))
+      suppressWarnings(library(RCurl,warn.conflicts=FALSE,quietly=TRUE))
+      suppressWarnings(library(DT,warn.conflicts=FALSE,quietly=TRUE))
+      pred2<<-if(path.file==TRUE){read.csv(FILENAMEQUOTED,stringsAsFactors=FALSE) %>% .[,2:ncol(.)]} else {FILENAMEQUOTED}
+      data_mapper<<-function(CountryPredictions,OPPORTUNITY){
+        gchars<-ddply(CountryPredictions,.(OpID),summarise,"charsum"=sum(nchars))
+        CountryPredictions<-plyr::join(CountryPredictions,gchars)
+        CountryPredictions$weight<-CountryPredictions$nchars/CountryPredictions$charsum
+        CountryPredictions<-cbind(CountryPredictions[,1:2],CountryPredictions[,3:c(ncol(CountryPredictions)-3)]*CountryPredictions$weight)
+        ftemp<-dplyr::filter(CountryPredictions, OpID%in%OPPORTUNITY)
+        tframe<-reshape2::melt(colSums(ftemp[,3:ncol(ftemp)],na.rm=TRUE)/sum(ftemp[,3:ncol(ftemp)],na.rm=TRUE))
+        tframe$countryids<-row.names(tframe)
+        tframe$ccode2<-plyr::join(data.frame("ISO3166.1.Alpha.2"=tframe$countryids),ccodes)$ISO3166.1.Alpha.3
+        tframe$nameC<-plyr::join(data.frame("ISO3166.1.Alpha.2"=tframe$countryids),ccodes)$official_name_en
+        tframe$hover<-paste(tframe$nameC,": ",round(tframe$value*100)/100,sep="")
+        tframe}
+    })}
 
 
 nearest_to2<-function(topicm,wordvec,n=10,fixword=FALSE,limitwords=NULL){ 
@@ -679,50 +722,6 @@ nearest_to2<-function(topicm,wordvec,n=10,fixword=FALSE,limitwords=NULL){
   list("searchwords"=row.names(mt)[whichwords],"simwords"=structure(1 - sims[ords[1:n]], names = rownames(sims)[ords[1:n]]))
 }
 
-runMap<-function(FILENAMEQUOTED,path.file=FALSE,titleC){shiny::shinyApp(
-  ui = fluidPage(sidebarLayout(
-    sidebarPanel(selectizeInput("OpporID", label = "Opportunity Number", choices = unique(pred2$OpID),multiple=TRUE, selected=pred2$OpID[1]),
-                 selectInput("projection",label="Map Projection",choices=c('equirectangular','mercator', 'orthographic','natural earth','kavrayskiy7','miller', 'robinson','eckert4','azimuthal equal area','azimuthal equidistant','conic equal area','conic conformal','conic equidistant','gnomonic','stereographic','mollweide','hammer','transverse mercator'),selected='mollweide')
-    ),
-    mainPanel(
-      plotlyOutput("plotly"),
-      tableOutput("table")
-    ))),
-  server = function(input, output) {
-    ccodes<<-read.csv(textConnection(RCurl::getURL("http://data.okfn.org/data/core/country-codes/r/country-codes.csv")),stringsAsFactors=FALSE)
-    output$plotly<-renderPlotly({
-      g <- list(showframe = FALSE,showcoastlines = TRUE,projection = list(type = input$projection))
-      l <- list(color = toRGB("grey"), width = 0.5)
-      d1<-data_mapper(pred2,input$OpporID)
-      plot_ly(d1,z=value,hoverinfo="text", locations = ccode2, type = 'choropleth', marker = list(line = l),color = value, colors = 'Blues',zmax=max(value),zmin=min(value),text=hover,colorbar = list(title = 'Country Relevance'),source="select") %>% layout(title =paste(titleC,"<br>Source:<a href='https://github.com/c4fcm/CLIFF'>CLIFF</a>"), geo = g)
-    })
-    output$table<-renderTable({
-      eventdata<-event_data("plotly_click", source = "select")$pointNumber+1
-      d1<-data_mapper(pred2,input$OpporID)
-      rframe<-data.frame("col1"=pred2$OpID[sort.int(pred2[,d1$countryids[eventdata]],decreasing=TRUE,index.return=TRUE)$ix[1:5]])
-      colnames(rframe)[1]<-paste("Top 5 Opportunities for", d1$nameC[eventdata])
-      rframe})
-  },
-  onStart=function(){
-    suppressWarnings(library(plyr,warn.conflicts=FALSE,quietly=TRUE))
-    suppressWarnings(library(dplyr,warn.conflicts=FALSE,quietly=TRUE))
-    suppressWarnings(library(plotly,warn.conflicts=FALSE,quietly=TRUE))
-    suppressWarnings(library(RCurl,warn.conflicts=FALSE,quietly=TRUE))
-    suppressWarnings(library(DT,warn.conflicts=FALSE,quietly=TRUE))
-    pred2<<-if(path.file==TRUE){read.csv(FILENAMEQUOTED,stringsAsFactors=FALSE) %>% .[,2:ncol(.)]} else {FILENAMEQUOTED}
-    data_mapper<<-function(CountryPredictions,OPPORTUNITY){
-      gchars<-ddply(CountryPredictions,.(OpID),summarise,"charsum"=sum(nchars))
-      CountryPredictions<-plyr::join(CountryPredictions,gchars)
-      CountryPredictions$weight<-CountryPredictions$nchars/CountryPredictions$charsum
-      CountryPredictions<-cbind(CountryPredictions[,1:2],CountryPredictions[,3:c(ncol(CountryPredictions)-3)]*CountryPredictions$weight)
-      ftemp<-dplyr::filter(CountryPredictions, OpID%in%OPPORTUNITY)
-      tframe<-reshape2::melt(colSums(ftemp[,3:ncol(ftemp)],na.rm=TRUE)/sum(ftemp[,3:ncol(ftemp)],na.rm=TRUE))
-      tframe$countryids<-row.names(tframe)
-      tframe$ccode2<-plyr::join(data.frame("ISO3166.1.Alpha.2"=tframe$countryids),ccodes)$ISO3166.1.Alpha.3
-      tframe$nameC<-plyr::join(data.frame("ISO3166.1.Alpha.2"=tframe$countryids),ccodes)$official_name_en
-      tframe$hover<-paste(tframe$nameC,": ",round(tframe$value*100)/100,sep="")
-      tframe}
-  })}
 
 
 tableapp<-function(basic_table,TOPICMODEL){

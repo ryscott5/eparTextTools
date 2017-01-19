@@ -20,6 +20,8 @@ Depends:
   plyr,
   dplyr,
   reshape2
+  shiny
+  plotly
 Imports:
   downloader,
   DT,
@@ -44,7 +46,6 @@ Imports:
   lubridate,pbapply,
   devtools,
   tm.plugin.mail,
-  plotly,
   data.table,
   igraph,
   networkD3,
