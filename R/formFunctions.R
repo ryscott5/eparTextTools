@@ -119,7 +119,8 @@ do.call(rbind,lapply(file_list,function(file1){
   temp1$doc<-file1
   temp1}))}
 
-cell_extractor<-function(docxml,string1,string2){startint<-which(str_detect(docxml, string1))+1
+cell_extractor<-function(docxml,string1,string2){
+startint<-which(str_detect(docxml, string1))+1
 stopint<-which(str_detect(docxml,string2))-1
 stopint<-if(length(stopint>1)){subset(stopint, stopint-startint>=0) %>% .[which.min(.-startint)]}
 paste(docxml[c(startint:stopint)],collapse="\n",sep="\n")}

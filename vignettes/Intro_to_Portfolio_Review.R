@@ -1,6 +1,8 @@
 ## ----eval=FALSE----------------------------------------------------------
 #  devtools::install_github("ryscott5/epartexttools")
-#  library(epartexttools)
+
+## ------------------------------------------------------------------------
+library(epartexttools)
 
 ## ---- echo=TRUE, results='hide'------------------------------------------
 example_documents()
@@ -44,12 +46,5 @@ assocPrettyOneStep("gender",tdm, corpus2,.5)
 
 ## ------------------------------------------------------------------------
 
-tornadoCompare(tdm,c("gender","equal","femal"),20,10)
-
-## ---- fig.show='hold'----------------------------------------------------
-plot(1:10)
-plot(10:1)
-
-## ---- echo=FALSE, results='asis'-----------------------------------------
-knitr::kable(head(mtcars, 10))
+tornadoCompare(tdm,c("gender","equal","femal"),3,10)
 

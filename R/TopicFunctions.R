@@ -16,14 +16,14 @@ jgc <- function(){
 #' @examples
 #' loadparsers()
 loadparsers<-function(){
-sent_token_annotator <<- Maxent_Sent_Token_Annotator()
-word_token_annotator <<- Maxent_Word_Token_Annotator()
-pos_tag_annotator<<- Maxent_POS_Tag_Annotator()
-org.annotate<<-Maxent_Entity_Annotator(language = "en", kind="organization", probs = FALSE,model = NULL)
-pers.annotate<<-Maxent_Entity_Annotator(language = "en", kind="person", probs = FALSE,model = NULL)
-location.annotate<<-Maxent_Entity_Annotator(language = "en", kind="location", probs = FALSE,model = NULL)
-money.annotate<<-Maxent_Entity_Annotator(language = "en", kind="money", probs = FALSE,model = NULL)
-parse_annotator <<- Parse_Annotator()}
+sent_token_annotator <<- openNLP::Maxent_Sent_Token_Annotator()
+word_token_annotator <<- openNLP::Maxent_Word_Token_Annotator()
+pos_tag_annotator<<- openNLP::Maxent_POS_Tag_Annotator()
+org.annotate<<-openNLP::Maxent_Entity_Annotator(language = "en", kind="organization", probs = FALSE,model = NULL)
+pers.annotate<<-openNLP::Maxent_Entity_Annotator(language = "en", kind="person", probs = FALSE,model = NULL)
+location.annotate<<-openNLP::Maxent_Entity_Annotator(language = "en", kind="location", probs = FALSE,model = NULL)
+money.annotate<<-openNLP::Maxent_Entity_Annotator(language = "en", kind="money", probs = FALSE,model = NULL)
+parse_annotator <<- openNLP::Parse_Annotator()}
 
 
 #'Process a corpus into a topic model ready object
@@ -76,8 +76,8 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
   allans<-pblapply(par2$S,function(X) annotate(X,sent_token_annotator))
   par2<-par2[which(sapply(allans,function(X) length(X)>0)==TRUE),]
   allans<-allans[sapply(allans,function(X) length(X)>0)]
-  allans<-pblapply(1:nrow(par2),function(i){annotate(par2$S[i],word_token_annotator,allans[[i]])})
-  allans<-pblapply(1:nrow(par2),function(i){annotate(par2$S[i],list(org.annotate,pers.annotate,location.annotate),allans[[i]])})
+  allans<-pblapply(1:nrow(par2),function(i){NLP::annotate(par2$S[i],word_token_annotator,allans[[i]])})
+  allans<-pblapply(1:nrow(par2),function(i){NLP::annotate(par2$S[i],list(org.annotate,pers.annotate,location.annotate),allans[[i]])})
   par2$SnE<-NA
   par2$ents<-NA
   for(i in 1:nrow(par2)){
