@@ -1,5 +1,5 @@
 
-expandJava<-function(){options(java.parameters = "-Xmx2048m")}
+expandJava<-function(){options(java.parameters = "-Xmx6000m")}
 
 #list.of.packages <- c("ggplot2", "Rcpp","tm","ggthemes","SnowballC","rvest","downloader","DT","wordcloud","d3heatmap","plyr","reshape2","dplyr","qdapTools","stringr","openNLP","NLP","stm","LDAvis","servr","Rtsne","geometry","downloader","corrplot","pryr","openNLPmodels.en","lubridate","pbapply","devtools","tm.plugin.mail","plotly","data.table","igraph","networkD3")
 

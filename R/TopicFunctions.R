@@ -3,10 +3,12 @@
 #' Clean the java environment.
 #'
 #' Function cleans the java environment. This is a great command. Run it whenever you feel like it.
+#' @param NA
 #' @seealso \code{\link{rJava}} 
 #' @examples
 #' jgc()
 jgc <- function(){
+  gc()
   rJava::.jcall("java/lang/System", method = "gc")
 } 
 
@@ -22,9 +24,11 @@ pos_tag_annotator<<- openNLP::Maxent_POS_Tag_Annotator()
 org.annotate<<-openNLP::Maxent_Entity_Annotator(language = "en", kind="organization", probs = FALSE,model = NULL)
 pers.annotate<<-openNLP::Maxent_Entity_Annotator(language = "en", kind="person", probs = FALSE,model = NULL)
 location.annotate<<-openNLP::Maxent_Entity_Annotator(language = "en", kind="location", probs = FALSE,model = NULL)
-money.annotate<<-openNLP::Maxent_Entity_Annotator(language = "en", kind="money", probs = FALSE,model = NULL)
-parse_annotator <<- openNLP::Parse_Annotator()}
-
+#money.annotate<<-openNLP::Maxent_Entity_Annotator(language = "en", kind="money", probs = FALSE,model = NULL)
+parse_annotator <<- openNLP::Parse_Annotator()
+t1<-gc()
+jgc()
+gc()-t1}
 
 #'Process a corpus into a topic model ready object
 #'
@@ -39,13 +43,13 @@ parse_annotator <<- openNLP::Parse_Annotator()}
 #' @export
 #' @examples
 #' BASE_INPUT<-PreTopicFrame(corpus1,1)
-PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
+PreTopicFrame<-function(CORPUS_A,howmanyentities=10){
   loadparsers()
   corpEntN<-CORPUS_A[sapply(CORPUS_A,function(x) length(content(x)))>0]
   corpus1b<-CORPUS_A[sapply(CORPUS_A,function(x) length(content(x)))>0]
   corpEntN<-lapply(names(corpEntN[[1]]$meta),function(K){meta(corpEntN,K)})
   corpEntN[[1]]<-melt(sapply(1:length(corpEntN[[1]]),function(x) paste(corpEntN[[1]][[x]],collapse="")))[,1]
-  corpEntN[[2]]<-melt(sapply(1:length(corpEntN[[2]]), function(x) ymd_hms(corpEntN[[2]][[x]]),simplify=T))
+  corpEntN[[2]]<-melt(sapply(1:length(corpEntN[[2]]), function(x) lubridate::ymd_hms(corpEntN[[2]][[x]]),simplify=T))
   corpEntN[[2]]<-join(data.frame("L1"=1:length(corpEntN[[1]])),corpEntN[[2]])$value
   corpEntN[[3]]<-melt(sapply(1:length(corpEntN[[3]]),function(x) paste(corpEntN[[3]][[x]],collapse="")))[,1]
   corpEntN[[4]]<-melt(sapply(1:length(corpEntN[[4]]),function(x) paste(corpEntN[[4]][[x]],collapse="")))[,1]
@@ -64,20 +68,26 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
                rep.int("paragraph", n),
                spans$start,
                spans$end)}, list(description ="A paragraph token annotator based on blankline_tokenizer()."))
-  par1<-lapply(corpus1b,function(x) annotate(as.String(content(x)),para_token_annotator))
+  par1<-lapply(corpus1b,function(x) NLP::annotate(as.String(x$content),para_token_annotator))
+  jgc()
   corpEntN$Orig<-1:nrow(corpEntN)
   par2<-lapply(1:length(par1),function(i) {
     dfout<-join(data.frame("S1"=sapply(par1[i],function(x) as.character(as.String(content(corpus1b[[i]]))[x]),USE.NAMES=FALSE),"Orig"=i),corpEntN[i,],by="Orig")
     colnames(dfout)[1]<-"S"
     dfout})
+  jgc()
   par2<-do.call(rbind,par2)
   par2$SC<-as.character(par2$S)
   par2<-par2[nchar(par2$SC)>=100,]
-  allans<-pblapply(par2$S,function(X) annotate(X,sent_token_annotator))
+  jgc()
+  allans<-pbapply::pblapply(par2$S,function(X) NLP::annotate(X,sent_token_annotator))
   par2<-par2[which(sapply(allans,function(X) length(X)>0)==TRUE),]
+  jgc()
   allans<-allans[sapply(allans,function(X) length(X)>0)]
-  allans<-pblapply(1:nrow(par2),function(i){NLP::annotate(par2$S[i],word_token_annotator,allans[[i]])})
-  allans<-pblapply(1:nrow(par2),function(i){NLP::annotate(par2$S[i],list(org.annotate,pers.annotate,location.annotate),allans[[i]])})
+  allans<-pbapply::pblapply(1:nrow(par2),function(i){NLP::annotate(par2$S[i],word_token_annotator,allans[[i]])})
+  jgc()
+  allans<-pbapply::pblapply(1:nrow(par2),function(i){NLP::annotate(par2$S[i],list(org.annotate,pers.annotate,location.annotate),allans[[i]])})
+  jgc()
   par2$SnE<-NA
   par2$ents<-NA
   for(i in 1:nrow(par2)){
@@ -95,12 +105,11 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=25){
   entp<-lapply(top.ents, function(X) str_detect(par2$SC,fixed(X)))
   names(entp)<-top.ents
   entp<-do.call(cbind,entp)
-  processed <-textProcessor(par2$SnE,metadata=cbind(par2[,2:length(par2)],entp),sparselevel=1)
-  out <- prepDocuments(processed$documents,processed$vocab,processed$meta,lower.thresh=4)
+  processed <-stm::textProcessor(par2$SnE,metadata=cbind(par2[,2:length(par2)],entp),sparselevel=1)
+  out <- stm::prepDocuments(processed$documents,processed$vocab,processed$meta,lower.thresh=4)
   colnames(out$meta)<-gsub("\\W",".",colnames(out$meta))
   list("SentFrame"=par2,"Annotations"=allans,"processed"=processed,"out"=out)
 }
-
 
 #'Keep only those sentences with desired verbs.
 #'
@@ -619,7 +628,6 @@ buildcliff<-function() {system('sudo docker run -p "8080:8080" -d --name cliff c
 startcliff<-function() {system('sudo docker start cliff')}
 checkcliff<-function(){system('sudo docker ps')}
 stopcliff<-function(){system('sudo docker stop cliff')}
-
 PredictCountryByDoc<-function(BASE_INPUT){
   fullc<-ddply(BASE_INPUT$SentFrame, .(Orig), summarise, "fullc"=paste(SC, collapse=" ",sep=" "))
   countries<-vector("list",nrow(fullc))
@@ -630,7 +638,7 @@ PredictCountryByDoc<-function(BASE_INPUT){
       noutstop<-c(1,c(1:ceiling(nchar(TEXTI)/4000))*ncons)
       stsp<-lapply(1:c(length(noutstop)-1),function(X) c(noutstop[X],noutstop[X+1]))
       subers<-lapply(stsp,function(X) substr(TEXTI,X[1],X[2]))
-      mres<-lapply(subers,function(X) GET(url="http://localhost:8080/CLIFF-2.1.1/parse/text",query = list(replaceAllDemonyms="true",q=X)))
+      mres<-lapply(subers,function(X) httr::GET(url="http://localhost:8080/CLIFF-2.1.1/parse/text",query = list(replaceAllDemonyms="true",q=X)))
       mres<-mres[sapply(mres,function(X) X$status_code==200)]
       res<-do.call(rbind.fill, lapply(mres,function(X) jsonlite::fromJSON(X[[1]][[1]])$results$places$focus$countries))[,c("countryCode","score")]
       res<-unlist(sapply(1:nrow(res),function(i) rep(res$countryCode[i],res$score[i])))
@@ -681,7 +689,7 @@ runMap<-function(FILENAMEQUOTED,path.file=FALSE,titleC){shiny::shinyApp(
       tableOutput("table")
     ))),
   server = function(input, output) {
-    ccodes<<-read.csv(textConnection(getURL("http://data.okfn.org/data/core/country-codes/r/country-codes.csv")),stringsAsFactors=FALSE)
+    ccodes<<-read.csv(textConnection(RCurl::getURL("http://data.okfn.org/data/core/country-codes/r/country-codes.csv")),stringsAsFactors=FALSE)
     output$plotly<-renderPlotly({
       g <- list(showframe = FALSE,showcoastlines = TRUE,projection = list(type = input$projection))
       l <- list(color = toRGB("grey"), width = 0.5)
