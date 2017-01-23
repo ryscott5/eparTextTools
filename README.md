@@ -264,7 +264,11 @@ Fitting a topic model has numerous benefits over simply viewing raw word counts,
 
 ```{r}
 writeFormulaforSTM(BASE_INPUT,workingfolder)
+```
 
+```{r}
+runSTM(workingfolder)
+```
 jgc()
 
 #to run remotely

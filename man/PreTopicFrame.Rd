@@ -4,7 +4,7 @@
 \alias{PreTopicFrame}
 \title{Process a corpus into a topic model ready object}
 \usage{
-PreTopicFrame(CORPUS_A, howmanyentities = 25)
+PreTopicFrame(CORPUS_A, howmanyentities = 10)
 }
 \arguments{
 \item{CORPUS_A}{Document corpus}

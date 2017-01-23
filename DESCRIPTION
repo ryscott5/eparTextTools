@@ -19,9 +19,9 @@ Depends:
   stringr,
   plyr,
   dplyr,
-  reshape2
-  shiny
-  plotly
+  reshape2,
+  shiny,
+  plotly,
 Imports:
   downloader,
   DT,
@@ -52,7 +52,7 @@ Imports:
   stringr,
   RSQLite,
   docxtractr,
-  xml2
+  xml2,
 RoxygenNote: 5.0.1.9000
 Suggests: knitr,
     rmarkdown
