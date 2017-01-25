@@ -35,6 +35,4 @@ searchWordsPubMED<-function(searchterms,email,retmax=25){
   toframe
 }
 
-test1<-searchWordsPubMED("'gender equity'+environment","ryscott5@uw.edu",retmax=10)
-test2<-epartexttools::doc_clean_process(tm::VCorpus(tm::VectorSource(test1$Abstract)))
-epartexttools::word_heatmap(tm::TermDocumentMatrix(test2),10)
+
