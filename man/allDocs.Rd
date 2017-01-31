@@ -4,10 +4,12 @@
 \alias{allDocs}
 \title{Calls getTextR on all files in a directory joining into corpus.}
 \usage{
-allDocs(directory)
+allDocs(directory, onError = "skip")
 }
 \arguments{
-\item{directory}{Folder to read files from}
+\item{directory}{Folder to read files from'}
+
+\item{onError}{if skip skip documents that read wrong.}
 }
 \value{
 Corpus of text documents.

@@ -181,6 +181,8 @@ jgc()
 ```{r,eval=FALSE}
 runSTM(workingfolder)
 ```
+
+
 ## Q2 Where is there alignment between causal pathways identified withins the three research foci?
 
 

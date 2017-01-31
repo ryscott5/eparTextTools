@@ -184,15 +184,25 @@ readPDF2<-function (engine = c("xpdf", "Rpoppler", "ghostscript", "Rcampdf","cus
 
 #' Calls getTextR on all files in a directory joining into corpus. 
 #'
-#' @param directory Folder to read files from
+#' @param directory Folder to read files from'
+#' @param onError if skip skip documents that read wrong.
 #' @return Corpus of text documents.
 #' @seealso \code{\link{corpus}} 
 #' @export
 #' @description  This function will read from a folder documents of the class pdf, docx, doc or txt.
 #' @examples
 #' allDocs("folder")
-allDocs<-function(directory){do.call(c,lapply(file.path(directory,list.files(directory)),getTextR))}
-
+allDocs<-function(directory,onError="skip"){
+  if(onError=="skip"){
+    temp<-lapply(file.path(directory,list.files(directory)),function(FILENAME){
+      try(getTextR(FILENAME))})
+    temp<-temp[sapply(temp,class)!="character"]
+    temp<-temp[sapply(temp,class)!="error"]
+    temp<-temp[sapply(temp,is.na)==FALSE]
+    do.call(c,temp)
+    } else {
+  do.call(c,lapply(file.path(directory,list.files(directory)),getTextR))
+  }}
 
 #' Cleans documents performing many common tasks .
 #'
@@ -207,6 +217,7 @@ doc_clean_process<-function(corpusname){
   stopWords <- function(x) removeWords(x, tm::stopwords("en"))
   funs <- list(stripWhitespace,
                stopWords,
+               removeNumbers,
                removePunctuation,
                stemDocument,
                content_transformer(tolower))
@@ -403,3 +414,52 @@ interest_plot_bydoc_char<-function(wordlist,termDocumentMatrix,doccharacteristic
   }}
 
 
+#' creates a table of word counts within a set of documents.
+#'
+#' @param termDocumentMatrix tm TermDocumentMatrix object
+#' @param wordlist list of words
+#' @param doccorpus original document corpus
+#' @param trunc should filenames be truncated in output table
+#' @param raw if true then outputs a data.table if false then produces an htmltable allowing csv/excel export. the resulting table can be saved using the saveWidgets command in htmlwidgets.
+
+#' @return a data.table or DT datatable depending on if raw is set to true or false.
+#' @description  This function is useful for looking at occurences of words within documents.
+#' @examples
+#' wordcount_table(c("gender","nutrition"),TermDocumentMatrix(clcorp),corpus1)
+wordcount_table<-function(wordlist,termDocumentMatrix,doccorpus,trunc=FALSE,raw=FALSE){
+  truelist<-unique(unlist(sapply(wordlist, function(X) which(str_detect(termDocumentMatrix$dimnames$Terms,X)),USE.NAMES = FALSE)))
+  tempframe<-data.frame(as.matrix(termDocumentMatrix[truelist,]))
+  tempframe$word<-row.names(tempframe)
+  tempframe<-melt(tempframe,id=c("word"))
+  tempframe$variable<-as.character(tempframe$variable)
+  tempframe<-dplyr::filter(tempframe, value>0)
+  tempframe<-tempframe[order(nchar(tempframe$word),tempframe$value,decreasing=c(F,T)),]
+  doccorpus<-corpus1
+  sents<-adply(tempframe,.margins=1,.fun=function(X){
+    sframe<-unlist(tokenizers::tokenize_sentences(paste(textreg::convert.tm.to.character(doccorpus[which(gsub("%",".",names(doccorpus),fixed=TRUE)==X[,2])]),collapse=" ")))
+    sframe<-sframe[unique(which(str_detect(sframe, X[,1])))] %>% paste(str_trim(.),collapse="...   ")
+    sframe
+  })
+  
+  if(trunc==TRUE) {temprame$variable<-tempframe$variable %>% stringr::str_trunc(.,20,side="left")}
+colnames(sents)<-c("Word","Document","Count","String")
+sents<-filter(sents,nchar(String)>0)
+if(raw==TRUE){data.table::data.table(sents)} else {
+  datatable(sents, options = list(columnDefs = list(list(
+    targets = 4,
+    render = JS(
+      "function(data, type, row, meta) {",
+      "return type === 'display' && data.length > 50 ?",
+      "'<span title=\"' + data + '\">' + data.substr(0, 50) + '...</span>' : data;",
+      "}")
+  ),list(
+    targets = 2,
+    render = JS(
+      "function(data, type, row, meta) {",
+      "return type === 'display' && data.length > 20 ?",
+      "'<span title=\"' + data + '\">' + data.substr(0, 20) + '...</span>' : data;",
+      "}")
+  )),
+  dom = 'Bfrtip',
+  buttons = c('csv', 'excel')), extensions = 'Buttons', callback = JS('table.page(3).draw(false);'),filter="top")
+  }}
