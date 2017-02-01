@@ -15,15 +15,12 @@ jgc()
 
 ## ---- echo=TRUE, results='asis'------------------------------------------
 corpus2<-doc_clean_process(corpus1)
-rm(clcorp)
-gc()
-jgc()
 tdm<-TermDocumentMatrix(corpus2) %>% removeSparseTerms(.,.6)
 
-## ------------------------------------------------------------------------
+## ----echo=TRUE, results='asis'-------------------------------------------
 wordcount_table(c("gender","access"),tdm,corpus1)
 
-## ------------------------------------------------------------------------
+## ----echo=TRUE, results='asis'-------------------------------------------
 tout<-wordcount_table(c("gender","access"),tm::TermDocumentMatrix(corpus2,control=list(weighting=function(X) tm::weightTfIdf(X, normalize=FALSE))),corpus1,raw=T)
 head(tout[,1:3])
 

@@ -69,9 +69,6 @@ Texts are stored in the corpus as character strings facilitating use of differen
 
 ```{r, echo=TRUE, results='asis'}
 corpus2<-doc_clean_process(corpus1)
-rm(clcorp)
-gc()
-jgc()
 tdm<-TermDocumentMatrix(corpus2) %>% removeSparseTerms(.,.6)
 ```
 
@@ -80,14 +77,14 @@ To begin exploring documents, we highlight two commands which provide useful int
 
 The function wordcount_table() is a useful starting point-- it allows us to search for word frequencies in documents, pulling counts of how many times a word occurs in various documents, and weighting that count by the length of the document if we so desire.
 
-```{r}
+```{r,echo=TRUE, results='asis'}
 wordcount_table(c("gender","access"),tdm,corpus1)
 ```
 
 The function generates an html table which can be saved using the saveWidget() command or which can be used just to interact with the data. By default, the function TermDocumentMatrix weights according to weightTF which just counts term frequencies. We might instead want to weight by the term frequency relative to the document frequency, as below. In this command, rather then generating an interactive table, setting raw=true generates a data.table which can then be manipulated within R.
 
 
-```{r}
+```{r,echo=TRUE, results='asis'}
 tout<-wordcount_table(c("gender","access"),tm::TermDocumentMatrix(corpus2,control=list(weighting=function(X) tm::weightTfIdf(X, normalize=FALSE))),corpus1,raw=T)
 head(tout[,1:3])
 ```

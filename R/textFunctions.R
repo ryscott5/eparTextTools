@@ -192,7 +192,7 @@ readPDF2<-function (engine = c("xpdf", "Rpoppler", "ghostscript", "Rcampdf","cus
 #' @description  This function will read from a folder documents of the class pdf, docx, doc or txt.
 #' @examples
 #' allDocs("folder")
-allDocs<-function(directory,SkiponError=TRUE){
+allDocs<-function(directory,SkiponError=FALSE){
   if(SkiponError==TRUE){
     temp<-lapply(file.path(directory,list.files(directory)),function(FILENAME){
       try(getTextR(FILENAME))})
@@ -214,14 +214,14 @@ allDocs<-function(directory,SkiponError=TRUE){
 #' @examples
 #' doc_clean_process(corpus1)
 doc_clean_process<-function(corpusname){
-  stopWords <- function(x) removeWords(x, tm::stopwords("en"))
-  funs <- list(stripWhitespace,
+  stopWords <- function(x) tm::removeWords(x, tm::stopwords("en"))
+  funs <- list(tm::stripWhitespace,
                stopWords,
-               removeNumbers,
-               removePunctuation,
-               stemDocument,
-               content_transformer(tolower))
-  corpus2<-tm::tm_map(corpusname, FUN = tm_reduce, tmFuns = funs, mc.cores=1)
+               tm::removeNumbers,
+               tm::removePunctuation,
+               tm::stemDocument,
+               tm::content_transformer(tolower))
+  corpus2<-tm::tm_map(corpusname, FUN = tm::tm_reduce, tmFuns = funs, mc.cores=1)
   corpus2}
 
 #' Makes a pretty word association table .
@@ -279,18 +279,17 @@ wfplots<-function(termDocumentMatrix,typePlot=1,wordcount,minfreq=5,shortendoc=F
   mfcomframe<-mfcomframe[sort(rowSums(mfcomframe),index.return=TRUE,decreasing=TRUE)$ix[1:wordcount],]
   mfcomframe$word<-row.names(mfcomframe)
   mfcomframe$word<-factor(mfcomframe$word, levels = mfcomframe$word)
-  mfcomframe<-melt(mfcomframe,id=c("word"))
+  mfcomframe<-reshape2::melt(mfcomframe,id=c("word"))
   if(shortendoc==TRUE){
     mfcomframe$variable<-as.character(mfcomframe$variable)
     mfcomframe$variable<-stringr::str_trunc(mfcomframe$variable,side="left",width=20,ellipsis="...")
   }
   if(typePlot==1){
-    plotout<-ggplot(mfcomframe)+geom_bar(aes(x=word,y=value,fill=variable),position="stack",stat="identity")+coord_flip()+theme_pander()+scale_fill_tableau(name="Document")+ylab("Frequency")+xlab("Word")}
+    plotout<-ggplot(mfcomframe)+geom_bar(aes(x=word,y=value,fill=variable),position="stack",stat="identity")+coord_flip()+ggthemes::theme_pander()+ggthemes::scale_fill_tableau(name="Document")+ylab("Frequency")+xlab("Word")}
   if(typePlot!=1){
-    plotout<-ggplot(mfcomframe)+geom_bar(aes(x=variable,y=value,fill=word),position="stack",stat="identity")+coord_flip()+theme_pander()+scale_fill_tableau(name="Word",palette="tableau10")+ylab("Frequency")+xlab("Document")}
+    plotout<-ggplot(mfcomframe)+geom_bar(aes(x=variable,y=value,fill=word),position="stack",stat="identity")+coord_flip()+ggthemes::theme_pander()+ggthemes::scale_fill_tableau(name="Word",palette="tableau10")+ylab("Frequency")+xlab("Document")}
   plotout
 }
-
 
 
 
@@ -338,7 +337,7 @@ interest_plot<-function(wordlist,termDocumentMatrix,by.var=NULL,byvarname=""){
   if(is.null(by.var)){
     ggplot(tempframe, aes(word, Count)) + geom_bar(fill="#8ebfad", position = "dodge", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12),panel.background=element_blank())+xlab("")+ylab("Frequency")}
   else {
-    ggplot(tempframe, aes(word, Count, fill=by.var)) + geom_bar(position = "dodge", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12),panel.background=element_blank())+xlab("")+ylab("Frequency")+scale_fill_pander(name=as.character(byvarname))}
+    ggplot(tempframe, aes(word, Count, fill=by.var)) + geom_bar(position = "dodge", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12),panel.background=element_blank())+xlab("")+ylab("Frequency")+ggthemes::scale_fill_pander(name=as.character(byvarname))}
 }
 
 
@@ -355,12 +354,12 @@ interest_plot<-function(wordlist,termDocumentMatrix,by.var=NULL,byvarname=""){
 interest_plot_bydoc<-function(wordlist,termDocumentMatrix){
   tempframe<-data.frame(as.matrix(termDocumentMatrix[wordlist,]))
   tempframe$word<-row.names(tempframe)
-  tempframe<-melt(tempframe,id=c("word"))
+  tempframe<-reshape2::melt(tempframe,id=c("word"))
   tempframe$variable<-as.character(tempframe$variable) %>% stringr::str_trunc(.,20,side="left")
   if(length(wordlist)>1){
-    ggplot(tempframe, aes(variable, value, fill=word)) + geom_bar(position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12),panel.background=element_blank())+xlab("")+ylab("Frequency")+scale_fill_pander()
+    ggplot(tempframe, aes(variable, value, fill=word)) + geom_bar(position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12),panel.background=element_blank())+xlab("")+ylab("Frequency")+ggthemes::scale_fill_pander()
   } else {
-    ggplot(tempframe, aes(variable, value)) + geom_bar(fill="#8ebfad", position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12), panel.background=element_blank())+xlab("")+ylab("Frequency")+scale_fill_pander()
+    ggplot(tempframe, aes(variable, value)) + geom_bar(fill="#8ebfad", position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12), panel.background=element_blank())+xlab("")+ylab("Frequency")+ggthemes::scale_fill_pander()
   }}
 
 #' Generates tornado plot
@@ -384,11 +383,10 @@ tornadoCompare<-function(termmatrix,pickword,frequency,nwords) {
   bothgen<-as.TermDocumentMatrix(bothgen,weighting=weightTf) 
   bothgen$dimnames$Docs<-c("Chosen","Inverse")
   top10<-unique(c(sapply(1:2,function(X) sort(bothgen[,X]$v,decreasing=TRUE,index.return=T)$ix[1:nwords])))
-  bothgen<-melt(as.matrix(bothgen[top10,]))
+  bothgen<-reshape2::melt(as.matrix(bothgen[top10,]))
   bothgen$value[bothgen$Docs=="Inverse"]<-bothgen$value[bothgen$Docs=="Inverse"]*-1
   ggplot(bothgen)+geom_bar(aes(x=Terms,y=value,fill=as.factor(Docs)),stat="identity",position=position_dodge(width=0.0))+coord_flip()+theme_minimal()+scale_fill_brewer("Document",palette="Dark2")+ylab("relative frequency")
 }
-
 
 
 #' Creates ggplot of wordcounts by document, allowing external characteristics.
@@ -406,11 +404,11 @@ interest_plot_bydoc_char<-function(wordlist,termDocumentMatrix,doccharacteristic
   termDocumentMatrix$dimnames$Docs<-doccharacteristic
   tempframe<-data.frame(as.matrix(termDocumentMatrix[wordlist,]))
   tempframe$word<-row.names(tempframe)
-  tempframe<-melt(tempframe,id=c("word"))
+  tempframe<-reshape2::melt(tempframe,id=c("word"))
   if(length(wordlist)>1){
-    ggplot(tempframe, aes(variable, value, fill=word)) + geom_bar(position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12),panel.background=element_blank())+xlab("")+ylab("Frequency")+scale_fill_pander()
+    ggplot(tempframe, aes(variable, value, fill=word)) + geom_bar(position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12),panel.background=element_blank())+xlab("")+ylab("Frequency")+ggthemes::scale_fill_pander()
   } else {
-    ggplot(tempframe, aes(variable, value)) + geom_bar(fill="#8ebfad", position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12), panel.background=element_blank())+xlab("")+ylab("Frequency")+scale_fill_pander()
+    ggplot(tempframe, aes(variable, value)) + geom_bar(fill="#8ebfad", position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12), panel.background=element_blank())+xlab("")+ylab("Frequency")+ggthemes::scale_fill_pander()
   }}
 
 
@@ -431,7 +429,7 @@ wordcount_table<-function(wordlist,termDocumentMatrix,doccorpus,trunc=FALSE,raw=
   truelist<-unique(unlist(sapply(wordlist, function(X) which(str_detect(termDocumentMatrix$dimnames$Terms,X)),USE.NAMES = FALSE)))
   tempframe<-data.frame(as.matrix(termDocumentMatrix[truelist,]))
   tempframe$word<-row.names(tempframe)
-  tempframe<-melt(tempframe,id=c("word"))
+  tempframe<-reshape2::melt(tempframe,id=c("word"))
   tempframe$variable<-as.character(tempframe$variable)
   tempframe<-dplyr::filter(tempframe, value>0)
   tempframe<-tempframe[order(nchar(tempframe$word),tempframe$value,decreasing=c(F,T)),]

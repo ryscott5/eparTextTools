@@ -4,7 +4,7 @@
 \alias{allDocs}
 \title{Calls getTextR on all files in a directory joining into corpus.}
 \usage{
-allDocs(directory, SkiponError = TRUE)
+allDocs(directory, SkiponError = FALSE)
 }
 \arguments{
 \item{directory}{Folder to read files from'}
