@@ -10,10 +10,9 @@ The vignettes below provide descriptions of common tasks.
 
 # Vignettes
 
-##[Intro to Portfolio Review](http://htmlpreview.github.io/?https://github.com/ryscott5/eparTextTools/vignettes/Intro_to_Portfolio_Revew.html)
+##[Intro to Portfolio Review](http://htmlpreview.github.io/?https://raw.githubusercontent.com/ryscott5/eparTextTools/master/vignettes/Intro_to_Portfolio_Review.html)
 
-##[Google Directions](http://htmlpreview.github.io/?https://github.com/ryscott5/eparTextTools/vignettes/GoogleDirections.html)
+##[Google Directions](http://htmlpreview.github.io/?https://raw.githubusercontent.com/ryscott5/eparTextTools/master/vignettes/GoogleDirections.html)
 
-##[Extracting Information from Web Forms](http://htmlpreview.github.io/?https://github.com/ryscott5/eparTextTools/vignettes/Extracting_From_Forms.html)
-(http://htmlpreview.github.io/?)
+##[Extracting Information from Web Forms](http://htmlpreview.github.io/?https://raw.githubusercontent.com/ryscott5/eparTextTools/master/Extracting_From_Forms.html)
 
