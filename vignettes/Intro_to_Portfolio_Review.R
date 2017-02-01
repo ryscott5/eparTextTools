@@ -10,24 +10,24 @@ example_documents()
 corpus1<-allDocs(directory="demo.docs.folder",SkiponError=FALSE)
 jgc()
 
-## ---- echo=TRUE, results='hide',eval=FALSE-------------------------------
-#  lapply(corpus1,function(X){X$meta})[[1]]
+## ---- echo=TRUE----------------------------------------------------------
+lapply(corpus1,function(X){X$meta})[[1]]
 
 ## ---- echo=TRUE, results='asis'------------------------------------------
+
+#cleans elements of corpus
 corpus2<-doc_clean_process(corpus1)
+
+#converts corpus into term document matrix, removing terms that occur infrequently (can be adjusted by manipulating that .6)
 tdm<-TermDocumentMatrix(corpus2) %>% removeSparseTerms(.,.6)
 
 ## ----echo=TRUE, results='asis'-------------------------------------------
+#Searches corpus 1 for the words gender and access based and returns counts based on the term document matrix we built above.
 wordcount_table(c("gender","access"),tdm,corpus1)
 
 ## ----echo=TRUE, results='asis'-------------------------------------------
 tout<-wordcount_table(c("gender","access"),tm::TermDocumentMatrix(corpus2,control=list(weighting=function(X) tm::weightTfIdf(X, normalize=FALSE))),corpus1,raw=T)
 head(tout[,1:3])
-
-## ----echo=TRUE, results='asis'-------------------------------------------
-word_heatmap(tdm,6)
-
-word_heatmap(tdm,pickwords=c("women","gender","access","land","right","work","labor","yield","security"))
 
 ## ----echo=TRUE, results='asis'-------------------------------------------
 tdm[,as.vector(tdm["gender",])>1] %>% .[,as.vector(.["women",])>1] %>% word_heatmap(.,20)
@@ -49,6 +49,11 @@ interest_plot_bydoc(c("women","farmer","school"),tdm[,1:5]) %>% plotly::ggplotly
 
 ## ------------------------------------------------------------------------
 TermDocumentMatrix(corpus2[1:10],control=list(weighting=function(x) weightSMART(x))) %>% interest_plot_bydoc(c("women","farmer","school"),.) %>% plotly::ggplotly() 
+
+## ----echo=TRUE, results='asis'-------------------------------------------
+word_heatmap(tdm,6)
+
+word_heatmap(tdm,pickwords=c("women","gender","access","land","right","work","labor","yield","security"))
 
 ## ------------------------------------------------------------------------
 jgc()

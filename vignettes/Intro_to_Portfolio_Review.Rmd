@@ -12,7 +12,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This tookit provides a set of resources for analyzing textual documents using the R programming language for the conduct of portfolio analysis and review. The tools rely on text mining, natural language processing, and machine learning programs developed by other R users and as such heavily relies on code developed by other packages. Thus, it may be thought of as a set of tools combining other packages and thus enabling portfolio review rather than a new package for conduct of text analysis. 
+This tookit provides a set of resources for analyzing textual documents using the R programming language for the conduct of portfolio analysis and review. The tools rely on text mining, natural language processing, and machine learning programs developed by other R users, and as such heavily relies on code developed by other packages. Thus, it may be thought of as a set of tools combining other packages and thus enabling portfolio review rather than a new package for conduct of text analysis. 
 
 ## Introduction
 
@@ -30,22 +30,33 @@ We propose and demonstrate the use of data analytic tools including natural lang
 
 ## Portfolio Review Focus
 
-We begin by addressing the basic question, "how have the research projects conducted by the Evans School Policy Analysis and Research (EPAR) group informed the three aims of the research foci, specifically gender, adoption, and measurement, and what potential synergies exist across these current research topics which may inform the comparative advantage of the EPAR research group?"
+We begin by addressing the basic question:
+
+***How have the research projects conducted by the Evans School Policy Analysis and Research (EPAR) group informed the three aims of the research foci, specifically gender, adoption, and measurement?***
+
+Second,
+
+***what potential synergies exist across these current research topics which may inform the comparative advantage of the EPAR research group?***
 
 Within each of the three-research foci, we demonstrate how the tools we are developing can be applied for addressing a key question that may face an organization like ours.
 
-The package can be installed by using the command,
+##Installing the package.
+
+Because many of the tools run here take time and depend on externally installed packages, it might be easier to run the code on an external server rather than working to ensure every package is installed at your workstation. To facilitate your setting up a server, you can find directions for how to set up a Google Cloud Compute insance at [this link](http://htmlpreview.github.io/?https://raw.githubusercontent.com/ryscott5/eparTextTools/master/vignettes/GoogleDirections.html).
+
+The package, epartexttools, can be installed by using the command,
 ```{r,eval=FALSE}
 devtools::install_github("ryscott5/epartexttools")
 ```
+
+Prior to loading the package, it is very important to first set the java parameters to a larger "swap" size which is done via the following code, thus, prior to calling library, the code below expands the java limit to 4 GB. 
 
 ```{r}
 options(java.parameters = "-Xmx4g")
 library(epartexttools)
 ```
 
-##Planned method of study
-## Q1 What research targets gender, adoption, and measurement?
+##Processing Documents
 
 We begin by reading in a corpus. The EPAR demonstration corpus can be read in and downloaded using the example_documents command which will create a folder titled "demo.docs.folder" in the current working directory. The downloaded documents can then be loaded usingthe allDocs() command. Documents are read into R as a textual corpus--the method used by the TM package. This enables preservation of document metatdata alongside document text. Metadata such as ids and timestamps is stored in the .$meta location of each corpus.
 
@@ -56,28 +67,51 @@ corpus1<-allDocs(directory="demo.docs.folder",SkiponError=FALSE)
 jgc()
 ```
   
-Currently, allDocs supports parsing of txt, pdf,docx, doc, or txt files. However, it is itself a wrapper which reads a directory files using the getTextR function, which itself utilizes modified versions of the read_doc, readPDF, or readPlain functions from the tm package, and the read_docx function from qdapTools. Once documents are read in, the metadata from the documents can be extracted by loooping through elements included within the document, for example;
+Currently, the allDocs  command supports parsing of txt, pdf,docx, doc, or txt files. However, it is itself a wrapper which reads a directory files using the getTextR function, which itself utilizes modified versions of the read_doc, readPDF, or readPlain functions from the tm package, and the read_docx function from qdapTools. Once documents are read in, the metadata from the documents can be extracted by loooping through elements included within the document, for example;
 
-```{r, echo=TRUE, results='hide',eval=FALSE}
+```{r, echo=TRUE}
 lapply(corpus1,function(X){X$meta})[[1]]
 ```
 
 This method of reading in documents treats all documents as unstructured and keeps all elements of text included within a document. It is thus useful for characterizing batches of documents for which there is no common structure. If a common structure does exist for documents, then elements of a document can be extracted using pattern matching (via stringr) or via the tools described in the "Structured Document Analysis" vignette. 
 
+
+When beginning a text analysis process, a good starting point is consideration of the is the unit of analysis which we will use for a study. On the one hand, each document may represent a theory of policy change or for a program under study. More than likely however, within a given document or proposal description, more than one theory of change or pathway will be described. Clustering documents in a way that assigns each proposal to a single categegory or cluster would ignore this potential variation. Luckily for the purposes of portfolio review, we are not the first to recognize that bodies of text are not monolithic entities! in fact, a whole series of text analytic progams have been develop that attempt to understand the semantic meanings within text, the connections between areas of text, and how near and far apart bodies of text are associated. 
+
+As a start, it is useful to step back and reconsider what a "document" entails. While up to this point we have considered each unique PDF, docx, or doc as a "document" for study, taking a liberal approach to the word "document" will enable a more fine-grained approach to text analysis. For example, a document could refer to a sentence or a paragraph. Or inversely, a document could refer to a group of documents which are all part of one proposal. As such, the term document can be somewhat confusing!
+
+For the purposes of clarity, it is thus easier to think about a set of documents as a set of strings or a set of character vectors. For each string--which might represent an entire proposal or a just a sentence from a proposal depending on the question at hand-- a researcher might decide on a set number of variables, and they could construct a spreadsheet where in one column are a set of strings, and in the other columns are features describing those strings such as funding agency, year, author, grant status, etc. Just as in an introductory statistics class the unit of anlysis is the rows in the spreadsheet while the columns represent variable. Text is just one variable we might consider in an analysis. Moreover, we might aggregate or disagregate text into bigger or larger chunks thus changing the unit of anlysis.
+
+When we break text into smaller chunks it is generally refered to as tokenization. Joining segments of text is concatonization.  When we count word frequencies, we are tokenizing text into a words. We then count of often each word occurs in each document--this is really no different than seeing how many people live in a certain county within a dataset or attmepting to count how many farmers adopted a certain seed variety. 
+
 ###Cleaning and Parsing Text
-Texts are stored in the corpus as character strings facilitating use of different analysis packages. For addressing the first research question-- "What research targets gender, adoption and measurement?" a basic text mining approach that relies on word frequencies, counts, and occurances of words may be optimal. For this, we may want to perform common tasks such as removing whitespace, eliminating stopwords, removing punctuation, and stemming documents. All of these are accomplished rapidly by the doc_clean_process() command which streamlines functionality from the tm package for rapid portfolio review. The second command, TermDocumentMatrix creates a word frequency matrix and removes sparse terms allowing graphical and exploratory analysis of text.
+Within R texts are stored in the corpus as character strings facilitating use of different analysis packages. While we can break those texts into smaller segements or expand them into larger segments, we often want to do so in a systematic way. To begin, we will explore texts with the unit of analysis being individual reports which were downloaded to build the demo dataset. Each report is a study from the EPAR Website.
+
+
+
+While we could take the texts as in, there are lots of features in text we generally dont care much about--blank lines, periods, capitalization, white spaces, margins, random-chunks-of-meaningless-text. As a result, we *may* want to perform common tasks such as removing whitespace, eliminating stopwords (boring words), removing punctuation, and stemming (taking words down to their roots). All of these are accomplished rapidly by the doc clean process  command which streamlines functionality from the tm package for rapid portfolio review. It tokenizes documents into words and then stems words before joining them back into a a corpus. 
+
+A second command, TermDocumentMatrix, creates a word frequency matrix and removes sparse terms allowing graphical and exploratory analysis of text. A Term Document Matrixes structures a group of text into a matrix where for every word there is a count of how often that word occurs wihtin a given document. Again, remember, our unit of analysis is going to be a report, so  we can use a term document matrix to study how term usage varies across those reports. A Term Document Matrix, however, stores, documents in columns and words in each row. Notice, the unit of anlysis could thus be either words (with counts in each report) or reports (which counts of words in each). 
 
 ```{r, echo=TRUE, results='asis'}
+
+#cleans elements of corpus
 corpus2<-doc_clean_process(corpus1)
+
+#converts corpus into term document matrix, removing terms that occur infrequently (can be adjusted by manipulating that .6)
 tdm<-TermDocumentMatrix(corpus2) %>% removeSparseTerms(.,.6)
 ```
 
 
-To begin exploring documents, we highlight two commands which provide useful interfaces for seaching documents and clustering documents. When exploring a textual corpora, one often has some sort of an idea of what kinds of information they are interested in. For exa,ple, for the above questions we might be interested in what documents discuss terms such as women, gender, access.
+##Counting, describing, and mining for what research targets gender, adoption, and measurement?
+
+
+To begin exploring documents, we highlight two commands which provide useful interfaces for seaching documents and clustering documents. When exploring a textual corpora, one often has some sort of an idea of what kinds of information they are interested in. For example, for the above questions we might be interested in what documents discuss terms such as women, gender, access.
 
 The function wordcount_table() is a useful starting point-- it allows us to search for word frequencies in documents, pulling counts of how many times a word occurs in various documents, and weighting that count by the length of the document if we so desire.
 
 ```{r,echo=TRUE, results='asis'}
+#Searches corpus 1 for the words gender and access based and returns counts based on the term document matrix we built above.
 wordcount_table(c("gender","access"),tdm,corpus1)
 ```
 
@@ -89,13 +123,6 @@ tout<-wordcount_table(c("gender","access"),tm::TermDocumentMatrix(corpus2,contro
 head(tout[,1:3])
 ```
 
-For clustering we can utilize the d3heatmap package to construct a heatmap of which words are the most common (y axis) across a set of documents (x axis) where the user can select the number of words they are interested in (6 in demo).
-
-```{r,echo=TRUE, results='asis'}
-word_heatmap(tdm,6)
-
-word_heatmap(tdm,pickwords=c("women","gender","access","land","right","work","labor","yield","security"))
-```
 
 The tdm object can be edited to narrow the graphical information presented, for example if we are only interested words within documents which contain the word women, we can use piping to structure the tdm for the graph. The following code creates a heatmap for documents where gender and women both occur at least once, but then clusters those documents based on the 20 most common words across the entire corpus. 
 
@@ -131,7 +158,21 @@ By editing the term document matrix to include weighting, each of these commands
 TermDocumentMatrix(corpus2[1:10],control=list(weighting=function(x) weightSMART(x))) %>% interest_plot_bydoc(c("women","farmer","school"),.) %>% plotly::ggplotly() 
 ```
 
-These approaches can provide useful exploration, but to get at the key research questions, it can be beneficial to begin to explore how documents are related. If we are interested in identifying research that targets gender, adoption, and measurement respectively, we might first start by exploring words related to gender. 
+
+
+While tokenization into words is great, we often want to know how various words go together and how words form sentences that produce meaning and finally (eventually) causal processses.
+
+Within text analysis, document clustering refers to the grouping of documents into a set of categories based on their semantic concepts. From a program evaluation or portfolio review perspective clustering documents is useful because it can allow us to move beyond user-generated queries to allowing a set of textual data provide evidence about underlying theories of change or policy processes.
+
+For initial clustering of text, we can utilize the d3heatmap package to construct a heatmap of which words are the most common (y axis) across a set of documents (x axis) where the user can select the number of words they are interested in (6 in demo).
+
+```{r,echo=TRUE, results='asis'}
+word_heatmap(tdm,6)
+
+word_heatmap(tdm,pickwords=c("women","gender","access","land","right","work","labor","yield","security"))
+```
+
+Perhaps, alternatively we would like to know which words are most highly associated with another word. Here, we generate a table where we show words which occur most commonly with the word gender within the corpus.
 
 ```{r}
 jgc()
@@ -146,32 +187,9 @@ tornadoCompare(tdm,c("gender","equal","femal"),3,10)
 
 Based on this, we might notice that seasons and school are relatively more frequent for research projects targetting gender as are system related studies and studies of households.
 
-
 ##Document Clustering
 
-Within text analysis, document clustering refers to the grouping of documents into a set of categories based on their semantic concepts. From a program evaluation or portfolio review perspective clustering documents is useful because it can allow us to move beyond user-generated queries to allowing a set of textual data provide evidence about underlying theories of change or policy processes.
-
-A starting question, however, is the unit of analysis at which we would consider a policy theory to be operating at. On the one hand, each document may represent a theory. More than likely however, within a given document or proposal description, more than one theory of change or pathway will be described. Clustering documents in a way that assigns each proposal to a single categegory or cluster would ignore this potential variation. Luckily for the purposes of portfolio review, we are not the first to recognize that bodies of text are not monolithic entities! in fact, a whole series of text analytic progams have been develop that attempt to understand the semantic meanings within text, the connections between areas of text, and how near and far apart bodies of text are associated. 
-
-As a start, it is useful to step back and reconsider what a "document" entails. While up to this point we have considered each unique PDF, docx, or doc as a "document" for study, taking a liberal approach to the word "document" will enable a more fine-grained approach to text analysis. For example, a document could refer to a sentence or a paragraph. Or inversely, a document could refer to a group of documents which are all part of one proposal. As such, the term document can be somewhat confusing!
-
-For the purposes of clarity, it is thus easier to think about a set of documents as a set of strings or a set of character vectors. For each string--which might represent an entire proposal or a just a sentence from a proposal depending on the question at hand-- a researcher might decide on a set number of variables, and they could construct a spreadsheet where in one column are a set of strings, and in the other columns are features describing those strings such as funding agency, year, author, grant status, etc. Just as in an introductory statistics class the unit of anlysis is the rows in the spreadsheet while the columns represent variable. Text is just one variable we might consider in an analysis. Moreover, we might aggregate or disagregate text into bigger or larger chunks thus changing the unit of anlysis.
-
-When we break text into smaller chunks it is generally refered to as tokenization. Joining segments of text is concatonization. You have already liberally applied tokenization in the excersizes above even if you did not realize it at the time. When we count word frequencies, we are tokenizing text into a words. We then count of often each word occurs in each document--this is really no different than seeing how many people live in a certain county within a dataset or attmepting to count how many farmers adopted a certain seed variety. 
-
-While tokenization into words is great, we often want to know how various words go together and how words form sentences that produce meaning and finally (eventually) causal processses.
-
-##Other approaches
-
-There are many approaches to these challenges with R. an emerging method is TidyText which was just emerging at the time this project was starting http://tidytextmining.com/index.html 
-
-
-##our approach
-1. break documents into paragraphs
-2. model the topics within paragraphs
-3. cluster words,paragraphs, documents
-4. extract relevatn causal patterns
-
+In the above analysis, there was a brief intro into document clustering for the creation of the heatmap of words. However, clustering of documents and words is the basis of much of the automated portfolio review toolset and so we will go into it in more detail throughout the rest of the vignette.
 
 
 ```{r,eval=F}
