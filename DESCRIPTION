@@ -8,7 +8,7 @@ Description: This tookit provides a set of resources for analyzing textual docum
 Depends: R (>= 3.1.0)
 License: https://www.tldrlegal.com/l/mit
 LazyData: true
-Depends:
+Imports:
   tm,
   ggplot2, 
   Rcpp,
@@ -22,7 +22,6 @@ Depends:
   reshape2,
   shiny,
   plotly,
-Imports:
   downloader,
   DT,
   wordcloud,
@@ -43,9 +42,9 @@ Imports:
   corrplot,
   pryr,
   openNLPmodels.en,
-  lubridate,pbapply,
+  lubridate,
+  pbapply,
   devtools,
-  tm.plugin.mail,
   data.table,
   igraph,
   networkD3,
@@ -54,7 +53,9 @@ Imports:
   docxtractr,
   xml2,
   RISmed,
+  knitr,
+  rmarkdown
 RoxygenNote: 5.0.1.9000
-Suggests: knitr,
-    rmarkdown
+Suggests: 
+  tm.plugin.mail,
 VignetteBuilder: knitr

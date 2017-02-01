@@ -192,8 +192,8 @@ readPDF2<-function (engine = c("xpdf", "Rpoppler", "ghostscript", "Rcampdf","cus
 #' @description  This function will read from a folder documents of the class pdf, docx, doc or txt.
 #' @examples
 #' allDocs("folder")
-allDocs<-function(directory,onError="skip"){
-  if(onError=="skip"){
+allDocs<-function(directory,SkiponError=TRUE){
+  if(SkiponError==TRUE){
     temp<-lapply(file.path(directory,list.files(directory)),function(FILENAME){
       try(getTextR(FILENAME))})
     temp<-temp[sapply(temp,class)!="character"]
@@ -445,21 +445,21 @@ wordcount_table<-function(wordlist,termDocumentMatrix,doccorpus,trunc=FALSE,raw=
 colnames(sents)<-c("Word","Document","Count","String")
 sents<-filter(sents,nchar(String)>0)
 if(raw==TRUE){data.table::data.table(sents)} else {
-  datatable(sents, options = list(columnDefs = list(list(
+  DT::datatable(sents, options = list(columnDefs = list(list(
     targets = 4,
-    render = JS(
+    render = DT::JS(
       "function(data, type, row, meta) {",
       "return type === 'display' && data.length > 50 ?",
       "'<span title=\"' + data + '\">' + data.substr(0, 50) + '...</span>' : data;",
       "}")
   ),list(
     targets = 2,
-    render = JS(
+    render = DT::JS(
       "function(data, type, row, meta) {",
       "return type === 'display' && data.length > 20 ?",
       "'<span title=\"' + data + '\">' + data.substr(0, 20) + '...</span>' : data;",
       "}")
   )),
   dom = 'Bfrtip',
-  buttons = c('csv', 'excel')), extensions = 'Buttons', callback = JS('table.page(3).draw(false);'),filter="top")
+  buttons = c('csv', 'excel')), extensions = 'Buttons', callback = DT::JS('table.page(3).draw(false);'),filter="top")
   }}

@@ -17,6 +17,8 @@ wordcount_table(wordlist, termDocumentMatrix, doccorpus, trunc = FALSE,
 \item{trunc}{should filenames be truncated in output table}
 
 \item{raw}{if true then outputs a data.table if false then produces an htmltable allowing csv/excel export. the resulting table can be saved using the saveWidgets command in htmlwidgets.}
+
+\item{weighting}{passed to tm::TermDocumentMatrix (by default is weightTf)}
 }
 \value{
 a data.table or DT datatable depending on if raw is set to true or false.

@@ -52,7 +52,7 @@ We begin by reading in a corpus. The EPAR demonstration corpus can be read in an
 
 ```{r, echo=TRUE, results='hide'}
 example_documents()
-corpus1<-allDocs("demo.docs.folder")
+corpus1<-allDocs(directory="demo.docs.folder",SkiponError=FALSE)
 jgc()
 ```
   
