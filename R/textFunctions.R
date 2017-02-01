@@ -420,6 +420,7 @@ interest_plot_bydoc_char<-function(wordlist,termDocumentMatrix,doccharacteristic
 #' @param wordlist list of words
 #' @param doccorpus original document corpus
 #' @param trunc should filenames be truncated in output table
+#' @param weighting passed to tm::TermDocumentMatrix (by default is weightTf)
 #' @param raw if true then outputs a data.table if false then produces an htmltable allowing csv/excel export. the resulting table can be saved using the saveWidgets command in htmlwidgets.
 
 #' @return a data.table or DT datatable depending on if raw is set to true or false.
@@ -434,14 +435,13 @@ wordcount_table<-function(wordlist,termDocumentMatrix,doccorpus,trunc=FALSE,raw=
   tempframe$variable<-as.character(tempframe$variable)
   tempframe<-dplyr::filter(tempframe, value>0)
   tempframe<-tempframe[order(nchar(tempframe$word),tempframe$value,decreasing=c(F,T)),]
-  doccorpus<-corpus1
   sents<-adply(tempframe,.margins=1,.fun=function(X){
     sframe<-unlist(tokenizers::tokenize_sentences(paste(textreg::convert.tm.to.character(doccorpus[which(gsub("%",".",names(doccorpus),fixed=TRUE)==X[,2])]),collapse=" ")))
     sframe<-sframe[unique(which(str_detect(sframe, X[,1])))] %>% paste(str_trim(.),collapse="...   ")
     sframe
   })
   
-  if(trunc==TRUE) {temprame$variable<-tempframe$variable %>% stringr::str_trunc(.,20,side="left")}
+  if(trunc==TRUE) {tempframe$variable<-tempframe$variable %>% stringr::str_trunc(.,20,side="left")}
 colnames(sents)<-c("Word","Document","Count","String")
 sents<-filter(sents,nchar(String)>0)
 if(raw==TRUE){data.table::data.table(sents)} else {
