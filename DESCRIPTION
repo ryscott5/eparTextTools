@@ -44,7 +44,6 @@ Imports:
   downloader,
   corrplot,
   pryr,
-  openNLPmodels.en,
   lubridate,
   pbapply,
   devtools,
@@ -57,8 +56,11 @@ Imports:
   xml2,
   RISmed,
   knitr,
-  rmarkdown
+  rmarkdown,
+  tokenizers,
+  textreg
 RoxygenNote: 5.0.1.9000
 Suggests: 
   tm.plugin.mail,
+  openNLPmodels.en,
 VignetteBuilder: knitr

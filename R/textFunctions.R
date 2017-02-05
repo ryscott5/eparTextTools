@@ -323,7 +323,7 @@ word_heatmap<-function(termDocumentMatrix,wordcount,minfreq=2,col_labels=paste(1
 #'
 #' @param termDocumentMatrix tm TermDocumentMatrix object
 #' @param wordlist list of words
-#' @param by.var can specify variable to group documents by.
+#' @param by.var can specify variable to group documents by
 #' @param name plottable name of by.var 
 #' @return a ggplot2 object
 #' @seealso \code{\link{ggplot2}} 
@@ -420,7 +420,6 @@ interest_plot_bydoc_char<-function(wordlist,termDocumentMatrix,doccharacteristic
 #' @param trunc should filenames be truncated in output table
 #' @param weighting passed to tm::TermDocumentMatrix (by default is weightTf)
 #' @param raw if true then outputs a data.table if false then produces an htmltable allowing csv/excel export. the resulting table can be saved using the saveWidgets command in htmlwidgets.
-
 #' @return a data.table or DT datatable depending on if raw is set to true or false.
 #' @description  This function is useful for looking at occurences of words within documents.
 #' @examples
