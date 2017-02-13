@@ -875,9 +875,6 @@ cat(paste("tables saved to",file.path(workingfolder,"textDB")))
 }
 
 
-
-fulltable<-filter(fulltable,)
-
 SNetTXTCALL<-function(doc,dontprintoutput=T){
   doc<-gsub("'","’",doc)
   writeLines(doc,"~/input.txt")
@@ -889,7 +886,6 @@ SNetTXTCALL<-function(doc,dontprintoutput=T){
     temp}) %>% bind_rows(.id="Sent")
   view_out
 }
-install.packages("readr")
 view_out<-lapply(unlist(strsplit(readr::read_file("~/output.txt"),split="\n\n")),function(X){
 temp<-read.delim(textConnection(X),header=F)
 closeAllConnections()

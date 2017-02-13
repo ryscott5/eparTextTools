@@ -2,6 +2,7 @@
 
 export(AnnotateVerbsTopicJoin)
 export(PreTopicFrame)
+export(PreTopicFrame2)
 export(ProcessforAPI)
 export(allDocs)
 export(assocPTable)
