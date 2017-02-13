@@ -14,10 +14,6 @@ expandJava<-function(){options(java.parameters = "-Xmx6000m")}
 
 #package depends on xpdf... on mac, install via brew install xpdf and follow instructions.
 
-
-
-
-
 demandwordvec<-function(){
   try({if (!require(wordVectors)) {
   if (!(require(devtools))) {
