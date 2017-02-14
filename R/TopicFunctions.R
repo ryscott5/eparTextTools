@@ -886,10 +886,3 @@ SNetTXTCALL<-function(doc,dontprintoutput=T){
     temp}) %>% bind_rows(.id="Sent")
   view_out
 }
-view_out<-lapply(unlist(strsplit(readr::read_file("~/output.txt"),split="\n\n")),function(X){
-temp<-read.delim(textConnection(X),header=F)
-closeAllConnections()
-temp}) %>% bind_rows(.id="Sent")
-tail(view_out)
-closeAllConnections()
-?textConnection
