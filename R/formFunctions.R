@@ -4,7 +4,6 @@
 #' @param docxml The xml table for a word document.
 #' @param string1 String to start capture on.
 #' @param string2 String to end capture on.
-
 #' @return a character vector of length one
 #' @export
 #' @description Read the primary table from a Gates proposal word document, keeping column names. 

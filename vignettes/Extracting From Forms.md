@@ -1,7 +1,7 @@
 ---
 title: "Scraping Structured Documents"
 author: "Ryan P Scott"
-date: "2017-01-25"
+date: "2017-02-15"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Scraping Structured Documents}
@@ -16,6 +16,7 @@ In terms of structured documents, there are multple kinds a user may run across.
 #Demonstration
 
 ```r
-tfiles<-list.files("../epar/PracticeDocs2/files",full.names=T)
+tfiles<-list.files("../CRO_form_demo",full.names=T)
 tfiles<-tfiles[str_detect(tolower(tfiles),"docx")]
 ```
+
