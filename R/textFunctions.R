@@ -91,6 +91,14 @@ readMails<-function(folder_in,newmailsdirectory){
   mailsc<-Corpus(mails)
   mailsc}
 
+#' Tests if save directory exists and creates new one if not
+#'
+#' @param dir directory
+#' #' @description  This function does the quite useful task of making a workingfolder object in the environment.
+makeworking<-function(dir){if(dir.exists(dir)==FALSE) {dir.create(dir)} else {cat("Good News, Directory Already Exists Containing:",paste(list.files("Research.Grants"),collapse="\n"))}
+  workingfolder<<-dir}
+
+
 #' Creates directory and copies from old to new.
 #'
 #' @param from Old directory
