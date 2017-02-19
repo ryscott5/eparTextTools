@@ -205,10 +205,88 @@ hr {
 
 <p>In terms of structured documents, there are multple kinds a user may run across. First of all, a structured PDF may have OCR labelled text that is in a similar location across a wide body of documents. These are among the more complicated documents to code as one has to rely on characters either being recognized the same across a range of responses or the text information must remained stored in a similar manner across the corpus. Word documents can have structured form fields&ndash;this is much less of a problem for extracting data, and we can rely on commmon tools such as Microsoft Access to batch process results. However, this vignette demonstrates how to utilize R to extract necessary information from form fields rapidly by visually assessing the form document and deciding what information is needed for a database.</p>
 
-<p>#Demonstration</p>
+<p>#Demonstration
+Here, we load agendas from some meetings from the state of Colorado. These tools are mostly built for word files so that&#39;s what we demonstrate here.</p>
 
-<pre><code class="r">tfiles&lt;-list.files(&quot;../CRO_form_demo&quot;,full.names=T)
+<pre><code class="r">tfiles&lt;-list.files(&quot;../../CRO_form_demo&quot;,full.names=T)
 tfiles&lt;-tfiles[str_detect(tolower(tfiles),&quot;docx&quot;)]
+</code></pre>
+
+<p>Word files area really just xml files. To see the contents of a file, you can use the &ldquo;docx_table_view()&rdquo; command.</p>
+
+<pre><code class="r">head(docx_table_view(tfiles[1], export_frame=T,showView=F))
+</code></pre>
+
+<pre><code>##                                                                                                                                                          content
+## 1                                                                                                                       CO Resiliency Framework Services Project
+## 2                                                                                                                                     Week Ending March 14, 2015
+## 3                                                                                                                                                 SUMMARY REPORT
+## 4                                                                                                                                   Task 1: Resiliency Framework
+## 5                                                                                                                                       Activity this past week:
+## 6 Attended all sector committee meetings (except housing) for feedback on drafts and review remaining committee deliverables  - Chang, Jankousky, McClurg w/FEMA
+</code></pre>
+
+<p>We can use that structured information to select common elements. When we are unsure what exactly we need from each document but we know what text comes before and after, we can use the cell_extractor function to then select relevent text. For example, if we want the dates from the files above, we would select &ldquo;CO Resiliency Framework Services Project&rdquo; and &ldquo;SUMMARY REPORT&rdquo; as brackets.</p>
+
+<pre><code class="r">cell_extractor(docx_table_view(tfiles[1],export_frame=T,showView=F)$content,&quot;CO Resiliency&quot;,&quot;SUMMARY&quot;)
+</code></pre>
+
+<pre><code>## [1] &quot;Week Ending March 14, 2015&quot;
+</code></pre>
+
+<p>This can then easily be wrapped through documents.</p>
+
+<pre><code class="r">sapply(tfiles, function(X) tryCatch({cell_extractor(docx_table_view(X,export_frame=T,showView=F)$content,&quot;CO Resiliency&quot;,&quot;SUMMARY&quot;)},error=function(e) {NA}))
+</code></pre>
+
+<pre><code>## Warning in startint:stopint: numerical expression has 2 elements: only the
+## first used
+
+## Warning in startint:stopint: numerical expression has 2 elements: only the
+## first used
+
+## Warning in startint:stopint: numerical expression has 2 elements: only the
+## first used
+
+## Warning in startint:stopint: numerical expression has 2 elements: only the
+## first used
+</code></pre>
+
+<pre><code>##  ../../CRO_form_demo/CRO Weekly rpt 3-14-15.docx 
+##                     &quot;Week Ending March 14, 2015&quot; 
+##  ../../CRO_form_demo/CRO Weekly rpt 3-21-15.docx 
+##                     &quot;Week Ending March 28, 2015&quot; 
+##  ../../CRO_form_demo/CRO Weekly rpt 3-28-15.docx 
+##                     &quot;Week Ending March 28, 2015&quot; 
+##   ../../CRO_form_demo/CRO Weekly rpt 3-7-15.docx 
+##                      &quot;Week Ending March 7, 2015&quot; 
+##  ../../CRO_form_demo/CRO Weekly rpt 4-11-15.docx 
+##                                               NA 
+##  ../../CRO_form_demo/CRO Weekly rpt 4-18-15.docx 
+##                                               NA 
+##  ../../CRO_form_demo/CRO Weekly rpt 4-25-15.docx 
+##                                               NA 
+##   ../../CRO_form_demo/CRO Weekly rpt 4-4-15.docx 
+##                                               NA 
+## ../../CRO_form_demo/CRO Weekly rpt2 2-28-15.docx 
+##                  &quot;Week Ending February 28, 2015&quot; 
+##  ../../CRO_form_demo/CRO weekly rpt 2-14-15.docx 
+##                  &quot;Week Ending February 14, 2015&quot; 
+##  ../../CRO_form_demo/CRO weekly rpt 2-21-15.docx 
+##                  &quot;Week Ending February 21, 2015&quot;
+</code></pre>
+
+<p>Based on the warning, se can see this worked for most of our documents but not all of our documents. One could use the table view command to inspect the files, but we could also use the document cluster command to see how our documents/forms may differ and if that set is meaningfully different. If you had 10000 forms, you obviously couldnt look at them all. </p>
+
+<pre><code class="r">formcluster(tfiles)
+</code></pre>
+
+<p><img src="data:image/png;base64,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" alt="plot of chunk unnamed-chunk-5"/></p>
+
+<p>We might notice that the first four documents are generally somewhat different from the 5th through 11th documents, suggesting we need to do more to think about how to anlalyze these forms.</p>
+
+<pre><code class="r">docx_table_view(tfiles[8])
+docx_table_view(tfiles[1])
 </code></pre>
 
 </body>

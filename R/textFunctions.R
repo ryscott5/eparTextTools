@@ -196,18 +196,20 @@ readPDF2<-function (engine = c("xpdf", "Rpoppler", "ghostscript", "Rcampdf","cus
 #' @description  This function will read from a folder documents of the class pdf, docx, doc or txt.
 #' @examples
 #' allDocs("folder")
-allDocs<-function(directory,SkiponError=FALSE){
+allDocs<-function (directory, SkiponError = FALSE) {
   if(SkiponError==TRUE){
-    temp<-lapply(file.path(directory,list.files(directory)),function(FILENAME){
-      try(getTextR(FILENAME))})
-    temp<-temp[sapply(temp,class)!="character"]
-    temp<-temp[sapply(temp,class)!="error"]
-    temp<-temp[sapply(temp,is.na)==FALSE]
-    do.call(c,temp)
-    } else {
-  do.call(c,lapply(file.path(directory,list.files(directory)),getTextR))
-  }}
-
+    temp <- lapply(file.path(directory, list.files(directory)), 
+                   function(FILENAME) {
+                     try(getTextR(FILENAME))
+                   })
+    temp <- temp[sapply(temp, class) != "character"]
+    temp <- temp[sapply(temp, class) != "error"]
+    temp <- temp[sapply(temp, is.null) != TRUE]
+    do.call(c, temp)
+  } else {
+    do.call(c, lapply(file.path(directory, list.files(directory)),getTextR))
+  }
+}
 #' Cleans documents performing many common tasks .
 #'
 #' @param corpus corpus to clean
