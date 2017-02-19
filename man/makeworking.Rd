@@ -7,10 +7,9 @@
 makeworking(dir)
 }
 \arguments{
-\item{dir}{directory
-#' @description  This function does the quite useful task of making a workingfolder object in the environment.}
+\item{dir}{directory}
 }
 \description{
-Tests if save directory exists and creates new one if not
+This function does the quite useful task of making a workingfolder object in the environment.
 }
 
