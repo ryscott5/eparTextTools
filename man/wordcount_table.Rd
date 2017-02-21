@@ -2,10 +2,10 @@
 % Please edit documentation in R/textFunctions.R
 \name{wordcount_table}
 \alias{wordcount_table}
-\title{creates a table of word counts within a set of documents.}
+\title{Creates a table of word counts within a set of documents.}
 \usage{
 wordcount_table(wordlist, termDocumentMatrix, doccorpus, trunc = FALSE,
-  raw = FALSE)
+  raw = FALSE, onlywordlist = F)
 }
 \arguments{
 \item{wordlist}{list of words}

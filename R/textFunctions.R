@@ -423,8 +423,7 @@ interest_plot_bydoc_char<-function(wordlist,termDocumentMatrix,doccharacteristic
     ggplot(tempframe, aes(variable, value)) + geom_bar(fill="#8ebfad", position = "stack", stat="identity") + theme(axis.text.x=element_text(color="#000000",angle=50, hjust=1, size=12), panel.background=element_blank())+xlab("")+ylab("Frequency")+ggthemes::scale_fill_pander()
   }}
 
-
-#' creates a table of word counts within a set of documents.
+#' Creates a table of word counts within a set of documents.
 #'
 #' @param termDocumentMatrix tm TermDocumentMatrix object
 #' @param wordlist list of words
@@ -434,10 +433,10 @@ interest_plot_bydoc_char<-function(wordlist,termDocumentMatrix,doccharacteristic
 #' @param raw if true then outputs a data.table if false then produces an htmltable allowing csv/excel export. the resulting table can be saved using the saveWidgets command in htmlwidgets.
 #' @return a data.table or DT datatable depending on if raw is set to true or false.
 #' @description  This function is useful for looking at occurences of words within documents
-#' @export.
+#' @export
 #' @examples
 #' wordcount_table(c("gender","nutrition"),TermDocumentMatrix(clcorp),corpus1)
-wordcount_table<-function(wordlist,termDocumentMatrix,doccorpus,trunc=FALSE,raw=FALSE){
+wordcount_table<-function(wordlist,termDocumentMatrix,doccorpus,trunc=FALSE,raw=FALSE,onlywordlist=F){
   truelist<-unique(unlist(sapply(wordlist, function(X) which(str_detect(termDocumentMatrix$dimnames$Terms,X)),USE.NAMES = FALSE)))
   tempframe<-data.frame(as.matrix(termDocumentMatrix[truelist,]))
   tempframe$word<-row.names(tempframe)
@@ -451,9 +450,17 @@ wordcount_table<-function(wordlist,termDocumentMatrix,doccorpus,trunc=FALSE,raw=
     sframe
   })
   
-  if(trunc==TRUE) {tempframe$variable<-tempframe$variable %>% stringr::str_trunc(.,20,side="left")}
-colnames(sents)<-c("Word","Document","Count","String")
-sents<-filter(sents,nchar(String)>0)
+  if(trunc==TRUE) {sents$variable<-sents$variable %>% stringr::str_trunc(.,20,side="left")}
+  
+  colnames(sents)<-c("Word","Document","Count","String")
+  sents<-filter(sents,nchar(String)>0)
+  if(onlywordlist==TRUE){
+    sents<-do.call(rbind,lapply(wordlist,function(W){
+      temp1<-filter(sents, str_detect(Word,W))
+      temp1<-ddply(temp1,.(Document), summarize=T,Count=sum(Count),String=paste(String,collapse="...   "))
+    temp1
+  }))
+}
 if(raw==TRUE){data.table::data.table(sents)} else {
   DT::datatable(sents, options = list(columnDefs = list(list(
     targets = 4,
