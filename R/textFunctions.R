@@ -275,13 +275,14 @@ assocPrettyOneStep<-function(wordlist,termDocumentMatrix,corpus,corrVal=.8){
 #' @param wordcount How many words to graph 
 #' @param minfreq minimum number of times a word should occur to be reported
 #' @param shortendoc Should document names be shortened?
+#' @param allCorpus For plot type 1, would you like the plot for all documents combined?
 #' @return a ggplot2 object.
 #' @seealso \code{\link{ggplot}} 
 #' @export
 #' @description  This function creates bar graphs in ggplot. It can be customized by adding items to the returned object.
 #' @examples
 #' wfplots(TermDocumentMatrix(corpus1),typePlot=1,5,minfreq=5,shortendoc=T)
-wfplots<-function(termDocumentMatrix,typePlot=1,wordcount,minfreq=5,shortendoc=FALSE){
+wfplots<-function(termDocumentMatrix,typePlot=1,wordcount,minfreq=5,shortendoc=FALSE, allCorpus=FALSE){
   mfcomframe<-data.frame(as.matrix(termDocumentMatrix[findFreqTerms(termDocumentMatrix, lowfreq=minfreq),]))
   mfcomframe<-mfcomframe[sort(rowSums(mfcomframe),index.return=TRUE,decreasing=TRUE)$ix[1:wordcount],]
   mfcomframe$word<-row.names(mfcomframe)
@@ -292,9 +293,13 @@ wfplots<-function(termDocumentMatrix,typePlot=1,wordcount,minfreq=5,shortendoc=F
     mfcomframe$variable<-stringr::str_trunc(mfcomframe$variable,side="left",width=20,ellipsis="...")
   }
   if(typePlot==1){
-    plotout<-ggplot(mfcomframe)+geom_bar(aes(x=word,y=value,fill=variable),position="stack",stat="identity")+coord_flip()+ggthemes::theme_pander()+ggthemes::scale_fill_tableau(name="Document")+ylab("Frequency")+xlab("Word")}
-  if(typePlot!=1){
-    plotout<-ggplot(mfcomframe)+geom_bar(aes(x=variable,y=value,fill=word),position="stack",stat="identity")+coord_flip()+ggthemes::theme_pander()+ggthemes::scale_fill_tableau(name="Word",palette="tableau10")+ylab("Frequency")+xlab("Document")}
+    if(allCorpus==TRUE){
+      plotout<-ggplot(mfcomframe)+geom_bar(aes(x=word,y=value),position="stack",stat="identity")+coord_flip()+ggthemes::theme_pander()+ylab("Frequency")+xlab("Word")
+      } else {
+    plotout<-ggplot(mfcomframe)+geom_bar(aes(x=word,y=value,fill=variable),position="stack",stat="identity")+coord_flip()+ggthemes::theme_pander()+ggthemes::scale_fill_tableau(name="Document")+ylab("Frequency")+xlab("Word")
+    }} else {
+    plotout<-ggplot(mfcomframe)+geom_bar(aes(x=variable,y=value,fill=word),position="stack",stat="identity")+coord_flip()+ggthemes::theme_pander()+ggthemes::scale_fill_tableau(name="Word",palette="tableau10")+ylab("Frequency")+xlab("Document")
+    }
   plotout
 }
 
@@ -428,7 +433,8 @@ interest_plot_bydoc_char<-function(wordlist,termDocumentMatrix,doccharacteristic
 #' @param weighting passed to tm::TermDocumentMatrix (by default is weightTf)
 #' @param raw if true then outputs a data.table if false then produces an htmltable allowing csv/excel export. the resulting table can be saved using the saveWidgets command in htmlwidgets.
 #' @return a data.table or DT datatable depending on if raw is set to true or false.
-#' @description  This function is useful for looking at occurences of words within documents.
+#' @description  This function is useful for looking at occurences of words within documents
+#' @export.
 #' @examples
 #' wordcount_table(c("gender","nutrition"),TermDocumentMatrix(clcorp),corpus1)
 wordcount_table<-function(wordlist,termDocumentMatrix,doccorpus,trunc=FALSE,raw=FALSE){

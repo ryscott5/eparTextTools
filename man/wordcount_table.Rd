@@ -24,7 +24,7 @@ wordcount_table(wordlist, termDocumentMatrix, doccorpus, trunc = FALSE,
 a data.table or DT datatable depending on if raw is set to true or false.
 }
 \description{
-This function is useful for looking at occurences of words within documents.
+This function is useful for looking at occurences of words within documents
 }
 \examples{
 wordcount_table(c("gender","nutrition"),TermDocumentMatrix(clcorp),corpus1)
