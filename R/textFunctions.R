@@ -431,6 +431,7 @@ interest_plot_bydoc_char<-function(wordlist,termDocumentMatrix,doccharacteristic
 #' @param trunc should filenames be truncated in output table
 #' @param weighting passed to tm::TermDocumentMatrix (by default is weightTf)
 #' @param raw if true then outputs a data.table if false then produces an htmltable allowing csv/excel export. the resulting table can be saved using the saveWidgets command in htmlwidgets.
+#' @param onlywordlist if true, bins words, otherwise returns all unique matches
 #' @return a data.table or DT datatable depending on if raw is set to true or false.
 #' @description  This function is useful for looking at occurences of words within documents
 #' @export
@@ -449,17 +450,17 @@ wordcount_table<-function(wordlist,termDocumentMatrix,doccorpus,trunc=FALSE,raw=
     sframe<-sframe[unique(which(str_detect(sframe, X[,1])))] %>% paste(str_trim(.),collapse="...   ")
     sframe
   })
-  
   if(trunc==TRUE) {sents$variable<-sents$variable %>% stringr::str_trunc(.,20,side="left")}
-  
   colnames(sents)<-c("Word","Document","Count","String")
   sents<-filter(sents,nchar(String)>0)
   if(onlywordlist==TRUE){
-    sents<-do.call(rbind,lapply(wordlist,function(W){
+    sents<-lapply(wordlist,function(W){
       temp1<-filter(sents, str_detect(Word,W))
-      temp1<-ddply(temp1,.(Document), summarize=T,Count=sum(Count),String=paste(String,collapse="...   "))
+      temp1<-ddply(temp1,.(Document), summarize,Count=sum(Count),String=paste(String,collapse="...   "))
     temp1
-  }))
+  })
+    names(sents)<-wordlist
+    sents<-bind_rows(sents,.id="Word")
 }
 if(raw==TRUE){data.table::data.table(sents)} else {
   DT::datatable(sents, options = list(columnDefs = list(list(

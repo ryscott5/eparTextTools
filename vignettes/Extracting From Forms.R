@@ -1,5 +1,5 @@
 ## ------------------------------------------------------------------------
-tfiles<-list.files("../../CRO_form_demo",full.names=T)
+tfiles<-list.files("~/CRO_form_demo",full.names=T)
 tfiles<-tfiles[str_detect(tolower(tfiles),"docx")]
 
 ## ------------------------------------------------------------------------
@@ -17,5 +17,4 @@ formcluster(tfiles)
 ## ---- eval=F-------------------------------------------------------------
 #  docx_table_view(tfiles[8])
 #  docx_table_view(tfiles[1])
-#  
 

@@ -8,7 +8,6 @@ library(epartexttools)
 ## ---- echo=TRUE, results='hide'------------------------------------------
 example_documents()
 corpus1<-allDocs(directory="demo.docs.folder",SkiponError=FALSE)
-jgc()
 
 ## ---- echo=TRUE----------------------------------------------------------
 lapply(corpus1,function(X){X$meta})[[1]]
@@ -56,14 +55,12 @@ word_heatmap(tdm,6)
 word_heatmap(tdm,pickwords=c("women","gender","access","land","right","work","labor","yield","security"))
 
 ## ------------------------------------------------------------------------
-jgc()
 assocPrettyOneStep("gender",tdm, corpus2,.5)
 
 ## ------------------------------------------------------------------------
 tornadoCompare(tdm,c("gender","equal","femal"),3,10)
 
 ## ----eval=F--------------------------------------------------------------
-#  jgc()
 #  rm(corpus2)
 #  rm(tdm)
 #  workingfolder<-file.path("Research.Grants")
@@ -73,12 +70,9 @@ tornadoCompare(tdm,c("gender","equal","femal"),3,10)
 
 ## ----eval=FALSE----------------------------------------------------------
 #  corpus1<-readRDS(file.path(workingfolder,"corpus.rds"))
-#  jgc()
-#  gc()
 #  BASE_INPUT<-PreTopicFrame(corpus1,15)
 #  BASE_INPUT$out$meta$OpID<-BASE_INPUT$out$meta$Orig
 #  #saves files so you can reload
-#  jgc()
 #  saveRDS(BASE_INPUT,file.path(workingfolder,"base_input1.rds"))
 
 ## ---- eval=FALSE---------------------------------------------------------
@@ -93,7 +87,6 @@ tornadoCompare(tdm,c("gender","equal","femal"),3,10)
 #  getwd()
 #  saveRDS(BASE_INPUT,file.path(workingfolder,"base_input1.rds"))
 #  write.csv(pred1,file.path(workingfolder,"countrypredictions1.csv"))
-#  jgc()
 
 ## ----eval=FALSE----------------------------------------------------------
 #  library(plotly)
@@ -101,7 +94,6 @@ tornadoCompare(tdm,c("gender","equal","femal"),3,10)
 
 ## ----eval=FALSE----------------------------------------------------------
 #  writeFormulaforSTM(BASE_INPUT,workingfolder)
-#  jgc()
 
 ## ----eval=FALSE----------------------------------------------------------
 #  runSTM(workingfolder)

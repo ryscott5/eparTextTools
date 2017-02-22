@@ -1,0 +1,288 @@
+Intro to portfolios
+========================================================
+author: Ryan P Scott
+date: February 2017
+autosize: true
+
+Setting Up a Google Cloud Image
+========================================================
+
+https://cloud.google.com/compute/
+
+```{r, eval=FALSE}
+install.packages("devtools")
+devtools::install_github("cloudyr/googleComputeEngineR")
+```
+
+
+```{r, eval=FALSE}
+library(googleComputeEngineR)
+setwd("H:")
+Sys.setenv("GCE_AUTH_FILE"=list.files("Google Keys",full.names=T)[1])
+gce_global_zone("us-central1-c")
+gce_global_project("epartexttools")
+gce_auth()
+vm <- gce_vm(template="dynamic",
+             dynamic_image="ryscott5/textfree", 
+             name = "trial1",
+             username="ryscott5", 
+             password="temporary",
+             predefined_type = "n1-standard-2",
+             scheduling=list('preemptible'='true'))
+```
+
+What if I want to build a full instance from scratch?
+========================================================
+
+```{r eval=F}
+library(epartexttools)
+RShowDoc("GoogleDirections",package="epartexttools")
+```
+
+Upload data to the cloud
+========================================================
+
+We would ideally like some data to analyze. Lets start with the example epar data. Here, we download research files from the EPAR page. We can use those to begin building a review of EPAR research.
+
+```{r, echo=F}
+library(epartexttools)
+library(plyr)
+library(dplyr)
+```
+
+```{r, eval=F, echo=F}
+example_documents()
+```
+
+```{r}
+list.files("demo.docs.folder",full.names = TRUE)[1:5]
+```
+
+Begin the Workflow
+========================================================
+Establish a working folder--this is a folder we can save output to as we progress through the analysis. When you run the makeworking command, it will establish a new value "workingfolder"..
+
+```{r, include=TRUE}
+epartexttools::makeworking("Research.Grants")
+```
+
+
+Read the Documents
+========================================================
+The allDocs command will read a corpus from a folder, dropping files with errors to build a tm corpus.
+
+```{r eval=F}
+corpus1<-allDocs("demo.docs.folder")
+```
+```{r echo=F}
+corpus1<-readRDS(file.path(workingfolder,"corpus.RDS"))
+```
+
+We then save a copy of the corpus to the workingfolder.
+```{r}
+saveRDS(corpus1,file.path(workingfolder,"corpus.RDS"))
+```
+
+If we call makeworking again, the rds file will appear in the printout
+
+```{r}
+makeworking("Research.Grants")
+```
+
+Meanwhile, the object *corpus1* should be in our environment.
+
+```{r}
+ls()
+```
+
+Working with the corpus
+========================================================
+
+To work with *corpus1*, we can call commands on the corpus.
+
+```{r}
+class(corpus1)
+
+#Number of Documents in the Corpus
+length(corpus1)
+```
+
+Corpus are used in the NLP, openNLP packages, so we can use any command exported from those packages.
+
+```{r}
+NLP::meta(corpus1[1],c("author"))
+```
+
+Basic R Commands
+========================================================
+Because we rely on infrastructure used by other R packages, we can easily leverage tools from other R packages.
+
+For example, the tm package allows structuring a corpus into a [term document matrix](https://en.wikipedia.org/wiki/Document-term_matrix) or document term matrix.
+
+```{r}
+tdm_unclean<-tm::TermDocumentMatrix(corpus1)
+```
+
+TDMs are stored in R as a list, with words stored under the dimnames entry
+```{r}
+names(tdm_unclean$dimnames)
+sample(tdm_unclean$dimnames$Terms,10)
+```
+
+Graphing Word Frequency
+========================================================
+left: 50
+```{r}
+wfplots(tdm_unclean,wordcount=5,
+        shortendoc = T, typePlot=2)
+```
+***
+
+
+**Notice, all of these words are boring!**
+
+* Cleaning documents can help a ton with making our analysis more meaningful.
+* Major steps include: 
+  + stemming words
+  + removing stopwords
+  + removing whitespace
+  + converting to lowercase
+
+[Duke Guide to Cleaning Tools](http://guides.library.duke.edu/c.php?g=289707&p=1930855)
+
+
+Cleaning Documents
+========================================================
+
+The command *doc clean process* is a wrapper that stems removes stopwords, converts to lowercase, and removes whitespace.
+
+```{r, eval=F}
+corpus_cleaned<-epartexttools::doc_clean_process(corpus1)
+saveRDS(corpus_cleaned,file.path(workingfolder, "corpus_cleaned.RDS"))
+```
+
+```{r, echo=F}
+corpus_cleaned<-readRDS(file.path(workingfolder, "corpus_cleaned.RDS")) 
+```
+
+```{r echo=F}
+tdm_cleaned<-TermDocumentMatrix(corpus_cleaned)s
+```
+
+
+*Discussion Question:*  What are some potential drawbacks of each of these cleaning steps?
+
+
+Re-plotting Cleaned Document--Top 5 Words
+========================================================
+```{r}
+wfplots(tdm_cleaned,wordcount=5,
+        shortendoc = T, typePlot=2)
+```
+
+***
+Hopefully, your plot looks a lot more useful!
+
+
+Editing Figures
+========================================================
+
+You can save your figure to an object,then edit that object
+```{r, fig.width=22}
+plot1<-wfplots(tdm_cleaned,wordcount=5,shortendoc = T, typePlot=2)
+plot1+ggtitle("Top 5 Words from EPAR Research")+ggthemes::theme_economist()
+```
+
+
+Other Plot Types
+========================================================
+
+Rather than plotting counts for individual documents, we might want counts for the entire corpus.
+
+```{r}
+plot2<-epartexttools::wfplots(tdm_cleaned,wordcount=5,shortendoc = T, typePlot=1, allCorpus=T)
+plot2+ggthemes::theme_fivethirtyeight()+ggtitle('5 most common words in EPAR research') 
+```
+
+More Plot Types
+========================================================
+
+If we are interested in certain words, we can search for those words by entering a wordlist.
+
+```{r}
+plot3<-epartexttools::interest_plot(tdm_cleaned,wordlist=c("gender","income"))
+plot3+ggthemes::theme_foundation()+ggtitle('Does EPAR do Gender Research?') 
+```
+
+The underlying matrix
+========================================================
+
+We can plot a heatmap showing word freqencies and clustering documents based on the results. Notice, this is just a visual representtion of a term document matrix.
+
+```{r, eval=F}
+epartexttools::word_heatmap(tdm_cleaned,5, minfreq=2))
+```        
+
+Interacting with tables
+========================================================
+
+Graphs are great, but tayloring the analysis to the exact type needed can be difficult. Thus, 
+
+```{r eval=F}
+epartexttools::wordcount_table(wordlist=c("income","gender"),termDocumentMatrix=tdm_cleaned,corpus1,trunc=T,raw=F)
+```
+
+
+Interacting with tables in raw form
+========================================================
+
+We can also interact with unformated tables
+
+```{r}
+tob<-epartexttools::wordcount_table(wordlist=c("sex","gender","wom","female","trans"),termDocumentMatrix=tdm_cleaned,corpus1,trunc=F,raw=T,onlywordlist=T)
+
+```
+
+```{r}
+ggplot(tob)+geom_histogram(aes(x=Count, fill=Word))+theme_minimal()
+```
+
+***
+```{r}
+ggplot(tob)+geom_bar(aes(x=Document,y=Count,fill=Word),stat="identity",position="stack")+coord_flip()
+```
+
+Interacting with tables in raw form
+========================================================
+
+We might use that information to identify documents that include gender and income most frequently.
+
+```{r}
+colnames(tob)
+tob2<-ddply(tob,.(Document),Count=sum(Count),summarize)
+
+tob2<-filter(tob2,Count>=quantile(tob2$Count,.5))
+
+genderDocs<-tdm_cleaned[,which(gsub("%",".",tdm_cleaned$dimnames$Docs)%in%tob2$Document)] %>% tm::removeSparseTerms(sparse=.9)
+indicators<-genderDocs[str_detect(genderDocs$dimnames$Terms,"indic"),]
+
+indicators
+
+epartexttools::assocPrettyOneStep(Terms(indicators),genderDocs,corpus_cleaned,corrVal=.95)
+```
+
+Comparing documents based on inputs
+========================================================
+```{r}
+tornadoCompare(tdm<-genderDocs,"seed",3,5)
+```
+
+That's great, but what if my documents are structured?
+========================================================
+
+Perchance, rather than research documents you have a set of forms  or documents with the same sort of format?
+
+* If the documents are PDFs, your best bet is to leverage regular expressions to extract what you need.
+* If they are word document forms (looking at you Gates Foundation), then we can leverage the structue of the xml documents to pull out relevant information.
+
+

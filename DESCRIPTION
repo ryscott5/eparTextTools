@@ -15,6 +15,7 @@ Depends:
   ggplot2,
   tm
 Imports:
+  methods,
   tm,
   ggplot2, 
   Rcpp,

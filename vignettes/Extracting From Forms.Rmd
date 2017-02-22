@@ -16,10 +16,9 @@ In terms of structured documents, there are multple kinds a user may run across.
 #Demonstration
 Here, we load agendas from some meetings from the state of Colorado. These tools are mostly built for word files so that's what we demonstrate here.
 ```{r}
-tfiles<-list.files("../../CRO_form_demo",full.names=T)
+tfiles<-list.files("~/CRO_form_demo",full.names=T)
 tfiles<-tfiles[str_detect(tolower(tfiles),"docx")]
 ```
-
 Word files area really just xml files. To see the contents of a file, you can use the "docx_table_view()" command.
 
 ```{r}
@@ -44,10 +43,10 @@ Based on the warning, se can see this worked for most of our documents but not a
 formcluster(tfiles)
 ```
 
-We might notice that the first four documents are generally somewhat different from the 5th through 11th documents, suggesting we need to do more to think about how to anlalyze these forms.
+We might notice that the first four documents are generally somewhat different from the 5th through 11th documents, suggesting we need to do more to think about how to analyze these forms.
 
 ```{r, eval=F}
 docx_table_view(tfiles[8])
 docx_table_view(tfiles[1])
-
 ```
+

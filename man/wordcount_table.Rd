@@ -18,6 +18,8 @@ wordcount_table(wordlist, termDocumentMatrix, doccorpus, trunc = FALSE,
 
 \item{raw}{if true then outputs a data.table if false then produces an htmltable allowing csv/excel export. the resulting table can be saved using the saveWidgets command in htmlwidgets.}
 
+\item{onlywordlist}{if true, bins words, otherwise returns all unique matches}
+
 \item{weighting}{passed to tm::TermDocumentMatrix (by default is weightTf)}
 }
 \value{
