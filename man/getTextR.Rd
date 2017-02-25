@@ -4,7 +4,8 @@
 \alias{getTextR}
 \title{Loads and processes doc,docx,pdf,and txt files into tm corpus.}
 \usage{
-getTextR(fname, tika = FALSE, tikapath = "tika-app-1.13.jar")
+getTextR(fname, tika = FALSE, gen_pdf_tools = T,
+  tikapath = "tika-app-1.13.jar")
 }
 \arguments{
 \item{fname}{Directory name}

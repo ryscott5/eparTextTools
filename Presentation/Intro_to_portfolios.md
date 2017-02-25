@@ -116,13 +116,15 @@ Setting Up a Google Cloud Image
 
 https://cloud.google.com/compute/
 
-```{r, eval=FALSE}
+
+```r
 install.packages("devtools")
 devtools::install_github("cloudyr/googleComputeEngineR")
 ```
 
 
-```{r, eval=FALSE}
+
+```r
 library(googleComputeEngineR)
 setwd("H:")
 Sys.setenv("GCE_AUTH_FILE"=list.files("Google Keys",full.names=T)[1])
@@ -141,7 +143,8 @@ vm <- gce_vm(template="dynamic",
 What if I want to build a full instance from scratch?
 ========================================================
 
-```{r eval=F}
+
+```r
 library(epartexttools)
 RShowDoc("GoogleDirections",package="epartexttools")
 ```
@@ -150,13 +153,13 @@ Using R = Lots of asking for help
 ========================================================
 
 When in doubt use help commands
-```{r, eval=FALSE}
+
+```r
 #Get help
 ?library
 
 #Get more help
 ??library
-
 ```
 If still in doubt do a google search.
 * [Stack overflow](http://stackoverflow.com/questions/tagged/r) is a *very* good resource for R
@@ -168,26 +171,35 @@ Upload data to the cloud
 
 We would ideally like some data to analyze. Lets start with the example epar data. Here, we download research files from the EPAR page. We can use those to begin building a review of EPAR research.
 
-```{r, echo=F}
-library(epartexttools)
-library(plyr)
-library(dplyr)
-```
 
-```{r, eval=F, echo=F}
-example_documents()
-```
 
-```{r}
+
+
+
+```r
 list.files("demo.docs.folder",full.names = TRUE)[1:5]
+```
+
+```
+[1] "demo.docs.folder/EPAR_283_SHG_Expanded_Final_Presentation_12_04_2014.pdf"                                     
+[2] "demo.docs.folder/EPAR_283_SHG%20Evidence%20Review%20Brief_12.5.14_0.pdf"                                      
+[3] "demo.docs.folder/EPAR_Request_201_Drivers%20of%20Inorganic%20Fertilizer%20Use%20in%20Tanzania_090713_af_0.pdf"
+[4] "demo.docs.folder/EPAR_REQUEST_295_RTB_Literature_Review_2-22-15FINAL_0.pdf"                                   
+[5] "demo.docs.folder/EPAR_UW_199_Wheat_Global_Analysis_7.27.12.pdf"                                               
 ```
 
 Begin the Workflow
 ========================================================
 Establish a working folder--this is a folder we can save output to as we progress through the analysis. When you run the makeworking command, it will establish a new value "workingfolder"..
 
-```{r, include=TRUE}
+
+```r
 epartexttools::makeworking("Research.Grants")
+```
+
+```
+Good News, Directory Already Exists Containing: corpus_cleaned.RDS
+corpus.RDS
 ```
 
 
@@ -195,28 +207,39 @@ Read the Documents
 ========================================================
 The allDocs command will read a corpus from a folder, dropping files with errors to build a tm corpus.
 
-```{r eval=F}
+
+```r
 corpus1<-allDocs("demo.docs.folder")
 ```
-```{r echo=F}
-corpus1<-readRDS(file.path(workingfolder,"corpus.RDS"))
-```
+
 
 We then save a copy of the corpus to the workingfolder.
-```{r}
+
+```r
 saveRDS(corpus1,file.path(workingfolder,"corpus.RDS"))
 ```
 
 If we call makeworking again, the rds file will appear in the printout
 
-```{r}
+
+```r
 makeworking("Research.Grants")
+```
+
+```
+Good News, Directory Already Exists Containing: corpus_cleaned.RDS
+corpus.RDS
 ```
 
 Meanwhile, the object *corpus1* should be in our environment.
 
-```{r}
+
+```r
 ls()
+```
+
+```
+[1] "corpus1"       "workingfolder"
 ```
 
 Working with the corpus
@@ -224,17 +247,34 @@ Working with the corpus
 
 To work with *corpus1*, we can call commands on the corpus.
 
-```{r}
-class(corpus1)
 
+```r
+class(corpus1)
+```
+
+```
+[1] "VCorpus" "Corpus" 
+```
+
+```r
 #Number of Documents in the Corpus
 length(corpus1)
 ```
 
+```
+[1] 109
+```
+
 Corpus are used in the NLP, openNLP packages, so we can use any command exported from those packages.
 
-```{r}
+
+```r
 NLP::meta(corpus1[1],c("author"))
+```
+
+```
+$EPAR_283_SHG_Expanded_Final_Presentation_12_04_2014.pdf
+[1] "Chris Clark"
 ```
 
 Basic R Commands
@@ -243,23 +283,41 @@ Because we rely on infrastructure used by other R packages, we can easily levera
 
 For example, the tm package allows structuring a corpus into a [term document matrix](https://en.wikipedia.org/wiki/Document-term_matrix) or document term matrix.
 
-```{r}
+
+```r
 tdm_unclean<-tm::TermDocumentMatrix(corpus1)
 ```
 
 TDMs are stored in R as a list, with words stored under the dimnames entry
-```{r}
+
+```r
 names(tdm_unclean$dimnames)
+```
+
+```
+[1] "Terms" "Docs" 
+```
+
+```r
 sample(tdm_unclean$dimnames$Terms,10)
+```
+
+```
+ [1] "2,600,000"      "huddleston,"    "$5.04"          "ipinge,"       
+ [5] "[1.1,1.8]"      "133,327"        "8.16%"          "height-for-age"
+ [9] "hollingworth,"  "tractors,"     
 ```
 
 Graphing Word Frequency
 ========================================================
 left: 50
-```{r}
+
+```r
 wfplots(tdm_unclean,wordcount=5,
         shortendoc = T, typePlot=2)
 ```
+
+![plot of chunk unnamed-chunk-18](Intro_to_portfolios-figure/unnamed-chunk-18-1.png)
 ***
 
 
@@ -280,18 +338,15 @@ Cleaning Documents
 
 The command *doc clean process* is a wrapper that stems removes stopwords, converts to lowercase, and removes whitespace.
 
-```{r, eval=F}
+
+```r
 corpus_cleaned<-epartexttools::doc_clean_process(corpus1)
 saveRDS(corpus_cleaned,file.path(workingfolder, "corpus_cleaned.RDS"))
 ```
 
-```{r, echo=F}
-corpus_cleaned<-readRDS(file.path(workingfolder, "corpus_cleaned.RDS")) 
-```
 
-```{r echo=F}
-tdm_cleaned<-TermDocumentMatrix(corpus_cleaned)
-```
+
+
 
 
 *Discussion Question:*  What are some potential drawbacks of each of these cleaning steps?
@@ -299,10 +354,13 @@ tdm_cleaned<-TermDocumentMatrix(corpus_cleaned)
 
 Re-plotting Cleaned Document--Top 5 Words
 ========================================================
-```{r}
+
+```r
 wfplots(tdm_cleaned,wordcount=5,
         shortendoc = T, typePlot=2)
 ```
+
+![plot of chunk unnamed-chunk-22](Intro_to_portfolios-figure/unnamed-chunk-22-1.png)
 
 ***
 Hopefully, your plot looks a lot more useful!
@@ -312,10 +370,13 @@ Editing Figures
 ========================================================
 
 You can save your figure to an object,then edit that object
-```{r, fig.width=22}
+
+```r
 plot1<-wfplots(tdm_cleaned,wordcount=5,shortendoc = T, typePlot=2)
 plot1+ggtitle("Top 5 Words from EPAR Research")+ggthemes::theme_economist()
 ```
+
+![plot of chunk unnamed-chunk-23](Intro_to_portfolios-figure/unnamed-chunk-23-1.png)
 
 
 Other Plot Types
@@ -323,62 +384,85 @@ Other Plot Types
 
 Rather than plotting counts for individual documents, we might want counts for the entire corpus.
 
-```{r}
+
+```r
 plot2<-epartexttools::wfplots(tdm_cleaned,wordcount=5,shortendoc = T, typePlot=1, allCorpus=T)
 plot2+ggthemes::theme_fivethirtyeight()+ggtitle('5 most common words in EPAR research') 
 ```
+
+![plot of chunk unnamed-chunk-24](Intro_to_portfolios-figure/unnamed-chunk-24-1.png)
 
 More Plot Types
 ========================================================
 
 If we are interested in certain words, we can search for those words by entering a wordlist.
 
-```{r}
+
+```r
 plot3<-epartexttools::interest_plot(tdm_cleaned,wordlist=c("gender","income"))
 plot3+ggthemes::theme_foundation()+ggtitle('Does EPAR do Gender Research?') 
 ```
+
+![plot of chunk unnamed-chunk-25](Intro_to_portfolios-figure/unnamed-chunk-25-1.png)
 
 The underlying matrix
 ========================================================
 
 We can plot a heatmap showing word freqencies and clustering documents based on the results. Notice, this is just a visual representtion of a term document matrix.
 
-```{r, eval=F}
+
+```r
 epartexttools::word_heatmap(tdm_cleaned,5, minfreq=2))
-```        
+```
 
 Interacting with tables
 ========================================================
 
 Graphs are great, but tayloring the analysis to the exact type needed can be difficult. Thus, 
 
-```{r, eval=F}
+
+```r
 epartexttools::wordcount_table(wordlist=c("income","gender"),
 termDocumentMatrix=tdm_cleaned,corpus1,trunc=T,raw=F)
 ```
 
 We can also interact with unformated tables
 ========================================================
-```{r}
+
+```r
 tob<-epartexttools::wordcount_table(wordlist=c("sex","gender","wom","female","trans"),termDocumentMatrix=tdm_cleaned,corpus1,trunc=F,raw=T,onlywordlist=T)
 ```
-```{r}
+
+```r
 ggplot(tob)+geom_histogram(aes(x=Count, fill=Word))+theme_minimal()
 ```
 
+![plot of chunk unnamed-chunk-29](Intro_to_portfolios-figure/unnamed-chunk-29-1.png)
+
 Perhaps a nicer version?
 ========================================================
-```{r,fig.width=20}
+
+```r
 ggplot(tob)+geom_bar(aes(x=Document,y=Count,fill=Word),stat="identity",position="stack")+coord_flip()
 ```
+
+![plot of chunk unnamed-chunk-30](Intro_to_portfolios-figure/unnamed-chunk-30-1.png)
 
 Interacting with tables in raw form
 ========================================================
 
 We might use that information to identify documents that include gender and income most frequently.
 
-```{r}
+
+```r
 colnames(tob)
+```
+
+```
+[1] "Word"     "Document" "Count"    "String"  
+```
+
+```r
 tob2<-ddply(tob,.(Document),Count=sum(Count),summarize)
 tob2<-filter(tob2,Count>=quantile(tob2$Count,.5))
 
@@ -386,28 +470,43 @@ genderDocs<-tdm_cleaned[,which(gsub("%",".",tdm_cleaned$dimnames$Docs)%in%tob2$D
 indicators<-genderDocs[str_detect(genderDocs$dimnames$Terms,"indic"),]
 indicators
 ```
-```{r,eval=F}
+
+```
+<<TermDocumentMatrix (terms: 3, documents: 39)>>
+Non-/sparse entries: 51/66
+Sparsity           : 56%
+Maximal term length: 10
+Weighting          : term frequency (tf)
+```
+
+```r
 epartexttools::assocPrettyOneStep(Terms(indicators),genderDocs,corpus_cleaned,corrVal=.95)
 ```
 
 
 Comparing documents based on inputs
 ========================================================
-```{r}
+
+```r
 tornadoCompare(tdm<-genderDocs,"seed",3,5)
 ```
+
+![plot of chunk unnamed-chunk-33](Intro_to_portfolios-figure/unnamed-chunk-33-1.png)
 
 That's great, but what if there are two word strings I want?
 ========================================================
 
 we can leverage the control options in the TermDocumentMatrix command to select two words, eliminate words, etc. 
-```{r}
+
+```r
 BigramTokenizer <-function(x) unlist(lapply(ngrams(words(x), 2),
 paste, collapse = " "), use.names = FALSE)
 tdm_2gram<-tm::TermDocumentMatrix(corpus_cleaned,
 control =list(tokenizer=BigramTokenizer))
 wfplots(tdm_2gram, wordcount=5,allCorpus=T)
 ```
+
+![plot of chunk unnamed-chunk-34](Intro_to_portfolios-figure/unnamed-chunk-34-1.png)
 
 How to load my own documents?
 ========================================================

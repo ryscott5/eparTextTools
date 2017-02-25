@@ -60,12 +60,13 @@ checkForTika<-function(directory=getwd()){if("tika-app-1.13.jar"%in%list.files(p
 #' @export
 #' @examples
 #' corpus1<-getTextR(file.path())
-getTextR<-function(fname,tika=FALSE,tikapath="tika-app-1.13.jar"){
+getTextR<-function(fname,tika=FALSE,gen_pdf_tools=T,tikapath="tika-app-1.13.jar"){
   if(tika==TRUE){
     pdoc<-system(command=paste("java -jar",tikapath,"-t",gsub(" ","\\ ",fname,fixed=TRUE)),intern=TRUE,wait=TRUE)
   } else {
     pdoc<-if(stringr::str_detect(fname,".docx+$")==TRUE){read_docxtm(fname)} else {
-      if(stringr::str_detect(fname,".doc+$")==TRUE){tm::readDOC()(language="en",elem=list(uri=fname))} else {pdoc<-if(stringr::str_detect(fname, stringr::fixed(".pdf"))==TRUE){readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")} else {if(stringr::str_detect(fname,stringr::fixed(".txt"))==TRUE){tm::readPlain(elem=list(uri=fname,content=iconv(enc2utf8(readLines(fname)), sub = "byte")),language="en")} else {"FILETYPE NA"}}}}}
+      if(stringr::str_detect(fname,".doc+$")==TRUE){tm::readDOC()(language="en",elem=list(uri=fname))} else {pdoc<-if(stringr::str_detect(fname, stringr::fixed(".pdf"))==TRUE){
+        if(gen_pdf_tools==F){readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")} else {pdftools::pdf_text(list.files(filedir,full.names=T)[1])}} else {if(stringr::str_detect(fname,stringr::fixed(".txt"))==TRUE){tm::readPlain(elem=list(uri=fname,content=iconv(enc2utf8(readLines(fname)), sub = "byte")),language="en")} else {"FILETYPE NA"}}}}}
   pdoc
 }
 
@@ -186,6 +187,25 @@ readPDF2<-function (engine = c("xpdf", "Rpoppler", "ghostscript", "Rcampdf","cus
                           meta$Creator)
   }
 }
+
+
+#' Look up how to open a file. 
+#'
+#' @param ending the ending of the file in question.
+#' @export
+how_do_i_open<-function(ending){
+  browseURL(paste("http://lmgtfy.com/?q=how+do+i+open+a+",ending,"+file+in+R",sep=""))
+}
+
+#' Look up how to do something in R
+#'
+#' @param theproblem the problem.
+#' @description  A joke command to look up a method in R.
+#' @export
+how_do_i<-function(theproblem){
+  browseURL(paste("http://lmgtfy.com/?q=how+do+i+",theproblem,"+in+R",sep=""))
+}
+
 
 #' Calls getTextR on all files in a directory joining into corpus. 
 #'
