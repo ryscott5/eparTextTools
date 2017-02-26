@@ -48,12 +48,12 @@ lapply(demo.docs2$links, function(X){try(downloader::download(X, destfile=file.p
 #' @examples
 #' checkForTika()
 checkForTika<-function(directory=getwd()){if("tika-app-1.13.jar"%in%list.files(path=directory)) {cat("success")} else {download.file("http://apache.claz.org/tika/tika-app-1.13.jar",file.path(directory,"tika-app-1.13.jar"))}}
-
 #' Loads and processes doc,docx,pdf,and txt files into tm corpus.
 #'
 #'This command loads files into R from a directory into a corpus. Currently it reads doc, docx, pdf, and txt files.
 #' @param fname Directory name
 #' @param tika Should tika be used? 
+#' @param gen_pdf_tools if using a pc, set to true. if on linux, setting to false and installing the pdf2text library will be more useful. See readPDF in the tm package for more info.
 #' @param tikapath Path to the Tika application
 #' @return TM Text Corpus.
 #' @seealso \code{\link{tm::corpus}} 
@@ -66,7 +66,7 @@ getTextR<-function(fname,tika=FALSE,gen_pdf_tools=T,tikapath="tika-app-1.13.jar"
   } else {
     pdoc<-if(stringr::str_detect(fname,".docx+$")==TRUE){read_docxtm(fname)} else {
       if(stringr::str_detect(fname,".doc+$")==TRUE){tm::readDOC()(language="en",elem=list(uri=fname))} else {pdoc<-if(stringr::str_detect(fname, stringr::fixed(".pdf"))==TRUE){
-        if(gen_pdf_tools==F){readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")} else {pdftools::pdf_text(list.files(filedir,full.names=T)[1])}} else {if(stringr::str_detect(fname,stringr::fixed(".txt"))==TRUE){tm::readPlain(elem=list(uri=fname,content=iconv(enc2utf8(readLines(fname)), sub = "byte")),language="en")} else {"FILETYPE NA"}}}}}
+        if(gen_pdf_tools==T){readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")} else {readPDF2(engine="pdftools")(elem=list(uri=fname), language="en")}} else {if(stringr::str_detect(fname,stringr::fixed(".txt"))==TRUE){tm::readPlain(elem=list(uri=fname,content=iconv(enc2utf8(readLines(fname)), sub = "byte")),language="en")} else {"FILETYPE NA"}}}}}
   pdoc
 }
 
@@ -170,11 +170,11 @@ processURI2 <-function(uri) {
 #' @description  This function is a port of readpdf.
 #' @examples
 #' readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")
-readPDF2<-function (engine = c("xpdf", "Rpoppler", "ghostscript", "Rcampdf","custom"), control = list(info = NULL, text = NULL)) {
+readPDF2<-function (engine = c("xpdf", "Rpoppler", "ghostscript", "Rcampdf","custom","pdftools"), control = list(info = NULL, text = NULL)) {
   stopifnot(is.character(engine), is.list(control))
   engine <- match.arg(engine)
-  pdf_info <- switch(engine, xpdf = function(x) tm:::pdf_info_via_xpdf(x,control$info), Rpoppler = Rpoppler::PDF_info, ghostscript = tm:::pdf_info_via_gs,Rcampdf = Rcampdf::pdf_info, custom = control$info)
-  pdf_text <- switch(engine, xpdf = function(x) system2("pdftotext", c(control$text, shQuote(x), "-"), stdout = TRUE), Rpoppler = Rpoppler::PDF_text, ghostscript = pdf_text_via_gs, Rcampdf = Rcampdf::pdf_text, custom = control$text)
+  pdf_info <- switch(engine, xpdf = function(x) tm:::pdf_info_via_xpdf(x,control$info), Rpoppler = Rpoppler::PDF_info, pdftools=pdftools::pdf_info, ghostscript = tm:::pdf_info_via_gs,Rcampdf = Rcampdf::pdf_info, custom = control$info)
+  pdf_text <- switch(engine, xpdf = function(x) system2("pdftotext", c(control$text, shQuote(x), "-"), stdout = TRUE), Rpoppler = Rpoppler::PDF_text, pdftools=pdftools::pdf_text, ghostscript = pdf_text_via_gs, Rcampdf = Rcampdf::pdf_text, custom = control$text)
   if (!is.function(pdf_info) || !is.function(pdf_text)) 
     stop("invalid function for PDF extraction")
   function(elem, language, id) {
@@ -211,17 +211,18 @@ how_do_i<-function(theproblem){
 #'
 #' @param directory Folder to read files from'
 #' @param onError if skip skip documents that read wrong.
+#' @param gen_pdf_tools if using a pc set to true. if on a unix server, setting to false will preserve pdf metadata.
 #' @return Corpus of text documents.
 #' @seealso \code{\link{corpus}} 
 #' @export
 #' @description  This function will read from a folder documents of the class pdf, docx, doc or txt.
 #' @examples
 #' allDocs("folder")
-allDocs<-function (directory, SkiponError = FALSE) {
+allDocs<-function (directory, SkiponError = FALSE,gen_pdf_tools=TRUE) {
   if(SkiponError==TRUE){
     temp <- lapply(file.path(directory, list.files(directory)), 
                    function(FILENAME) {
-                     try(getTextR(FILENAME))
+                     try(getTextR(FILENAME, gen_pdf_tools=gen_pdf_tools))
                    })
     temp <- temp[sapply(temp, class) != "character"]
     temp <- temp[sapply(temp, class) != "error"]
