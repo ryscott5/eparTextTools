@@ -66,7 +66,7 @@ getTextR<-function(fname,tika=FALSE,gen_pdf_tools=T,tikapath="tika-app-1.13.jar"
   } else {
     pdoc<-if(stringr::str_detect(fname,".docx+$")==TRUE){read_docxtm(fname)} else {
       if(stringr::str_detect(fname,".doc+$")==TRUE){tm::readDOC()(language="en",elem=list(uri=fname))} else {pdoc<-if(stringr::str_detect(fname, stringr::fixed(".pdf"))==TRUE){
-        if(gen_pdf_tools==T){readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")} else {readPDF2(engine="pdftools")(elem=list(uri=fname), language="en")}} else {if(stringr::str_detect(fname,stringr::fixed(".txt"))==TRUE){tm::readPlain(elem=list(uri=fname,content=iconv(enc2utf8(readLines(fname)), sub = "byte")),language="en")} else {"FILETYPE NA"}}}}}
+        if(gen_pdf_tools==F){readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")} else {readPDF2(engine="pdftools")(elem=list(uri=fname), language="en")}} else {if(stringr::str_detect(fname,stringr::fixed(".txt"))==TRUE){tm::readPlain(elem=list(uri=fname,content=iconv(enc2utf8(readLines(fname)), sub = "byte")),language="en")} else {"FILETYPE NA"}}}}}
   pdoc
 }
 
