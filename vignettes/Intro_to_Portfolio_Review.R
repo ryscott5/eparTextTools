@@ -5,20 +5,34 @@
 options(java.parameters = "-Xmx4g")
 library(epartexttools)
 
-## ---- echo=TRUE, results='hide'------------------------------------------
-example_documents()
-corpus1<-allDocs(directory="demo.docs.folder",SkiponError=FALSE)
+## ---- echo=TRUE, results='hide', eval=F----------------------------------
+#  example_documents()
+#  corpus1<-allDocs(directory="demo.docs.folder",SkiponError=FALSE)
+
+## ------------------------------------------------------------------------
+#Make directory for saving and save a copy of the corpus
+epartexttools::makeworking("Research.Grants")
+
+## ---- eval=F-------------------------------------------------------------
+#  saveRDS(corpus1,file.path(workingfolder, "corpus.rds"))
+
+## ---- echo=T, eval=T-----------------------------------------------------
+corpus1<-readRDS(file.path(workingfolder,"corpus.rds"))
 
 ## ---- echo=TRUE----------------------------------------------------------
 lapply(corpus1,function(X){X$meta})[[1]]
 
-## ---- echo=TRUE, results='asis'------------------------------------------
+## ---- echo=TRUE, results='asis', eval=FALSE------------------------------
+#  #cleans elements of corpus
+#  corpus2<-doc_clean_process(corpus1)
+#  saveRDS(corpus2,file.path(workingfolder,"corpus_cleaned.rds"))
 
-#cleans elements of corpus
-corpus2<-doc_clean_process(corpus1)
+## ----echo=FALSE----------------------------------------------------------
+corpus2<-readRDS(file.path(workingfolder,"corpus_cleaned.rds"))
 
+## ------------------------------------------------------------------------
 #converts corpus into term document matrix, removing terms that occur infrequently (can be adjusted by manipulating that .6)
-tdm<-TermDocumentMatrix(corpus2) %>% removeSparseTerms(.,.6)
+tdm<-TermDocumentMatrix(corpus2) %>% removeSparseTerms(.,.8)
 
 ## ----echo=TRUE, results='asis'-------------------------------------------
 #Searches corpus 1 for the words gender and access based and returns counts based on the term document matrix we built above.
@@ -60,17 +74,8 @@ assocPrettyOneStep("gender",tdm, corpus2,.5)
 ## ------------------------------------------------------------------------
 tornadoCompare(tdm,c("gender","equal","femal"),3,10)
 
-## ----eval=F--------------------------------------------------------------
-#  rm(corpus2)
-#  rm(tdm)
-#  workingfolder<-file.path("Research.Grants")
-#  dir.create(file.path(workingfolder))
-#  saveRDS(corpus1,file.path(workingfolder,"corpus.rds"))
-#  rm(corpus1)
-
 ## ----eval=FALSE----------------------------------------------------------
-#  corpus1<-readRDS(file.path(workingfolder,"corpus.rds"))
-#  BASE_INPUT<-PreTopicFrame(corpus1,15)
+#  BASE_INPUT<-PreTopicFrame2(corpus1,workingfolder=workingfolder,removeentities=F)
 #  BASE_INPUT$out$meta$OpID<-BASE_INPUT$out$meta$Orig
 #  #saves files so you can reload
 #  saveRDS(BASE_INPUT,file.path(workingfolder,"base_input1.rds"))

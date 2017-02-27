@@ -132,7 +132,7 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=10){
 PreTopicFrame2<-function(CORPUS_A,sample_num,syntaxnet=T,workingfolder,removeentities=T){
   CORPUS_A<-readRDS(file.path(workingfolder,"corpus.rds"))
   cstrings<-lapply(CORPUS_A,function(X) paste(NLP::content(X),collapse="\n\n"))
-  pstrings<-lapply(cstrings,tokenize_sentences,simplify=T)
+  pstrings<-lapply(cstrings,tokenizers::tokenize_sentences,simplify=T)
   pstrings<-dplyr::bind_rows(lapply(pstrings,function(X) data.frame("string"=X)),.id="Orig")
   dca<-as.data.frame(do.call(cbind,lapply(names(CORPUS_A[[1]]$meta),function(K) sapply(CORPUS_A, function(X) paste(NLP::meta(X,K),collapse=";"),USE.NAMES=FALSE))))
   colnames(dca)<-names(NLP::meta(CORPUS_A[[1]]))
@@ -620,6 +620,7 @@ idSimilar<-function(SEARCH,COLUMN,NUM,TOPICMODEL){
 #' @param alchemykey key to alchemy api as character
 #' @param workingfolder workingfolder for project
 #' @return a .R file saved in the working folder
+#' @export
 writerun_alch<-function(alchemykey,workingfolder){
 writeLines(text=c(paste('
 rm(list=ls())
@@ -647,6 +648,7 @@ FillFolder(recombine,workingfolder)'),con=file.path(workingfolder,"run_Alchemy.R
 #' This function runs the .R file returned by writerun_alch. It takes as an argument a number which corresponds to a row in the BASE_INPUT dataframe
 #' @param num row number to start function at (this is to allow for restarts in case an error occurs?)
 #' @return NA fills folder with alchemy api calls
+#' @export
 RunAlchy<-function(num){
   system(paste("R CMD BATCH --args",file.path(workingfolder,"run_Alchemy.R"),num),wait=FALSE)
 }
@@ -658,6 +660,7 @@ RunAlchy<-function(num){
 #' This function calls out using the system command. make sure to clear your workspace and history if you use this. However, what a cool function, right?
 #' @param password you should type in your password 3 times.
 #' @return NA installs a docker server
+#' @export
 makeadockercliff<-function(){
   cwd<-getwd()
   setwd("~")
@@ -673,6 +676,7 @@ makeadockercliff<-function(){
 #'These commands start and run a cliff-docker server. 
 #'
 #'These commands collectively build, ensure a server is working, and stop a running docker server for gecoding. Once you have run buildcliff and startcliff, you can run the PredictCountryByDoc command to predict which countries documents correspond to. For these commands, we need to have the opportunity id labels as OpID in the SentFrame part of BASE_INPUT
+#'@export
 buildcliff<-function() {system('sudo docker run -p "8080:8080" -d --name cliff cliff:2.1.1')}
 startcliff<-function() {system('sudo docker start cliff')}
 checkcliff<-function(){system('sudo docker ps')}
@@ -848,6 +852,10 @@ frametable<-function(PARSEFRAME,BASEINPUT,origent){
   joined
 }
 
+#'Function to run syntaxnet
+#'
+#' This function calls syntaxnet.
+#' @export
 SQLtabSyntaxNET<-function(TEXTIN,sample_num){
   TEXTIN$string<-stringi::stri_trans_general(TEXTIN$string, "latin-ascii")
   TEXTIN$string<-iconv(TEXTIN$string, "latin1", "ASCII",sub='') 
@@ -874,7 +882,10 @@ copy_to(my_db,nonpropers,"nonpropers", temporary = FALSE)
 cat(paste("tables saved to",file.path(workingfolder,"textDB")))
 }
 
-
+#'Function to write code to run syntaxnet
+#'
+#' This function calls syntaxnet.
+#' @export
 SNetTXTCALL<-function(doc,dontprintoutput=T){
   doc<-gsub("'","’",doc)
   writeLines(doc,"~/input.txt")
