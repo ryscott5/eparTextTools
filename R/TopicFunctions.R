@@ -129,14 +129,17 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=10){
 #' @export
 #' @examples
 #' BASE_INPUT<-PreTopicFrame2(CORPUS_A,0,syntaxnet=F,workingfolder)
-PreTopicFrame2<-function(CORPUS_A,sample_num,syntaxnet=T,workingfolder,removeentities=T){
-  CORPUS_A<-readRDS(file.path(workingfolder,"corpus.rds"))
+PreTopicFrame2<-function(CORPUS_A,sample_num=0,syntaxnet=T,workingfolder,removeentities=T){
+  #CORPUS_A<-corpus1
+  #sample_num=0
+  #syntaxnet=T
+  #removeentities=T
   cstrings<-lapply(CORPUS_A,function(X) paste(NLP::content(X),collapse="\n\n"))
   pstrings<-lapply(cstrings,tokenizers::tokenize_sentences,simplify=T)
   pstrings<-dplyr::bind_rows(lapply(pstrings,function(X) data.frame("string"=X)),.id="Orig")
   dca<-as.data.frame(do.call(cbind,lapply(names(CORPUS_A[[1]]$meta),function(K) sapply(CORPUS_A, function(X) paste(NLP::meta(X,K),collapse=";"),USE.NAMES=FALSE))))
   colnames(dca)<-names(NLP::meta(CORPUS_A[[1]]))
-  dca$Orig<-row.names(dca)
+  dca$Orig<-dca$id
   row.names(dca)<-1:nrow(dca)
   fullorig<-merge(pstrings,dca,by.x="Orig")
   if(syntaxnet==T){
@@ -145,11 +148,11 @@ PreTopicFrame2<-function(CORPUS_A,sample_num,syntaxnet=T,workingfolder,removeent
     if(removeentities==T){
       temptab<-ddply(collect(tbl(my_db, sql("SELECT Orig,Sent,V2 FROM nonprops")),n=Inf),.(Orig,Sent),text=paste(V2,collapse=" "),summarize)
     } else {if(removeentities=="ONLY"){temptab<-ddply(collect(tbl(my_db, sql("SELECT Orig,Sent,V2 FROM propers")),n=Inf),.(Orig,Sent),text=paste(V2,collapse=" "),summarize)}
-    else {
-      temptab<-ddply(collect(tbl(my_db, sql("SELECT Orig,Sent,V2 FROM fulltable")),n=Inf),.(Orig,Sent),text=paste(V2,collapse=" "),summarize)
-    }}
-      processed <-stm::textProcessor(temptab$text,metadata=select(merge(temptab,dca,by.x="Orig"),-text),sparselevel=1)                                         
-  out <- stm::prepDocuments(processed$documents,processed$vocab,processed$meta,lower.thresh=4)
+      else {
+        temptab<-ddply(collect(tbl(my_db, sql("SELECT Orig,Sent,V2 FROM fulltable")),n=Inf),.(Orig,Sent),text=paste(V2,collapse=" "),summarize)
+      }}
+    processed <-stm::textProcessor(temptab$text,metadata=select(merge(temptab,dca,by.x="Orig"),-text),sparselevel=1)                                         
+    out <- stm::prepDocuments(processed$documents,processed$vocab,processed$meta,lower.thresh=4)
   } else {
     cat("WARNING: Skipping annotation annotation file will be empty")
     processed <-stm::textProcessor(fullorig$string,metadata=select(fullorig,-string),sparselevel=1)                                         
@@ -863,7 +866,6 @@ SQLtabSyntaxNET<-function(TEXTIN,sample_num){
   TEXTIN$string<-gsub("\\s+"," ",TEXTIN$string)
   TEXTIN<-dplyr::filter(TEXTIN,nchar(TEXTIN$string)>25)
 my_db<-dplyr::src_sqlite(file.path(workingfolder,"textDB"),create=T)
-sample_num<-100
 l_ply(unique(fullorig$Orig)[unique(fullorig$Orig)%in%src_tbls(my_db)==FALSE]
 ,function(X) {
   dft<-filter(fullorig,Orig==X)
@@ -875,7 +877,7 @@ fulltable<-lapply(src_tbls(my_db)[which(src_tbls(my_db)%in%unique(fullorig$Orig)
 head(fulltable)
 fulltable$Orig<-src_tbls(my_db)[which(src_tbls(my_db)%in%unique(fullorig$Orig))][as.numeric(fulltable$Orig)]
 propers<-filter(fulltable,V5%in%c("NNP","NNPS"))
-nonprops<-filter(fulltable,V5%in%c("NNP","NNPS")==FALSE,V4%in%c(".")==FALSE,tolower(V2)%in%stopwords("en")==FALSE)
+nonpropers<-filter(fulltable,V5%in%c("NNP","NNPS")==FALSE,V4%in%c(".")==FALSE,tolower(V2)%in%stopwords("en")==FALSE)
 copy_to(my_db,fulltable,"fulltable", temporary = FALSE)
 copy_to(my_db,propers,"propers", temporary = FALSE)
 copy_to(my_db,nonpropers,"nonpropers", temporary = FALSE)

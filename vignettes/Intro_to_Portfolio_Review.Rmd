@@ -213,7 +213,10 @@ In the above analysis, there was a brief intro into document clustering for the 
 While up to this point we have taken documents as given, most text analytic methods were developed for smaller chunks of text. Accordingy, it can be useful to break texts into paragraphs or sentences and then to consider the origin document as a covariate operating on that text chunk. We can thus think of the origin document as a categorical factor that has some unknown relationship to the sentence or text chunk. In the code below, we break a corpus of text--names corpus 1, into paragraph chunks preserving the metadata from each previous chunk. In this code we use the pretopicframe2 function which relies on the Parsey McParseface parser.
 
 ```{r,eval=FALSE}
-BASE_INPUT<-PreTopicFrame2(corpus1,workingfolder=workingfolder,removeentities=F)
+BASE_INPUT<-PreTopicFrame2(corpus1,workingfolder=workingfolder)
+```
+
+
 BASE_INPUT$out$meta$OpID<-BASE_INPUT$out$meta$Orig
 #saves files so you can reload
 saveRDS(BASE_INPUT,file.path(workingfolder,"base_input1.rds"))

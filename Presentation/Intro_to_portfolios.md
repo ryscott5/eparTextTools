@@ -110,12 +110,24 @@ Much text analysis is done using Python, but, that adds another language for EPA
 
 **FEWER LANGUAGES = MORE USERS = MORE ANALYSIS**
 
+Running the code
+========================================================
+The code can be run in R on a local computer, but you need to have administrator priviledges to build rtools.
+
+Thus, the Evans terminal server doesnt work for this. Additionally, some of the things we'll get to next session rely on building a server inside your computer. 
+
+This is very simple with modern cloud computing services but challenges most desktops. 
+
+As a result, I *highly* recommend running the tools remotely using something like google compute engine.
+
+For today, I have already set up a server for us to work on but I've also included directions for how to set up your own server to run the code.
 
 Setting Up a Google Cloud Image
 ========================================================
 
-https://cloud.google.com/compute/
+First, create an account by going to [https://cloud.google.com/compute/]
 
+Then, in R run the following:
 
 ```r
 install.packages("devtools")
@@ -123,10 +135,11 @@ devtools::install_github("cloudyr/googleComputeEngineR")
 ```
 
 
-
 ```r
 library(googleComputeEngineR)
+#set working directory
 setwd("H:")
+#point to authentication files downloaded from Google compute setup.
 Sys.setenv("GCE_AUTH_FILE"=list.files("Google Keys",full.names=T)[1])
 gce_global_zone("us-central1-c")
 gce_global_project("epartexttools")
@@ -303,9 +316,9 @@ sample(tdm_unclean$dimnames$Terms,10)
 ```
 
 ```
- [1] "2,600,000"      "huddleston,"    "$5.04"          "ipinge,"       
- [5] "[1.1,1.8]"      "133,327"        "8.16%"          "height-for-age"
- [9] "hollingworth,"  "tractors,"     
+ [1] "factors.”"     "(yield)"       "reproduction;" "2004)4,"      
+ [5] "mutava,"       "likely.110"    "[0,0]"         "berdegué,"    
+ [9] "12.0%"         "(farming,"    
 ```
 
 Graphing Word Frequency
@@ -526,7 +539,7 @@ Short assignment to work on before the next session...
 
 Hi There,
 
-Can you quickly (by machine) run through all the research outputs we have created (stored in the R drive under ____________) and figure out which research projects involved the following?
+Can you quickly (by machine) run through all the research outputs we have created (stored in the R drive under EPAR/Training and Resources/TextTools) and figure out which research projects involved the following?
 
 "financial services"
 "financial inclusion"
