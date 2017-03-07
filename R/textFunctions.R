@@ -227,6 +227,7 @@ allDocs<-function (directory, SkiponError = FALSE,gen_pdf_tools=TRUE) {
     temp <- temp[sapply(temp, class) != "character"]
     temp <- temp[sapply(temp, class) != "error"]
     temp <- temp[sapply(temp, is.null) != TRUE]
+    temp <- temp[sapply(temp,class)!="try-error"]
     do.call(c, temp)
   } else {
     do.call(c, lapply(file.path(directory, list.files(directory)),getTextR))
