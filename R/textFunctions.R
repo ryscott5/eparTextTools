@@ -35,7 +35,7 @@ example_documents<-function(){
  data(demo.docs)
 if(file.exists("demo.docs.folder")==FALSE){dir.create("demo.docs.folder")}
 demo.docs2<-demo.docs[which(file.exists(file.path("demo.docs.folder",sapply(demo.docs$links, function(X){tail(unlist(strsplit(X,split="/",fixed=TRUE)),n=1)})))==FALSE),]
-lapply(demo.docs2$links, function(X){try(downloader::download(X, destfile=file.path("demo.docs.folder",tail(unlist(strsplit(X,split="/",fixed=TRUE)),n=1))))})
+lapply(demo.docs2$links, function(X){try(download.file(X, destfile=file.path("demo.docs.folder",tail(unlist(strsplit(X,split="/",fixed=TRUE)),n=1)),mode="wb"))})
 }
 
 #' Check to see if Tika is available.
