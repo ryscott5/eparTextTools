@@ -224,10 +224,10 @@ allDocs<-function (directory, SkiponError = FALSE,gen_pdf_tools=TRUE) {
                    function(FILENAME) {
                      try(getTextR(FILENAME, gen_pdf_tools=gen_pdf_tools))
                    })
-    temp <- temp[sapply(temp, class) != "character"]
-    temp <- temp[sapply(temp, class) != "error"]
-    temp <- temp[sapply(temp, is.null) != TRUE]
-    temp <- temp[sapply(temp,class)!="try-error"]
+    temp <- temp[lapply(temp, class) != "character"]
+    temp <- temp[lapply(temp, class) != "error"]
+    temp <- temp[lapply(temp, is.null) != TRUE]
+    temp <- temp[lapply(temp,class)!="try-error"]
     do.call(c, temp)
   } else {
     do.call(c, lapply(file.path(directory, list.files(directory)),getTextR))
