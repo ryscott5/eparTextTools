@@ -4,6 +4,8 @@
 #outputs: creates text files in the local working directory with the same names as the PDFs to be OCR'd
 #TODO: remove all "\u00" 4 digit number fragments
 
+#Updated with fixes from later comments for checkin
+
 OCR_DOCS<-function(path){
 #save the working directory
 oldWD <- getwd()
