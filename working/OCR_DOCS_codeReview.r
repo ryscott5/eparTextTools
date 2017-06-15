@@ -1,10 +1,15 @@
-
+#==============================
 #The OCR_DOCS() function.  Original version By D. Graham Andrews and Ryan Scott, first finished 5/16/2017
-#inputs: A path to a directory containing mixed pdf/other documents.  Runs OCR on all the PDF documents. (possible improvement, detect which ones have existing OCT?)
-#outputs: creates text files in the local working directory with the same names as the PDFs to be OCR'd
-#TODO: remove all "\u00" 4 digit number fragments
+#==============================
+#' @Title \code{OCR_DOCS} will read a given folder for all PDFs in it
+#' @description This function uses Google's "parsey mcparseface" neural network to read PDFs and output machine readable text files of the content.
+#' @param path: A path to a directory containing mixed pdf/other documents.  Runs OCR on all the PDF documents. (Does not detect which PDFs have existing text.)
+#' @returns output path: creates text files in the local working directory with the same names as the PDFs to be OCR'd.
+#' @examples
+#' text_files_location <- OCR_DOCS(path_to_pdf_files)
+#TODO: remove all "\u00" 4 digit number fragments.
+#TODO: remove files after copy
 
-#Updated with fixes from later comments for checkin
 
 OCR_DOCS<-function(path){
 #save the working directory
