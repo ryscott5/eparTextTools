@@ -7,6 +7,7 @@
 #' @returns output path: creates text files in the local working directory with the same names as the PDFs to be OCR'd.
 #' @examples
 #' text_files_location <- OCR_DOCS(path_to_pdf_files)
+#' @export
 #TODO: remove all "\u00" 4 digit number fragments.
 #TODO: remove files after copy
 
