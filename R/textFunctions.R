@@ -97,7 +97,7 @@ readMails<-function(folder_in,newmailsdirectory){
 #' @param dir directory
 #' @export
 #' @description  This function does the quite useful task of making a workingfolder object in the environment.
-makeworking<-function(dir){if(dir.exists(dir)==FALSE) {dir.create(dir)} else {cat("Good News, Directory Already Exists Containing:",paste(list.files("Research.Grants"),collapse="\n"))}
+makeworking<-function(dir){if(dir.exists(dir)==FALSE) {dir.create(dir)} else {cat("Good News, Directory Already Exists Containing:",paste(list.files(dir),collapse="\n"))}
   workingfolder<<-dir}
 
 

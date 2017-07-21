@@ -87,7 +87,7 @@ wn<-loadwordnet()
 
 IDframes<-function(VERBWORD,parsecnnl){
   wn<-loadwordnet()
-  filter(tbl(wn, "fnwords"), word%in%filter(parsecnnl,penn=="VB")$tokens) %>% left_join(tbl(wn,"fnlexemes")) %>% left_join(tbl(wn, "fnlexunits")) %>% left_join(tbl(wn, "fnframes")) %>% select(.,word,frame,framedefinition) %>% collect %>% filter(., stringr::str_detect(tolower(frame), VERBWORD))
+  filter(tbl(wn, "fnwords"), word%in%filter(parsecnnl,pos=="VERB")$token) %>% left_join(tbl(wn,"fnlexemes")) %>% left_join(tbl(wn, "fnlexunits")) %>% left_join(tbl(wn, "fnframes")) %>% select(.,word,frame,framedefinition) %>% collect %>% filter(., stringr::str_detect(tolower(frame), VERBWORD))
 }
 
 idframes<-IDframes("[change|cause]", collect(tbl(scydb,"parses_uw"),n=Inf))
@@ -95,12 +95,12 @@ idframes<-IDframes("[change|cause]", collect(tbl(scydb,"parses_uw"),n=Inf))
 sentkeeper<-function(idframes,parsecnnl,database=T){
   if(database==T){
     parsecnnl<-mutate(parsecnnl,"word_out"=tolower(tokens))
-    keepers<-dplyr::filter(parsecnnl, word_out%in%idframes$word,penn=="VB") %>% select(docname)
+    keepers<-dplyr::filter(parsecnnl, word_out%in%idframes$word,pos=="VERB") %>% select(docname)
     dplyr::filter(parsecnnl, docname%in%collect(keepers)$docname) %>% collect(n=Inf)
-
+    
   }  else {
-  keepers<-dplyr::filter(parsecnnl, tolower(tokens)%in%idframes$word,penn=="VB")$docname
-  dplyr::filter(parsecnnl, docname%in%keepers)
+    keepers<-dplyr::filter(parsecnnl, tolower(tokens)%in%idframes$word,pos=="VERB")$docname
+    dplyr::filter(parsecnnl, docname%in%keepers)
   }
 }
 
@@ -108,7 +108,7 @@ spinsub<-sentkeeper(idframes,tbl(scydb,"parses_uw"),database=T)
 
 spinsub<-left_join(spinsub,tbl(scydb,"tfidf"),copy=T)
 
-join_parse_tmidf<-function(parseconnll, tmidf, scydb){
+join_parse_tmidf<-function(parseconnll, scydb){
   left_join(parseconnll,tbl(scydb,"tfidf"),copy=T)
   copy_to(scydb,parseconnll,"merged_wcuts",temporary=T)
   tbl(scydb,"merged_wcuts")

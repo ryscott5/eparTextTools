@@ -9,7 +9,7 @@ install_spacy()
 spacy_test<-function() {system("python -c 'import spacy; spacy.load('en'); print('OK')'")}
 
 spacy_test()
-
+install.packages("withr")
 devtools::install_github("kbenoit/spacyr")
 
 library(spacyr)

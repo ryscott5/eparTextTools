@@ -60,10 +60,18 @@ SPCY_PreTopicFrame<-function(CORPUS_A,sample_num=0,workingfolder,removeentities=
 #' @description This command creates a sqlite database which parse information is saved in.
 #' @examples
 #' accessSPCDB()
+#' Create an access database for spacy parses.
+#'
+#' @param workingfolder folder to save file in.
+#' @return will create a database names spacyframe.db
+#' @seealso the entire dplyr package 
+#' @export
+#' @description This command creates a sqlite database which parse information is saved in.
+#' @examples
+#' accessSPCDB()
 accessSPCDB<-function(workingfolder){
   spcydb<-dplyr::src_sqlite(file.path(workingfolder,"spacyframe.db"))
 }
-
 
 #' Create a tmidf matrix for keyword extraction
 #'
@@ -91,11 +99,13 @@ maketermkeywords<-function(CORPUS_A,db){
 #' @examples
 #' accessSPCDB()
 loadwordnet<-function(){
-  tempdir<-list.files(path="~",pattern="sqlite2.db",full.names=T)
+  tempdir<-list.files(path="~",pattern="sqlite-31.db",full.names=T)
   if(length(tempdir)==0){if(menu(c('yes','no'),title="Okay to download and install wordnet db 650mb?")==1){
-    download.file('https://sourceforge.net/projects/sqlunet/files/4.0.0/sqlite/sqlite-4.0.0-31-all.zip/download',"~/wndbf.db")
+    download.file('https://sourceforge.net/projects/sqlunet/files/4.0.0/sqlite/sqlite-4.0.0-31-all.zip/download',"~/wndbf.zip")
+    unzip("~/wndbf.zip",exdir="~")
+    file.remove("~/wndbf.zip")
     tempdir<-list.files(path="~",pattern="sqlite2.db",full.names=T)}}
-  dplyr::src_sqlite(tempdir)
+  dplyr::src_sqlite(tempdir,create=F)
 }
 
 #' Select relevant frames to keep
@@ -108,7 +118,7 @@ loadwordnet<-function(){
 #' IDframes("[cause|change],collect(tbl(scydb,"parses_uw"),n=Inf))
 IDframes<-function(VERBWORD,parsecnnl){
   wn<-loadwordnet()
-  filter(tbl(wn, "fnwords"), word%in%filter(parsecnnl,penn=="VB")$tokens) %>% left_join(tbl(wn,"fnlexemes")) %>% left_join(tbl(wn, "fnlexunits")) %>% left_join(tbl(wn, "fnframes")) %>% select(.,word,frame,framedefinition) %>% collect %>% filter(., stringr::str_detect(tolower(frame), VERBWORD))
+  filter(tbl(wn, "fnwords"), word%in%filter(parsecnnl,pos=="VERB")$tokens) %>% left_join(tbl(wn,"fnlexemes")) %>% left_join(tbl(wn, "fnlexunits")) %>% left_join(tbl(wn, "fnframes")) %>% select(.,word,frame,framedefinition) %>% collect %>% filter(., stringr::str_detect(tolower(frame), VERBWORD))
 }
 
 #' Keep only sentences from relevant frames
@@ -119,15 +129,16 @@ IDframes<-function(VERBWORD,parsecnnl){
 #' @examples
 sentkeeper<-function(idframes,parsecnnl,database=T){
   if(database==T){
-    parsecnnl<-mutate(parsecnnl,"word_out"=tolower(tokens))
-    keepers<-dplyr::filter(parsecnnl, word_out%in%idframes$word,penn=="VB") %>% select(docname)
-    dplyr::filter(parsecnnl, docname%in%collect(keepers)$docname) %>% collect(n=Inf)
+    parsecnnl<-mutate(parsecnnl,"word_out"=tolower(token))
+    keepers<-dplyr::filter(parsecnnl, word_out%in%idframes$word,pos=="VERB") %>% select(doc_id)
+    dplyr::filter(parsecnnl, doc_id%in%collect(keepers)$doc_id) %>% collect(n=Inf)
     
   }  else {
-    keepers<-dplyr::filter(parsecnnl, tolower(tokens)%in%idframes$word,penn=="VB")$docname
-    dplyr::filter(parsecnnl, docname%in%keepers)
+    keepers<-dplyr::filter(parsecnnl, tolower(token)%in%idframes$word,pos=="VERB")$doc_id
+    dplyr::filter(parsecnnl, doc_id%in%keepers)
   }
 }
+
 
 #' Keep only sentences from relevant frames
 #'
@@ -136,10 +147,10 @@ sentkeeper<-function(idframes,parsecnnl,database=T){
 #' @param tmidf tfidf frame
 #' @param scydb db with spacy in it
 #' @description This command joins a parseconll an term matrix for a database.
-join_parse_tmidf<-function(parseconnll, tmidf, scydb){
-  dplyr::left_join(parseconnll,tmidf,copy=T)
-  dplyr::copy_to(scydb,parseconnll,"merged_wcuts",temporary=T)
-  dplyr::tbl(scydb,"merged_wcuts")
+join_parse_tmidf<-function(parseconnll, scydb){
+  left_join(parseconnll,tbl(scydb,"tfidf"),copy=T)
+  copy_to(scydb,parseconnll,"merged_wcuts",temporary=T)
+  tbl(scydb,"merged_wcuts")
 }
 
 #' Keep only sentences from relevant frames
@@ -150,18 +161,18 @@ join_parse_tmidf<-function(parseconnll, tmidf, scydb){
 #' @param scydb db with spacy in it
 #' @description This command conversts
 conligraph<-function(parseconll){
-  spl<-lapply(unique(parseconll$docname),function(X) subset(parseconll, docname==X))
+  spl<-lapply(unique(parseconll$doc_id),function(X) subset(parseconll, doc_id==X))
   library(igraph)
   splout<-lapply(spl,function(splt) {
-    g1a<-data.frame("from"=splt$tokens, "to"=splt$tokens[sapply(splt$head_id,function(K) which(splt$id==K))])
+    g1a<-data.frame("from"=splt$token, "to"=splt$token[sapply(splt$head_token_id,function(K) which(splt$token_id==K))])
     g1<-g1a %>% igraph:: graph_from_data_frame(directed=TRUE) 
     commst<-igraph::walktrap.community(g1)
     tg<-igraph::contract(g1,mapping=igraph::membership(igraph::walktrap.community(g1)),vertex.attr.comb=toString)
     # tokenizers::tokenize_word_stems(stopwords=tokenizers::stopwords("en")) 
     V(tg)$name <-V(tg)$name %>% tolower() %>% lapply(.,function(X) paste(unique(X),collapse=","))
     commst<-commst %>% membership() %>% as.matrix()
-    splt2<-left_join(splt,data.frame("tokens"=names(commst[,1]),"community"=commst[,1]))
-    splt2$words_out<-splt2$tokens
+    splt2<-left_join(splt,data.frame("token"=names(commst[,1]),"community"=commst[,1]))
+    splt2$words_out<-splt2$token
     list(tg,splt2)})
   list("frame"=lapply(splout,function(X) X[[2]]) %>% bind_rows(),"nets"=lapply(splout,function(X) X[[1]]))
 }
