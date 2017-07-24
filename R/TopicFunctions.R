@@ -113,7 +113,7 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=10){
 
 
 
-#'Process a corpus into a topic model ready object, but do so while using the Syntaxnet Parser rather than the openNLP parser.
+#'Process a corpus into a topic model ready object, but do so while using the syntaxnet or spacy Parser rather than the openNLP parser.
 #'
 #'  This function takes a corpus and creates a processed version of that corpus with entities removed for use in a topic model. Additionally it allows you to specify common entities to count across documents for use as a covariate in the topic model. The object it returns includes a frame of the text, an annotation object, a processed version of the corpus with stems and stopwords removed, and an out object which is the input object for fitting a topic model within the stm package.
 #' @param CORPUS_A Document corpus
@@ -242,23 +242,23 @@ writeFormulaforSTM<-function(BASE_INPUT,workingfolder){
 #'
 #' this function will create .R file in the working folder which it then will call, resulting in fitting an stm model within a seperate R session. The output should be viewable in an Rout file.
 #' @param workingfolder the workingfolder where you are saving objects.
+#' @param filename name of the preprocessed rds file from pretopicprocess.
 #' @return writes file and starts new r process in background
 #' @seealso \code{\link{stm}} 
 #' @export
 #' @examples
 #' runSTM("../Research.Grants")
-runSTM<-function(workingfolder){
-writeLines(text='
+runSTM<-function(workingfolder,filename){
+writeLines(text=paste('
 library(plyr)
 library(dplyr)
 library(stm)
 args = commandArgs(TRUE)
 workingfolder<-args[1]
-baseinput<-readRDS(file.path(workingfolder,"base_input1.rds"))
+baseinput<-readRDS(file.path(workingfolder,','"',filename,'"','))
   st1<-stm(baseinput$out$documents,baseinput$out$vocab,data=baseinput$out$meta,prevalence=eval(parse(text=readLines(file.path(workingfolder,"formula1.txt")))),K=0, init.type="Spectral",max.em.its=1000)
-saveRDS(st1, file.path(workingfolder,"topicmodel.rds"))',
-           con=file.path(workingfolder,"callstm.R"))
-  system(paste("R CMD BATCH --no-restore","'--args",paste(paste("'",workingfolder,"'",sep=""),"'",sep=""),file.path(".",workingfolder,"callstm.R"),sep=" "),wait=FALSE)}
+saveRDS(st1, file.path(workingfolder,"topicmodel.rds"))',sep=""),con=file.path(workingfolder,"callstm.R"))
+  system(paste("R CMD BATCH --no-restore ","'--args ",workingfolder,"' ",file.path(workingfolder,"callstm.R"),sep=""),wait=FALSE)}
 
 AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME){
   loadparsers()
