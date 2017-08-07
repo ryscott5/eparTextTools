@@ -61,6 +61,7 @@ checkForTika<-function(directory=getwd()){if("tika-app-1.13.jar"%in%list.files(p
 #' @examples
 #' corpus1<-getTextR(file.path())
 getTextR<-function(fname,tika=FALSE,gen_pdf_tools=T,tikapath="tika-app-1.13.jar"){
+  fname <- sapply(fname,tolower)
   if(tika==TRUE){
     pdoc<-system(command=paste("java -jar",tikapath,"-t",gsub(" ","\\ ",fname,fixed=TRUE)),intern=TRUE,wait=TRUE)
   } else {
@@ -220,7 +221,7 @@ how_do_i<-function(theproblem){
 #' allDocs("folder")
 allDocs<-function (directory, SkiponError = FALSE,gen_pdf_tools=TRUE) {
   if(SkiponError==TRUE){
-    temp <- lapply(file.path(directory, list.files(directory)), 
+    temp <- lapply(file.path(directory, list.files(directory, recursive = TRUE, include.dirs = FALSE)), 
                    function(FILENAME) {
                      try(getTextR(FILENAME, gen_pdf_tools=gen_pdf_tools))
                    })
@@ -230,7 +231,7 @@ allDocs<-function (directory, SkiponError = FALSE,gen_pdf_tools=TRUE) {
     temp <- temp[lapply(temp,class)!="try-error"]
     do.call(c, temp)
   } else {
-    do.call(c, lapply(file.path(directory, list.files(directory)),getTextR))
+    do.call(c, lapply(file.path(directory, list.files(directory, recursive = TRUE, include.dirs = FALSE)),getTextR))
   }
 }
 #' Cleans documents performing many common tasks .

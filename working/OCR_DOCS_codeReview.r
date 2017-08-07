@@ -19,8 +19,14 @@ oldWD <- getwd()
 setwd(path)
 #build list of all PDFs at "path" and put that list in "listOfPDFs"
 listOfPDFs <- list.files(path,"\\.pdf")
- 
-outputPath <- toString(paste(path,"OCR_Results/",sep=""))
+
+#create the output folder and the source folder
+#outputPath <- toString(paste(path,"OCR_Results/",sep="")) This worked, but instead of putting the output in a new folder we're moving the sources away and keeping the output where the sources were
+outputpath <- toString(path)
+setwd(..)
+sourcePath <- toString(paste(getwd(),"OCR_Sources/", sep=""))
+setwd(path) #put the working directory back after creating the sources path.
+
 dir.create(outputPath)
 
 	for(eachPDFpath in listOfPDFs){
@@ -34,6 +40,7 @@ dir.create(outputPath)
 		else{print("Warning: OS is not windows, so remember that OCR_DOCs() function must be called with filenames and not paths on other OS's.")}
 		
 		#prep the output filename (remove the ".pdf" so as not to confuse later parts of texttools
+		fileName <- sapply(fileName,tolower)
 		outputFileName <- gsub(".pdf", "", fileName)
 		#prep a file connection to output the raw text
 		outputFile <- file(description=paste("rawText_",toString(outputFileName),".txt",sep=""), open="a", blocking=FALSE, encoding="", raw=FALSE, method="internal")
@@ -53,13 +60,16 @@ dir.create(outputPath)
 	
 			#save the raw text
 		
-			write(raw_text,outputFile)		
+			write(raw_text,outputFile)
 		}) #this is the end of the lapply function definition, so a ) looks odd here but belongs
 	close(outputFile)
+	#and move the source file out of the main directory to avoid showing two similar files to the next bit of code
+	file.copy(eachPDFpath, paste(sourcePath, fileName, sep = ""), copy.date = TRUE, copy.mode = TRUE)
+	file.remove(eachPDFpath)
 	}
 #Move all files except the PDFs to a new folder
-listOfFiles <- setdiff(list.files(path),listOfPDFs)
-file.copy(file.path(path, listOfFiles),outputPath)
+#listOfFiles <- setdiff(list.files(path),listOfPDFs)
+#file.copy(file.path(path, listOfFiles),outputPath)
 
 #return the working directory
 setwd(oldWD)

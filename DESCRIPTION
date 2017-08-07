@@ -1,20 +1,19 @@
 Package: epartexttools
 Title: Rapid Portfolio Review Toolkit
-Version: 0.1
+Version: 0.3
 Authors@R: c(person("Ryan", "Scott", email = "ryscott5@uw.edu",role = c("aut", "cre")),
+             person("Graham", "Andrews", email = "danielgandrews@gmail.com", role = c("aut", "cre")),
              person("Leigh", "Anderson", email = "epar@uw.edu",role = c("aut")),
              person("Travis", "Reynolds", email = "epar@uw.edu",role = c("aut")))
 Description: This tookit provides a set of resources for analyzing textual documents using the R programming language for the conduct of portfolio analysis and review. The tools rely on text mining, natural language processing, and machine learning programs developed by other R users and as such heavily relies on code developed by other packages. Thus, it may be thought of as a set of tools enabling portfolio analysis rather than a new package for conduct of text analysis
 Depends: R (>= 3.1.0)
 License: https://www.tldrlegal.com/l/mit
 LazyData: true
-Depends:
+Imports:
   plyr,
   dplyr,
   stringr,
   ggplot2,
-  tm
-Imports:
   methods,
   tm,
   ggplot2, 
@@ -30,7 +29,6 @@ Imports:
   DT,
   wordcloud,
   d3heatmap,
-  plyr,
   reshape2,
   dplyr,
   qdapTools,
@@ -62,7 +60,7 @@ Imports:
   tokenizers,
   textreg,
   pdftools
-RoxygenNote: 5.0.1.9000
+RoxygenNote: 6.0.1
 Suggests: 
   tm.plugin.mail,
   openNLPmodels.en,
