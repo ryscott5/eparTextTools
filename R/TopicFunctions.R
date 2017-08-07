@@ -113,12 +113,13 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=10){
 
 
 
-#'Process a corpus into a topic model ready object, but do so while using the Syntaxnet Parser rather than the openNLP parser.
+#'Process a corpus into a topic model ready object, but do so while using the syntaxnet or spacy Parser rather than the openNLP parser.
 #'
 #'  This function takes a corpus and creates a processed version of that corpus with entities removed for use in a topic model. Additionally it allows you to specify common entities to count across documents for use as a covariate in the topic model. The object it returns includes a frame of the text, an annotation object, a processed version of the corpus with stems and stopwords removed, and an out object which is the input object for fitting a topic model within the stm package.
 #' @param CORPUS_A Document corpus
 #' @param sample_num If sampling from documents, how many chunks to sample from each document? If 0, all chunks are kept.
 #' @param removeentities TRUE removes all proper nouns. FALSE keeps all proper nouns. "ONLY" will keep only proper nouns. This means you could fit a topic model to only proper nouns contained in documents
+#' @param spcy Defaults to true. Uses spacy to create a database.
 #' @param syntaxnet Defaults to true but if it is false, this skips annotating for NLP and goes directly to text processing. This might be useful if you dont care about limiting verb-phrases in later steps and want to fit a topic model to all documents.
 #' @param workingfolder folder where files are to be saved.
 #' @return SentFrame data frame with one row for each paragraph chunk
@@ -129,11 +130,7 @@ PreTopicFrame<-function(CORPUS_A,howmanyentities=10){
 #' @export
 #' @examples
 #' BASE_INPUT<-PreTopicFrame2(CORPUS_A,0,syntaxnet=F,workingfolder)
-PreTopicFrame2<-function(CORPUS_A,sample_num=0,syntaxnet=T,workingfolder,removeentities=T){
-  #CORPUS_A<-corpus1
-  #sample_num=0
-  #syntaxnet=T
-  #removeentities=T
+PreTopicFrame2<-function(CORPUS_A,sample_num=0,workingfolder,removeentities=T,dbexists=FALSE,spcy=T,syntaxnet=F){
   cstrings<-lapply(CORPUS_A,function(X) paste(NLP::content(X),collapse="\n\n"))
   pstrings<-lapply(cstrings,tokenizers::tokenize_sentences,simplify=T)
   pstrings<-dplyr::bind_rows(lapply(pstrings,function(X) data.frame("string"=X)),.id="Orig")
@@ -143,24 +140,33 @@ PreTopicFrame2<-function(CORPUS_A,sample_num=0,syntaxnet=T,workingfolder,removee
   row.names(dca)<-1:nrow(dca)
   fullorig<-merge(pstrings,dca,by.x="Orig")
   if(syntaxnet==T){
-    SQLtabSyntaxNET(fullorig,sample_num)
+    if(dbexists==FALSE){SQLtabSyntaxNET(fullorig,sample_num)}
     my_db<-src_sqlite(file.path(workingfolder,"textDB"),create=F)
     if(removeentities==T){
-      temptab<-ddply(collect(tbl(my_db, sql("SELECT Orig,Sent,V2 FROM nonprops")),n=Inf),.(Orig,Sent),text=paste(V2,collapse=" "),summarize)
+      temptab<-ddply(collect(tbl(my_db, sql("SELECT Orig,Sent,V2 FROM nonpropers")),n=Inf),.(Orig,Sent),text=paste(V2,collapse=" "),summarize)
     } else {if(removeentities=="ONLY"){temptab<-ddply(collect(tbl(my_db, sql("SELECT Orig,Sent,V2 FROM propers")),n=Inf),.(Orig,Sent),text=paste(V2,collapse=" "),summarize)}
       else {
         temptab<-ddply(collect(tbl(my_db, sql("SELECT Orig,Sent,V2 FROM fulltable")),n=Inf),.(Orig,Sent),text=paste(V2,collapse=" "),summarize)
       }}
     processed <-stm::textProcessor(temptab$text,metadata=select(merge(temptab,dca,by.x="Orig"),-text),sparselevel=1)                                         
     out <- stm::prepDocuments(processed$documents,processed$vocab,processed$meta,lower.thresh=4)
-  } else {
-    cat("WARNING: Skipping annotation annotation file will be empty")
-    processed <-stm::textProcessor(fullorig$string,metadata=select(fullorig,-string),sparselevel=1)                                         
-    out <- stm::prepDocuments(processed$documents,processed$vocab,processed$meta,lower.thresh=4)
+  } 
+  if(spcy==T){
+    dtmidf <- tm::DocumentTermMatrix(CORPUS_A, control = list(weighting = tm::weightTfIdf))
+    spcydb<-if(dbexists==F){
+      dplyr::src_sqlite(file.path(workingfolder,'spacyframe.db'),create=T)} else {dplyr::src_sqlite(file.path(workingfolder,'spacyframe.db'),create=F)}
+    spin<-spacyr::spacy_initialize()
+    spinout<-spacyr::spacy_parse(pstrings$string,dependency=T,named_entity=T,full_parse = TRUE)
+    spacyr::spacy_finalize()
+    spinout$Orig<-fullorig$Orig[as.numeric(gsub("text","",spinout$doc_id))]
+    dplyr::copy_to(spcydb,spinout,'parses_uw',temporary=F)
   }
+  processed <-stm::textProcessor(fullorig$string,metadata=select(fullorig,-string),sparselevel=1)                                     
+  out <- stm::prepDocuments(processed$documents,processed$vocab,processed$meta,lower.thresh=4)
   colnames(out$meta)<-gsub("\\W",".",colnames(out$meta))
-  list("SentFrame"=fullorig,"Annotations"="please call textDB to access","processed"=processed,"out"=out)
+  list("SentFrame"=fullorig,"Annotations"="please call textDB or spacyframe.db to access","processed"=processed,"out"=out)
 }
+
 
 
 #'Keep only those sentences with desired verbs.
@@ -236,23 +242,23 @@ writeFormulaforSTM<-function(BASE_INPUT,workingfolder){
 #'
 #' this function will create .R file in the working folder which it then will call, resulting in fitting an stm model within a seperate R session. The output should be viewable in an Rout file.
 #' @param workingfolder the workingfolder where you are saving objects.
+#' @param filename name of the preprocessed rds file from pretopicprocess.
 #' @return writes file and starts new r process in background
 #' @seealso \code{\link{stm}} 
 #' @export
 #' @examples
 #' runSTM("../Research.Grants")
-runSTM<-function(workingfolder){
-writeLines(text='
+runSTM<-function(workingfolder,filename){
+writeLines(text=paste('
 library(plyr)
 library(dplyr)
 library(stm)
 args = commandArgs(TRUE)
 workingfolder<-args[1]
-baseinput<-readRDS(file.path(workingfolder,"base_input1.rds"))
+baseinput<-readRDS(file.path(workingfolder,','"',filename,'"','))
   st1<-stm(baseinput$out$documents,baseinput$out$vocab,data=baseinput$out$meta,prevalence=eval(parse(text=readLines(file.path(workingfolder,"formula1.txt")))),K=0, init.type="Spectral",max.em.its=1000)
-saveRDS(st1, file.path(workingfolder,"topicmodel.rds"))',
-           con=file.path(workingfolder,"callstm.R"))
-  system(paste("R CMD BATCH --no-restore","'--args",paste(paste("'",workingfolder,"'",sep=""),"'",sep=""),file.path(".",workingfolder,"callstm.R"),sep=" "),wait=FALSE)}
+saveRDS(st1, file.path(workingfolder,"topicmodel.rds"))',sep=""),con=file.path(workingfolder,"callstm.R"))
+  system(paste("R CMD BATCH --no-restore ","'--args ",workingfolder,"' ",file.path(workingfolder,"callstm.R"),sep=""),wait=FALSE)}
 
 AnnotateVerbsByTopic<-function(MAXTOPS,WT,PROCESSED,OUT,ANNOTATELIST,SENTENCEFRAME){
   loadparsers()
