@@ -60,7 +60,7 @@ Second, check the output for any error that says a package might have failed to 
 
 Third, install that package manually using the line below with the correct package name added, then restart the process by running step 1.
 ```{r,eval=FALSE}
-devtools::install_github("PACKAGE_NAME", dependencies=TRUE)
+install.packages("PACKAGE_NAME", dependencies=TRUE)
 ```
 
 This can take several rounds of failed packages. So long as the errors are about a different package than before, keep at it! When there are no more errors, the packages have all been installed.
