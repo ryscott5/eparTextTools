@@ -48,15 +48,28 @@ Within each of the three (gender, adoption, and measurement), we demonstrate how
 #(http://htmlpreview.github.io/?https://raw.githubusercontent.com/ryscott5/eparTextTools/master/vignettes/GoogleDirections.html). -->
 
 The package, epartexttools, along with its dependencies, can be installed by using the following three-step process:
-First, try to install epartexttools with the following command:
+First, set your working directory.  I often use a new folder I create under "my documents" in windows, but others have had success using a folder in the EPAR shared server.
+
+For me, that command reads like this (replace everything in quotes with the complete path to your own):
+```{r,eval=FALSE}
+setwd("C:/Users/Graham/Documents/R/Git_Storage/eparTextTools")
+```
+
+Then you should start to install epartexttools with the following command:
 ```{r,eval=FALSE}
 devtools::install_github("ryscott5/epartexttools", dependencies=TRUE)
 ```
-Second, check the output for any error that says a package might have failed to install.  If the package is named PACKAGE_NAME then the error will look like:
+Second, check the output (right at the end) for any error that says a package might have failed to install.  If the package is named PACKAGE_NAME then the error will look like:
 
 ```{r,eval=FALSE}
 "Error in library(PACKAGE_NAME) : there is no package called ‘PACKAGE_NAME’" 
 ```
+or
+
+```{r,eval=FALSE}
+"Error: dependencies 'PACKAGE_NAME' and 'PACKAGE_NAME' are not available for package 'epartexttools""" 
+```
+I don't know exactly why it doesn't install all of the packages when it successfully covers so many, but it's normal to have a half dozen packages fail to install. What we do next is manually install the one that failed and start again.
 
 Third, install that package manually using the line below with the correct package name added, then restart the process by running step 1.
 ```{r,eval=FALSE}

@@ -65,9 +65,15 @@ getTextR<-function(fname,tika=FALSE,gen_pdf_tools=T,tikapath="tika-app-1.13.jar"
   if(tika==TRUE){
     pdoc<-system(command=paste("java -jar",tikapath,"-t",gsub(" ","\\ ",fname,fixed=TRUE)),intern=TRUE,wait=TRUE)
   } else {
-    pdoc<-if(stringr::str_detect(fname,".docx+$")==TRUE){read_docxtm(fname)} else {
-      if(stringr::str_detect(fname,".doc+$")==TRUE){tm::readDOC()(language="en",elem=list(uri=fname))} else {pdoc<-if(stringr::str_detect(fname, stringr::fixed(".pdf"))==TRUE){
-        if(gen_pdf_tools==F){readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")} else {readPDF2(engine="pdftools")(elem=list(uri=fname), language="en")}} else {if(stringr::str_detect(fname,stringr::fixed(".txt"))==TRUE){tm::readPlain(elem=list(uri=fname,content=iconv(enc2utf8(readLines(fname)), sub = "byte")),language="en")} else {"FILETYPE NA"}}}}}
+    pdoc<-if(stringr::str_detect(fname,".docx+$")==TRUE){read_docxtm(fname)} #if it's a docx, use read_docx
+    else {
+      if(stringr::str_detect(fname,".doc+$")==TRUE){tm::readDOC()(language="en",elem=list(uri=fname))} #if its a .doc, use readDOC
+      else {pdoc<-if(stringr::str_detect(fname, stringr::fixed(".pdf"))==TRUE){ #if it's a PDF, we choose from two
+        if(gen_pdf_tools==F){readPDF2(engine="xpdf")(elem=list(uri=fname), language="en")} #read pdf with the xpdf engine
+        else {readPDF2(engine="pdftools")(elem=list(uri=fname), language="en")}} #or read pdf with the pdftools engine
+      else {if(stringr::str_detect(fname,stringr::fixed(".txt"))==TRUE){ #if it's a raw text file
+        tm::readPlain(elem=list(uri=fname,content=iconv(enc2utf8(readLines(fname)), sub = "byte")),language="en")}
+        else {"getTextR: FILETYPE UNKNOWN"}}}}}
   pdoc
 }
 
@@ -211,7 +217,7 @@ how_do_i<-function(theproblem){
 #' Calls getTextR on all files in a directory joining into corpus. 
 #'
 #' @param directory Folder to read files from'
-#' @param onError if skip skip documents that read wrong.
+#' @param onError if skip, skip documents that read wrong.
 #' @param gen_pdf_tools if using a pc set to true. if on a unix server, setting to false will preserve pdf metadata.
 #' @return Corpus of text documents.
 #' @seealso \code{\link{corpus}} 
@@ -546,7 +552,7 @@ OCR_DOCS<-function(path){
   #create the output folder and the source folder
   #outputPath <- toString(paste(path,"OCR_Results/",sep="")) This worked, but instead of putting the output in a new folder we're moving the sources away and keeping the output where the sources were
   outputpath <- toString(path)
-  setwd(..)
+  setwd('..')
   sourcePath <- toString(paste(getwd(),"OCR_Sources/", sep=""))
   setwd(path) #put the working directory back after creating the sources path.
   

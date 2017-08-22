@@ -146,20 +146,20 @@ sentkeeper<-function(idframes,parsecnnl,database=T){
 #' @param parseconnll spacy parsed frame
 #' @param tmidf tfidf frame
 #' @param scydb db with spacy in it
-#' @description This command joins a parseconll an term matrix for a database.
+#' @description This command joins a parseconll and term matrix for a database.
 join_parse_tmidf<-function(parseconnll, scydb){
   left_join(parseconnll,tbl(scydb,"tfidf"),copy=T)
   copy_to(scydb,parseconnll,"merged_wcuts",temporary=T)
   tbl(scydb,"merged_wcuts")
 }
 
-#' Keep only sentences from relevant frames
+#' It makes a network graph of words. First part of list is a data frame showing connections, Second part I believe is an actual igraph object.
 #'
 #' @export
 #' @param parseconnll spacy parsed frame
 #' @param tmidf tfidf frame
 #' @param scydb db with spacy in it
-#' @description This command conversts
+#' @description This command makes a network graph of words from a spacy output frame.
 conligraph<-function(parseconll){
   spl<-lapply(unique(parseconll$doc_id),function(X) subset(parseconll, doc_id==X))
   library(igraph)
