@@ -1,7 +1,14 @@
 #==================
 #FindHiddenHTML
 #==================
-#We had a large set of HTML files that were all txt files.  This converts them to proper txt files.
+#We had a large set of HTML files that were all txt files.  This converts them to proper txt files. This parses the files and removes all HTML properly. Doing so by regex is much faster but prone to missing html bits and creating bugs.
+#' @param path A directory containing .txt files with some HTML in them we want removed
+#' @param moveOldFiles moves the source files to a newsource "HTML_Sources" directory *alongside* the folder designated by the path. This folder holds all the text files.  If this moveOldFiles is set to FALSE it will not move the files and they will be left where they are.
+#' @return A folder location containing the finished files
+#' @seealso \code{\link{tm.plugin.webmining::extractHTMLStrip}} 
+#' @export
+#' @examples
+#' outputFileLocation <- findHiddenHTML("C:/Users/Graham/Documents/EPAR/HTML_TXT_TestFiles")
 findHiddenHTML<-function(path, moveOldFiles=TRUE){
 
 #library 
@@ -12,7 +19,7 @@ oldWD <- getwd()
 #change working directory
 setwd(path)
 #build list of all PDFs at "path" and put that list in "listOfPDFs"
-listOfFiles <- list.files(path,"\\.txt")
+listOfFiles <- list.files(path,"\\.txt", recursive = TRUE, include.dirs = FALSE)
 #create the output folder
 
 outputPath <- toString(path)
@@ -33,7 +40,7 @@ for(eachFilePath in listOfFiles){
   fileName <- sapply(fileName,tolower)
   outputFileName <- gsub(".txt", "", fileName)  
   #prep a file connection to output the raw text
-  outputFile <- file(description=paste("rawText_",toString(outputFileName),".txt",sep=""), open="a", blocking=FALSE, encoding="", raw=FALSE, method="internal")
+  outputFile <- file(description=paste("noHTML_",toString(outputFileName),".txt",sep=""), open="a", blocking=FALSE, encoding="", raw=FALSE, method="internal")
   
   #open the file to read
   fileConnection = file(eachFilePath, "r")
@@ -70,9 +77,4 @@ closeAllConnections()
 return(outputPath)
 
 }
-findHiddenHTML("C:/Users/Graham/Documents/EPAR/HTML_TXT_TestFiles")
-"C:/Users/Graham/Documents/EPAR/HTML_TXT_TestFiles/0000318771-07-000004.txt"
-setwd('C:/Users/Graham/Documents/EPAR/HTML_TXT_TestFiles/')
 
-out <- tm.plugin.webmining::extractHTMLStrip('0000318771-07-000004.txt', asText=FALSE)
-C:/Users/Graham/Documents/EPAR/HTML_TXT_TestFiles/
