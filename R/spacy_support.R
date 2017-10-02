@@ -84,9 +84,12 @@ review_dtm_tfidf <- tm::DocumentTermMatrix(review_corpus, control = list(weighti
 
 
 #how to create wordtable data
-#wn<-dplyr::src_sqlite("~/sqlite2.db")
-#wordtable<-tbl(wn, "fnwords") %>% left_join(tbl(wn,"fnlexemes")) %>% left_join(tbl(wn, "fnlexunits")) %>% left_join(tbl(wn, "fnframes")) %>% select(.,word,frame,wordid,noccurs,lexunit,ludefinition,framedefinition) %>% collect(.) 
-
+wn<-dplyr::src_sqlite("~/sqlite2.db")
+library(plyr)
+library(dplyr)
+wordtable<-tbl(wn, "fnwords") %>% left_join(tbl(wn,"fnlexemes")) %>% left_join(tbl(wn, "fnlexunits")) %>% left_join(tbl(wn, "fnframes")) %>% select(.,word,frame,wordid,noccurs,lexunit,ludefinition,framedefinition) %>% collect(.) 
+save(wordtable,"~/wordtable.RData")
+?save
 
 frameselect<-function(word_input){
   temp<-filter(wordtable,word==word_input)
