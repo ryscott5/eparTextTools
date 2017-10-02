@@ -59,10 +59,10 @@ Imports:
   rmarkdown,
   tokenizers,
   textreg,
-  pdftools
-  tm.plugin.webmining
+  pdftools,
 RoxygenNote: 6.0.1
 Suggests: 
+  tm.plugin.webmining,
   tm.plugin.mail,
   openNLPmodels.en,
 VignetteBuilder: knitr
